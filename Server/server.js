@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const server = new WebSocket.Server({ port: 443 });
 
 server.on('connection', (client, req) => {
+    console.log(req);
     if (!req.userID) return client.close(401, 'Invalid User ID');
     client.userID = req.userID;
     client.send({
