@@ -21,5 +21,11 @@ namespace Union
         {
             Application.Exit();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ClientManager.Connect(textBox1.Text, textBox2.Text);
+            Close();
+        }
     }
 }

@@ -2,17 +2,45 @@ const WebSocket = require('ws');
 //const RethinkDB = require('rethinkdbdash');
 
 const server = new WebSocket.Server({ port: 443 });
+console.log('Listening!');
 
 server.on('connection', (client, req) => {
-    console.log(req);
-    if (!req.userID) return client.close(401, 'Invalid User ID');
-    client.userID = req.userID;
-    client.send({
-        op: OPCODES.DispatchServers,
-        d: users.find(u => u.id === client.userID).servers
-    });
-    client.on('message', handleIncomingData);
+    console.log('Client connecting...');
+    const auth = authenticate(client, req);
+    if (auth.authenticated) {
+        console.log('Client authenticated: ' + auth.userID);
+        client.userID = auth.userID;
+        client.send(JSON.stringify({
+            op: OPCODES.DispatchServers,
+            d: users.find(u => u.name === client.userID).servers
+        }));
+        client.on('message', handleIncomingData);
+    } else {
+        console.log('Client tried to connect but failed auth');
+        client.close(4001, 'Unauthorized: Invalid User ID');
+    }
 });
+
+function authenticate(client, req) {
+    const auth = { authenticated: false };
+
+    if (req.headers.authorization) {
+        const encryptedAuth = req.headers.authorization.split(' ')[1];
+        if (encryptedAuth) {
+            const decryptedAuth = Buffer.from(encryptedAuth, 'base64').toString();
+            console.log(decryptedAuth);
+            const [name, password] = decryptedAuth.split(':');
+
+            const user = users.find(u => u.name === name && u.password === password);
+            if (user) {
+                auth.authenticated = true;
+                auth.userID = name;
+            }
+        }
+    }
+
+    return auth;
+}
 
 function handleIncomingData(data) {
     const j = safeParse(data);
@@ -51,7 +79,8 @@ function handleIncomingData(data) {
 }
 
 function send(serverID, data) {
-    const clients = server.clients.filter(client => client.readyState === WebSocket.OPEN && users.find(u => u.id === client.userID).servers.includes(serverID));
+    const clients = server.clients
+        .filter(client => client.readyState === WebSocket.OPEN && users.find(u => u.name === client.userID).servers.includes(serverID));
 
     clients.forEach(client => client.send(data));
 }
@@ -74,8 +103,8 @@ const OPCODES = {
 
 const users = [
     {
-        id: 123456,
         name: 'Kromatic',
+        password: 'williamisgay2',
         servers: [12345]
     }
 ];
