@@ -5,19 +5,24 @@ const server = new WebSocket.Server({ port: 443 });
 console.log('Listening!');
 
 server.on('connection', (client, req) => {
-    console.log('Client connecting...');
     const auth = authenticate(client, req);
     if (auth.authenticated) {
-        console.log('Client authenticated: ' + auth.userID);
         client.userID = auth.userID;
+
+        client.send(JSON.stringify({
+            op: OPCODES.Hello,
+            d: null
+        }));
+
         client.send(JSON.stringify({
             op: OPCODES.DispatchServers,
             d: users.find(u => u.name === client.userID).servers
         }));
+
         client.on('message', handleIncomingData);
+        client.on('error', () => {});
     } else {
-        console.log('Client tried to connect but failed auth');
-        client.close(4001, 'Unauthorized: Invalid User ID');
+        client.close(4001, 'Unauthorized: Invalid Credentials');
     }
 });
 
@@ -28,7 +33,6 @@ function authenticate(client, req) {
         const encryptedAuth = req.headers.authorization.split(' ')[1];
         if (encryptedAuth) {
             const decryptedAuth = Buffer.from(encryptedAuth, 'base64').toString();
-            console.log(decryptedAuth);
             const [name, password] = decryptedAuth.split(':');
 
             const user = users.find(u => u.name === name && u.password === password);
@@ -94,11 +98,12 @@ function safeParse(data) {
 }
 
 const OPCODES = {
-    'DispatchJoin': 1,
-    'DispatchMessage': 2,
-    'DispatchServers': 3,
-    'Message': 4,
-    'JoinServer': 5
+    'Hello': 1,
+    'DispatchJoin': 2,
+    'DispatchMessage': 3,
+    'DispatchServers': 4,
+    'Message': 5,
+    'JoinServer': 6
 };
 
 const users = [

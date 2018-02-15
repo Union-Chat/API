@@ -16,8 +16,7 @@ namespace Union
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Form1 login = new Form1();
-            login.Show();
+            new Form1().Show();
 
             Application.Run();
         }
