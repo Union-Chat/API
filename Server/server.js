@@ -48,6 +48,7 @@ function authenticate(client, req) {
 
 function handleIncomingData(data) {
     const j = safeParse(data);
+    console.log(j);
 
     if (!j) return; // Invalid data received
 
@@ -61,6 +62,7 @@ function handleIncomingData(data) {
             const responseM = {
                 op: OPCODES.DispatchMessage,
                 d: {
+                    server: serverM,
                     m: message
                 }
             };
@@ -83,10 +85,20 @@ function handleIncomingData(data) {
 }
 
 function send(serverID, data) {
-    const clients = server.clients
-        .filter(client => client.readyState === WebSocket.OPEN && users.find(u => u.name === client.userID).servers.includes(serverID));
-
-    clients.forEach(client => client.send(data));
+    console.log('iterating')
+    console.log(server)
+    console.log(server.clients);
+    server.clients.forEach(client => {
+        console.log(client)
+        console.log(client.readyState)
+        console.log(WebSocket.OPEN)
+        console.log(users.find(u => u.name === client.userID))
+        if (client.readyState === WebSocket.OPEN) {
+            if (users.find(u => u.name === client.userID).servers.includes(serverID)) {
+                client.send(JSON.stringify(data));
+            }
+        }
+    });
 }
 
 function safeParse(data) {
