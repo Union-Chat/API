@@ -17,7 +17,14 @@ namespace Union
             InitializeComponent();
             Username.Text = author;
             Content.Text = content.Replace("\n", Environment.NewLine);
-
+            if (Username.Text == "SYSTEM")
+            {
+                this.Height = 50;
+                if (Content.Text.Contains(" is online"))
+                    Content.ForeColor = Color.LawnGreen;
+                else if (Content.Text.Contains(" is offline"))
+                    Content.ForeColor = Color.Orange;
+            }
             Dock = DockStyle.Bottom;
         }
     }
