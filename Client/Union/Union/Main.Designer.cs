@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.messages = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // panel1
@@ -39,24 +41,55 @@
             this.panel1.Size = new System.Drawing.Size(60, 518);
             this.panel1.TabIndex = 0;
             // 
+            // textBox1
+            // 
+            this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.textBox1.Enabled = false;
+            this.textBox1.Font = new System.Drawing.Font("Arial", 10F);
+            this.textBox1.ForeColor = System.Drawing.Color.White;
+            this.textBox1.Location = new System.Drawing.Point(60, 472);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(722, 46);
+            this.textBox1.TabIndex = 1;
+            this.textBox1.Text = "No server selected";
+            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
+            // 
+            // messages
+            // 
+            this.messages.AutoScroll = true;
+            this.messages.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messages.Location = new System.Drawing.Point(60, 0);
+            this.messages.Name = "messages";
+            this.messages.Size = new System.Drawing.Size(722, 472);
+            this.messages.TabIndex = 2;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.ClientSize = new System.Drawing.Size(782, 518);
+            this.Controls.Add(this.messages);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Main";
             this.ShowIcon = false;
             this.Text = "Union";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox textBox1;
+        public System.Windows.Forms.Panel messages;
     }
 }

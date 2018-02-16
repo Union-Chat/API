@@ -7,20 +7,19 @@ console.log('Listening!');
 server.on('connection', (client, req) => {
     const auth = authenticate(client, req);
     if (auth.authenticated) {
-        client.userID = auth.userID;
+        client.user = auth.user;
 
         client.send(JSON.stringify({
             op: OPCODES.Hello,
             d: null
         }));
 
-        client.send(JSON.stringify({
-            op: OPCODES.DispatchServers,
-            d: users.find(u => u.name === client.userID).servers
-        }));
-
-        client.on('message', handleIncomingData);
+        client.on('message', (data) => handleIncomingData(data, client));
         client.on('error', () => {});
+        client.on('close', () => dispatchLogoff(client));
+
+        dispatchServers(client);
+        dispatchLogon(client);
     } else {
         client.close(4001, 'Unauthorized: Invalid Credentials');
     }
@@ -38,7 +37,7 @@ function authenticate(client, req) {
             const user = users.find(u => u.name === name && u.password === password);
             if (user) {
                 auth.authenticated = true;
-                auth.userID = name;
+                auth.user = user;
             }
         }
     }
@@ -46,9 +45,55 @@ function authenticate(client, req) {
     return auth;
 }
 
-function handleIncomingData(data) {
+function dispatchServers(client) {
+    const dispatch = [];
+
+    for (const server of client.user.servers) {
+        const s = servers.find(s => s.id === server);
+        if (s)
+            dispatch.push(s);
+    }
+
+    client.send(JSON.stringify({
+        op: OPCODES.DispatchServers,
+        d: dispatch
+    }));
+}
+
+function dispatchLogon(client) {
+    const sysMsg = {
+        op: OPCODES.DispatchMessage,
+        d: {
+            message: {
+                content: `${client.user.name} has logged on`,
+                author: 'SYSTEM'
+            }
+        }
+    };
+    for (const server of client.user.servers) {
+        sysMsg.d.server = server;
+        send(server, sysMsg);
+    }
+}
+
+function dispatchLogoff(client) {
+    const sysMsg = {
+        op: OPCODES.DispatchMessage,
+        d: {
+            message: {
+                content: `${client.user.name} has logged off`,
+                author: 'SYSTEM'
+            }
+        }
+    };
+    for (const server of client.user.servers) {
+        sysMsg.d.server = server;
+        send(server, sysMsg);
+    }
+}
+
+function handleIncomingData(data, client) {
     const j = safeParse(data);
-    console.log(j);
 
     if (!j) return; // Invalid data received
 
@@ -56,47 +101,28 @@ function handleIncomingData(data) {
 
     switch(op) {
         case OPCODES.Message: // eslint-disable-line
-            const serverM = j.d.s;
-            const message = j.d.m;
+            const serverM = j.d.server;
+            const content = j.d.content;
 
             const responseM = {
                 op: OPCODES.DispatchMessage,
                 d: {
                     server: serverM,
-                    m: message
+                    message: {
+                        content,
+                        author: client.user.name
+                    }
                 }
             };
             send(serverM, responseM);
-
-            break;
-        case OPCODES.JoinServer: // eslint-disable-line
-            const serverJ = j.d.s;
-            const user = j.d.u;
-
-            const responseJ = {
-                op: OPCODES.DispatchJoin,
-                d: {
-                    u: user
-                }
-            };
-            send(serverJ, responseJ);
             break;
     }
 }
 
 function send(serverID, data) {
-    console.log('iterating')
-    console.log(server)
-    console.log(server.clients);
     server.clients.forEach(client => {
-        console.log(client)
-        console.log(client.readyState)
-        console.log(WebSocket.OPEN)
-        console.log(users.find(u => u.name === client.userID))
-        if (client.readyState === WebSocket.OPEN) {
-            if (users.find(u => u.name === client.userID).servers.includes(serverID)) {
-                client.send(JSON.stringify(data));
-            }
+        if (client.readyState === WebSocket.OPEN && client.user.servers.includes(serverID)) {
+            client.send(JSON.stringify(data));
         }
     });
 }
@@ -114,14 +140,22 @@ const OPCODES = {
     'DispatchJoin': 2,
     'DispatchMessage': 3,
     'DispatchServers': 4,
-    'Message': 5,
-    'JoinServer': 6
+    'DispatchPresence': 5,
+    'Message': 6,
+    'JoinServer': 7
 };
 
 const users = [
     {
-        name: 'Kromatic',
-        password: 'williamisgay2',
+        name: 'Guest',
+        password: '',
         servers: [12345]
+    },
+];
+
+const servers = [
+    {
+        id: 12345,
+        name: 'Default Server'
     }
 ];
