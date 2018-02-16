@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using WebSocketSharp;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Union
 {
@@ -21,7 +23,7 @@ namespace Union
             ws.OnMessage += OnMessage;
             ws.OnClose += OnClose;
             ws.SetCredentials(name, password, true);
-            ws.Connect();
+            ws.ConnectAsync();
         }
 
         public static List<Message> GetMessagesFor(int server)
@@ -30,6 +32,18 @@ namespace Union
             messageCache.TryGetValue(server, out temp);
 
             return temp;
+        }
+
+        public static void GetMembersFor(int server)
+        {
+            IWSMessage wsm = new IWSMessage()
+            {
+                op = (int)OPCODES.SyncMembers,
+                d = server
+            };
+
+            string compiled = JsonConvert.SerializeObject(wsm);
+            ws.Send(Encoding.ASCII.GetBytes(compiled));
         }
 
         public static void AddOrUpdate(int server, Message m)
@@ -88,9 +102,19 @@ namespace Union
                     AddOrUpdate(server, m);
 
                     if (client.selectedServer == server)
-                    {
                         client.messages.Invoke(new Action(() => client.messages.Controls.Add(m)));
-                    }
+                    break;
+
+                case OPCODES.DispatchPresence:
+                    JObject presenceData = (JObject)data.Property("d").Value;
+                    int userId = (int)presenceData.Property("user_id").Value;
+                    bool online = (bool)presenceData.Property("status").Value;
+                    client.UpdatePresence(userId, online);
+                    break;
+
+                case OPCODES.DispatchMembers:
+                    JArray members = (JArray)data.Property("d").Value;
+                    client.AddMembers(members);
                     break;
             }
            
@@ -98,13 +122,15 @@ namespace Union
 
         static void OnClose(Object sender, CloseEventArgs e)
         {
-            Log(LogLevel.INFO, $"Websocket closed with code {e.Code} and reason {e.Reason}");
-
-            Form f = Application.OpenForms.OfType<Form1>().First();
-            f.Invoke(new Action(() => f.Show()));
 
             ws.OnMessage -= OnMessage;
             ws.OnClose -= OnClose;
+
+            if (!e.WasClean)
+                MessageBox.Show($"WebSocket Closed: {e.Reason}");
+
+            Log(LogLevel.INFO, $"Websocket closed with code {e.Code} and reason {e.Reason}");
+
         }
 
         #endregion
@@ -126,6 +152,8 @@ namespace Union
             DispatchMessage,
             DispatchServers,
             DispatchPresence,
+            DispatchMembers,
+            SyncMembers,
             Message,
             JoinServer
         }

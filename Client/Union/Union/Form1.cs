@@ -36,13 +36,18 @@ namespace Union
         {
             ClientManager.Connect(textBox1.Text, textBox2.Text);
             textBox2.Clear();
-            Hide();
+            Dispose();
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == Convert.ToChar(Keys.Enter) && !ModifierKeys.HasFlag(Keys.Shift))
                 button1.PerformClick();
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            textBox1.Focus();
         }
     }
 }

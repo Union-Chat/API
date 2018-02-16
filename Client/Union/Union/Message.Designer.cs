@@ -35,7 +35,7 @@
             // Content
             // 
             this.Content.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Content.Font = new System.Drawing.Font("Open Sans", 8F);
+            this.Content.Font = new System.Drawing.Font("Verdana", 9F);
             this.Content.ForeColor = System.Drawing.Color.White;
             this.Content.Location = new System.Drawing.Point(0, 25);
             this.Content.Name = "Content";
@@ -43,6 +43,7 @@
             this.Content.Size = new System.Drawing.Size(315, 68);
             this.Content.TabIndex = 0;
             this.Content.Text = "Content";
+            this.Content.UseCompatibleTextRendering = true;
             // 
             // Username
             // 

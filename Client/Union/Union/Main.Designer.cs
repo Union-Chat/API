@@ -31,6 +31,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.messages = new System.Windows.Forms.Panel();
+            this.Members = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // panel1
@@ -47,12 +48,12 @@
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.textBox1.Enabled = false;
-            this.textBox1.Font = new System.Drawing.Font("Arial", 10F);
+            this.textBox1.Font = new System.Drawing.Font("Arial Unicode MS", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.ForeColor = System.Drawing.Color.White;
             this.textBox1.Location = new System.Drawing.Point(60, 472);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(722, 46);
+            this.textBox1.Size = new System.Drawing.Size(518, 46);
             this.textBox1.TabIndex = 1;
             this.textBox1.Text = "No server selected";
             this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
@@ -60,11 +61,22 @@
             // messages
             // 
             this.messages.AutoScroll = true;
+            this.messages.AutoScrollMinSize = new System.Drawing.Size(10, 10);
             this.messages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.messages.Location = new System.Drawing.Point(60, 0);
             this.messages.Name = "messages";
-            this.messages.Size = new System.Drawing.Size(722, 472);
+            this.messages.Size = new System.Drawing.Size(518, 472);
             this.messages.TabIndex = 2;
+            this.messages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.messages_ControlAdded);
+            // 
+            // Members
+            // 
+            this.Members.AutoScroll = true;
+            this.Members.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Members.Location = new System.Drawing.Point(578, 0);
+            this.Members.Name = "Members";
+            this.Members.Size = new System.Drawing.Size(204, 518);
+            this.Members.TabIndex = 3;
             // 
             // Main
             // 
@@ -74,6 +86,7 @@
             this.ClientSize = new System.Drawing.Size(782, 518);
             this.Controls.Add(this.messages);
             this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.Members);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -91,5 +104,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox textBox1;
         public System.Windows.Forms.Panel messages;
+        public System.Windows.Forms.Panel Members;
     }
 }

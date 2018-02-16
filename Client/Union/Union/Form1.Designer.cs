@@ -34,6 +34,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.ErrorReason = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
@@ -91,11 +92,21 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "Password:";
             // 
+            // ErrorReason
+            // 
+            this.ErrorReason.AutoSize = true;
+            this.ErrorReason.Location = new System.Drawing.Point(12, 99);
+            this.ErrorReason.Name = "ErrorReason";
+            this.ErrorReason.Size = new System.Drawing.Size(0, 13);
+            this.ErrorReason.TabIndex = 6;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(332, 129);
+            this.ClientSize = new System.Drawing.Size(328, 125);
+            this.ControlBox = false;
+            this.Controls.Add(this.ErrorReason);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.label1);
@@ -107,6 +118,7 @@
             this.Name = "Form1";
             this.ShowIcon = false;
             this.Text = "Login to Union";
+            this.Shown += new System.EventHandler(this.Form1_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -120,6 +132,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label2;
+        public System.Windows.Forms.Label ErrorReason;
     }
 }
 

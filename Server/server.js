@@ -14,12 +14,11 @@ server.on('connection', (client, req) => {
             d: null
         }));
 
+        dispatchServers(client);
+        updatePresence(client);
         client.on('message', (data) => handleIncomingData(data, client));
         client.on('error', () => {});
-        client.on('close', () => dispatchLogoff(client));
-
-        dispatchServers(client);
-        dispatchLogon(client);
+        client.on('close', () => updatePresence(client));
     } else {
         client.close(4001, 'Unauthorized: Invalid Credentials');
     }
@@ -45,6 +44,35 @@ function authenticate(client, req) {
     return auth;
 }
 
+function updatePresence(client) {
+    const { user } = client;
+    const sessions = filter(c => c.user.id === user.id, server.clients);
+
+    if (sessions.length === 0) {
+        dispatchLogoff(client);
+        user.online = false;
+        const presence = {
+            op: OPCODES.DispatchPresence,
+            d: {
+                user_id: client.user.id,
+                status: user.online
+            }
+        };
+        send(null, presence);
+    } else if (sessions.length === 1 && !user.online) {
+        dispatchLogon(client);
+        user.online = true;
+        const presence = {
+            op: OPCODES.DispatchPresence,
+            d: {
+                user_id: client.user.id,
+                status: user.online
+            }
+        };
+        send(null, presence);
+    }
+}
+
 function dispatchServers(client) {
     const dispatch = [];
 
@@ -65,7 +93,7 @@ function dispatchLogon(client) {
         op: OPCODES.DispatchMessage,
         d: {
             message: {
-                content: `${client.user.name} has logged on`,
+                content: `${client.user.name} is online`,
                 author: 'SYSTEM'
             }
         }
@@ -81,7 +109,7 @@ function dispatchLogoff(client) {
         op: OPCODES.DispatchMessage,
         d: {
             message: {
-                content: `${client.user.name} has logged off`,
+                content: `${client.user.name} is offline`,
                 author: 'SYSTEM'
             }
         }
@@ -116,14 +144,23 @@ function handleIncomingData(data, client) {
             };
             send(serverM, responseM);
             break;
+
+        case OPCODES.SyncMembers: //eslint-disable-line
+            const serverID = j.d;
+            const members = users.filter(u => u.servers.includes(serverID));
+            const responseSync = {
+                op: OPCODES.DispatchMembers,
+                d: members
+            };
+            client.send(JSON.stringify(responseSync));
+            break;
     }
 }
 
 function send(serverID, data) {
     server.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN && client.user.servers.includes(serverID)) {
+        if (client.readyState === WebSocket.OPEN && (!serverID || client.user.servers.includes(serverID)))
             client.send(JSON.stringify(data));
-        }
     });
 }
 
@@ -141,16 +178,20 @@ const OPCODES = {
     'DispatchMessage': 3,
     'DispatchServers': 4,
     'DispatchPresence': 5,
-    'Message': 6,
-    'JoinServer': 7
+    'DispatchMembers': 6,
+    'SyncMembers': 7,
+    'Message': 8,
+    'JoinServer': 9
 };
 
 const users = [
     {
-        name: 'Guest',
-        password: '',
-        servers: [12345]
-    },
+        id: 1,
+        name: 'Test',
+        password: 'test',
+        servers: [12345],
+        online: false
+    }
 ];
 
 const servers = [
@@ -159,3 +200,18 @@ const servers = [
         name: 'Default Server'
     }
 ];
+
+/*
+ * Patch-in functions
+ */
+
+function filter(expression, set) {
+    const results = [];
+
+    set.forEach(item => {
+        if (expression(item))
+            results.push(item);
+    });
+
+    return results;
+}

@@ -18,7 +18,7 @@ namespace Union
             Username.Text = author;
             Content.Text = content.Replace("\n", Environment.NewLine);
 
-            Dock = DockStyle.Top;
+            Dock = DockStyle.Bottom;
         }
     }
 }
