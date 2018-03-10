@@ -121,8 +121,8 @@ namespace Union
 
             Application.Exit();
 
-            //if (ClientManager.ws.IsAlive)
-                //ClientManager.ws.Close();
+            if (ClientManager.ws.IsAlive)
+                ClientManager.ws.Close();
             
         }
 

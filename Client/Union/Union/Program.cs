@@ -18,6 +18,7 @@ namespace Union
             Application.SetCompatibleTextRenderingDefault(false);
             ClientManager.CreateLogin();
             Application.Run();
+            ClientManager.WriteLog();
         }
     }
 }

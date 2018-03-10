@@ -21,7 +21,7 @@ namespace Union
         private void button2_Click(object sender, EventArgs e)
         {
             foreach (Form form in Application.OpenForms.Cast<Form>().ToList())
-                form.Dispose();
+                form.Invoke(new Action(() => form.Dispose()));
 
             if (ClientManager.ws.IsAlive)
                 ClientManager.ws.Close();

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
+using System.IO;
 
 namespace Union
 {
@@ -16,7 +17,8 @@ namespace Union
         public static Form1 login;
         public static Main client;
 
-        public static WebSocket ws = new WebSocket("ws://127.0.0.1:443");
+        private static TextWriter LogFile = File.AppendText("union-log.txt");
+        public static WebSocket ws = new WebSocket("ws://serux.pro:8080");
         public static Form currentForm;
         private static Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
 
@@ -47,6 +49,7 @@ namespace Union
         {
             ws.OnMessage += OnMessage;
             ws.OnClose += OnClose;
+            ws.OnError += OnError;
             ws.SetCredentials(name, password, true);
             ws.ConnectAsync();
         }
@@ -102,6 +105,13 @@ namespace Union
         static void Log(LogLevel level, Object content)
         {
             Console.WriteLine($"[{level.ToString()}] {content.ToString()}");
+            LogFile.WriteLine($"[{level.ToString()}] {content.ToString()}");
+        }
+
+        public static void WriteLog()
+        {
+            LogFile.Flush();
+            LogFile.Close();
         }
 
         #endregion
@@ -114,11 +124,13 @@ namespace Union
             int op = (int)data.Property("op").Value;
 
             OPCODES code = (OPCODES)Enum.Parse(typeof(OPCODES), op.ToString());
+            Log(LogLevel.INFO, $"Received message with opcode {code}");
 
             switch (code) {
                 case OPCODES.Heartbeat:
                     SendHeartbeat();
                     break;
+
                 case OPCODES.Hello:
                     CreateClient();
                     break;
@@ -147,7 +159,7 @@ namespace Union
                     JObject presenceData = (JObject)data.Property("d").Value;
                     int userId = (int)presenceData.Property("user_id").Value;
                     bool online = (bool)presenceData.Property("status").Value;
-                    //client.UpdatePresence(userId, online);
+                    client.UpdatePresence(userId, online);
                     break;
 
                 case OPCODES.DispatchMembers:
@@ -157,12 +169,18 @@ namespace Union
             }
         }
 
+        static void OnError(Object sender, WebSocketSharp.ErrorEventArgs error)
+        {
+            Log(LogLevel.ERROR, $"Websocket encountered an error: {error.Message}");
+        }
+
         static void OnClose(Object sender, CloseEventArgs e)
         {
             Log(LogLevel.INFO, $"Websocket closed; code: {e.Code}, reason: {e.Reason}");
 
             ws.OnMessage -= OnMessage;
             ws.OnClose -= OnClose;
+            ws.OnError -= OnError;
 
             CreateLogin(e.Reason);
         }
