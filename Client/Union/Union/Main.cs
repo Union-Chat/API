@@ -106,14 +106,16 @@ namespace Union
             panel1.Controls.Clear();
             messages.Controls.Clear();
             Members.Controls.Clear();
-            ClientManager.Purge();
+            ClientManager.PurgeMessageCache();
             selectedServer = 0;
 
             e.Cancel = true;
             Hide();
 
-            if (ClientManager.ws.IsAlive)
-                ClientManager.ws.Close();
+            Application.Exit();
+
+            //if (ClientManager.ws.IsAlive)
+                //ClientManager.ws.Close();
             
         }
 

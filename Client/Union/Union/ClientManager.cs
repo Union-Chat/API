@@ -58,7 +58,18 @@ namespace Union
             }
         }
 
-        public static void Purge()
+        public static void SendHeartbeat()
+        {
+            IWSMessage wsm = new IWSMessage()
+            {
+                op = (int)OPCODES.Heartbeat
+            };
+
+            string compiled = JsonConvert.SerializeObject(wsm);
+            ws.Send(Encoding.ASCII.GetBytes(compiled));
+        }
+
+        public static void PurgeMessageCache()
         {
             messageCache.Clear();
         }
@@ -80,14 +91,17 @@ namespace Union
             OPCODES code = (OPCODES)Enum.Parse(typeof(OPCODES), op.ToString());
 
             switch (code) {
+                case OPCODES.Heartbeat:
+                    SendHeartbeat();
+                    break;
                 case OPCODES.Hello:
-                    Form f = Application.OpenForms.OfType<Main>().First();
-                    f.Invoke(new Action(() => f.Show()));
+                    //Form f = Application.OpenForms.OfType<Main>().First();
+                    //f.Invoke(new Action(() => f.Show()));
                     break;
 
                 case OPCODES.DispatchServers:
                     JArray d = (JArray)data.Property("d").Value;
-                    client.AddServers(d);
+                    //client.AddServers(d);
                     break;
 
                 case OPCODES.DispatchMessage:
@@ -109,7 +123,7 @@ namespace Union
                     JObject presenceData = (JObject)data.Property("d").Value;
                     int userId = (int)presenceData.Property("user_id").Value;
                     bool online = (bool)presenceData.Property("status").Value;
-                    client.UpdatePresence(userId, online);
+                    //client.UpdatePresence(userId, online);
                     break;
 
                 case OPCODES.DispatchMembers:
@@ -117,20 +131,14 @@ namespace Union
                     client.AddMembers(members);
                     break;
             }
-           
         }
 
         static void OnClose(Object sender, CloseEventArgs e)
         {
-
             ws.OnMessage -= OnMessage;
             ws.OnClose -= OnClose;
 
-            if (!e.WasClean)
-                MessageBox.Show($"WebSocket Closed: {e.Reason}");
-
-            Log(LogLevel.INFO, $"Websocket closed with code {e.Code} and reason {e.Reason}");
-
+            Log(LogLevel.INFO, $"Websocket closed; code: {e.Code}, reason: {e.Reason}");
         }
 
         #endregion
@@ -146,7 +154,7 @@ namespace Union
 
         public enum OPCODES
         {
-            Unused,
+            Heartbeat,
             Hello,
             DispatchJoin,
             DispatchMessage,

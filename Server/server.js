@@ -1,13 +1,17 @@
 const WebSocket = require('ws');
 //const RethinkDB = require('rethinkdbdash');
 
-const server = new WebSocket.Server({ port: 443 });
-console.log('Listening!');
+const server = new WebSocket.Server({ port: 443 }, () => {
+    console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
+    setInterval(sweepClients, 10e3);
+});
 
 server.on('connection', (client, req) => {
     const auth = authenticate(client, req);
     if (auth.authenticated) {
         client.user = auth.user;
+        client.hasPinged = false;
+        client.lastHeartbeat = Date.now();
 
         client.send(JSON.stringify({
             op: OPCODES.Hello,
@@ -45,11 +49,11 @@ function authenticate(client, req) {
 }
 
 function updatePresence(client) {
+    console.log('presence updated')
     const { user } = client;
     const sessions = filter(c => c.user.id === user.id, server.clients);
 
     if (sessions.length === 0) {
-        dispatchLogoff(client);
         user.online = false;
         const presence = {
             op: OPCODES.DispatchPresence,
@@ -60,7 +64,6 @@ function updatePresence(client) {
         };
         send(null, presence);
     } else if (sessions.length === 1 && !user.online) {
-        dispatchLogon(client);
         user.online = true;
         const presence = {
             op: OPCODES.DispatchPresence,
@@ -74,50 +77,12 @@ function updatePresence(client) {
 }
 
 function dispatchServers(client) {
-    const dispatch = [];
-
-    for (const server of client.user.servers) {
-        const s = servers.find(s => s.id === server);
-        if (s)
-            dispatch.push(s);
-    }
+    const dispatch = client.user.servers.map(server => servers.find(s => s.id === server));
 
     client.send(JSON.stringify({
         op: OPCODES.DispatchServers,
         d: dispatch
     }));
-}
-
-function dispatchLogon(client) {
-    const sysMsg = {
-        op: OPCODES.DispatchMessage,
-        d: {
-            message: {
-                content: `${client.user.name} is online`,
-                author: 'SYSTEM'
-            }
-        }
-    };
-    for (const server of client.user.servers) {
-        sysMsg.d.server = server;
-        send(server, sysMsg);
-    }
-}
-
-function dispatchLogoff(client) {
-    const sysMsg = {
-        op: OPCODES.DispatchMessage,
-        d: {
-            message: {
-                content: `${client.user.name} is offline`,
-                author: 'SYSTEM'
-            }
-        }
-    };
-    for (const server of client.user.servers) {
-        sysMsg.d.server = server;
-        send(server, sysMsg);
-    }
 }
 
 function handleIncomingData(data, client) {
@@ -154,6 +119,13 @@ function handleIncomingData(data, client) {
             };
             client.send(JSON.stringify(responseSync));
             break;
+
+        case OPCODES.Heartbeat:
+            if (!client.hasPinged) {
+                client.hasPinged = true;
+                client.lastHeartbeat = Date.now();
+            }
+            break;
     }
 }
 
@@ -164,15 +136,24 @@ function send(serverID, data) {
     });
 }
 
-function safeParse(data) {
-    try {
-        return JSON.parse(data);
-    } catch (exception) {
-        return null;
-    }
+function sweepClients() {
+    const ping = JSON.stringify({ op: OPCODES.Heartbeat, d: null });
+    const clients = filter(ws => ws.readyState === WebSocket.OPEN && Date.now() - ws.lastHeartbeat >= 10e3, server.clients);
+
+    clients.forEach(client => client.send(ping));
+
+    setTimeout(() => {
+        clients.forEach(client => {
+            if (!client.hasPinged)
+                client.close(4002, 'Missed heartbeat')
+
+            client.hasPinged = false;
+        });
+    }, 10e3);
 }
 
 const OPCODES = {
+    'Heartbeat': 0,
     'Hello': 1,
     'DispatchJoin': 2,
     'DispatchMessage': 3,
@@ -207,11 +188,14 @@ const servers = [
 
 function filter(expression, set) {
     const results = [];
-
-    set.forEach(item => {
-        if (expression(item))
-            results.push(item);
-    });
-
+    set.forEach(item => expression(item) && results.push(item));
     return results;
+}
+
+function safeParse(data) {
+    try {
+        return JSON.parse(data);
+    } catch (exception) {
+        return null;
+    }
 }

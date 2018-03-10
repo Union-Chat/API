@@ -16,9 +16,6 @@ namespace Union
         public Form1()
         {
             InitializeComponent();
-            ClientManager.client = new Main();
-            ClientManager.client.Show();
-            ClientManager.client.Hide();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -36,7 +33,6 @@ namespace Union
         {
             ClientManager.Connect(textBox1.Text, textBox2.Text);
             textBox2.Clear();
-            Dispose();
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
