@@ -15,10 +15,22 @@ namespace Union
         public Message(String author, String content)
         {
             InitializeComponent();
+            String ct = content.Replace("\n", Environment.NewLine);
+
             Username.Text = author;
-            Content.Text = content.Replace("\n", Environment.NewLine);
+            Content.Text = ct;
 
             Dock = DockStyle.Bottom;
         }
+
+        private void Username_Paint(object sender, PaintEventArgs e)
+        {
+            using (Graphics g = CreateGraphics())
+            {
+                float height = g.MeasureString(Content.Text, Content.Font).Height + Username.Height + 20;
+                Height = (int)Math.Round(height);
+            }
+        }
     }
+
 }

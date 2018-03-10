@@ -3,7 +3,7 @@ const WebSocket = require('ws');
 
 const server = new WebSocket.Server({ port: 443 }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
-    setInterval(sweepClients, 10e3);
+    setInterval(sweepClients, 60e3);
 });
 
 server.on('connection', (client, req) => {
@@ -49,7 +49,6 @@ function authenticate(client, req) {
 }
 
 function updatePresence(client) {
-    console.log('presence updated')
     const { user } = client;
     const sessions = filter(c => c.user.id === user.id, server.clients);
 
@@ -77,7 +76,9 @@ function updatePresence(client) {
 }
 
 function dispatchServers(client) {
-    const dispatch = client.user.servers.map(server => servers.find(s => s.id === server));
+    const dispatch = client.user.servers
+        .filter(server => servers.find(s => s.id === server))
+        .map(server => servers.find(s => s.id === server));
 
     client.send(JSON.stringify({
         op: OPCODES.DispatchServers,
@@ -138,7 +139,7 @@ function send(serverID, data) {
 
 function sweepClients() {
     const ping = JSON.stringify({ op: OPCODES.Heartbeat, d: null });
-    const clients = filter(ws => ws.readyState === WebSocket.OPEN && Date.now() - ws.lastHeartbeat >= 10e3, server.clients);
+    const clients = filter(ws => ws.readyState === WebSocket.OPEN && Date.now() - ws.lastHeartbeat >= 60e3, server.clients);
 
     clients.forEach(client => client.send(ping));
 
@@ -170,15 +171,19 @@ const users = [
         id: 1,
         name: 'Test',
         password: 'test',
-        servers: [12345],
+        servers: [11111, 11112],
         online: false
     }
 ];
 
 const servers = [
     {
-        id: 12345,
+        id: 11111,
         name: 'Default Server'
+    },
+    {
+        id: 11112,
+        name: 'Test Server'
     }
 ];
 

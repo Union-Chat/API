@@ -31,7 +31,7 @@ namespace Union
                 {
                     Height = panel1.Width,
                     Dock = DockStyle.Top,
-                    BackColor = Color.FromArgb(45, 45, 45),
+                    BackColor = Color.FromArgb(50, 50, 50),
                     FlatStyle = FlatStyle.Flat
                 };
 
@@ -69,6 +69,7 @@ namespace Union
             if (selectedServer == (int)b.Tag)
                 return;
 
+            b.BackColor = Color.FromArgb(70, 70, 70);
             Text = $"Union - {b.Text}";
             selectedServer = (int)b.Tag;
 
@@ -81,6 +82,12 @@ namespace Union
 
             textBox1.Enabled = true;
             textBox1.Text = "Send a message...";
+
+            foreach (Button server in panel1.Controls)
+            {
+                if (server != b)
+                    server.BackColor = Color.FromArgb(50, 50, 50);
+            }
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)

@@ -7,14 +7,39 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Text;
+using System.Threading;
 
 namespace Union
 {
     public partial class ClientManager : Component
     {
-        public static WebSocket ws = new WebSocket("ws://127.0.0.1:443");
+        public static Form1 login;
         public static Main client;
+
+        public static WebSocket ws = new WebSocket("ws://127.0.0.1:443");
+        public static Form currentForm;
         private static Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
+
+        public static void CreateLogin(String errorMessage = "")
+        {
+            new Thread(() =>
+            {
+                login = new Form1();
+                login.Show();
+                login.ErrorReason.Text = errorMessage;
+                Application.Run(login);
+            }).Start();
+        }
+
+        public static void CreateClient()
+        {
+            new Thread(() =>
+            {
+                client = new Main();
+                client.Show();
+                Application.Run(client);
+            }).Start();
+        }
 
         #region Functions
 
@@ -95,13 +120,12 @@ namespace Union
                     SendHeartbeat();
                     break;
                 case OPCODES.Hello:
-                    //Form f = Application.OpenForms.OfType<Main>().First();
-                    //f.Invoke(new Action(() => f.Show()));
+                    CreateClient();
                     break;
 
                 case OPCODES.DispatchServers:
                     JArray d = (JArray)data.Property("d").Value;
-                    //client.AddServers(d);
+                    client.AddServers(d);
                     break;
 
                 case OPCODES.DispatchMessage:
@@ -135,10 +159,12 @@ namespace Union
 
         static void OnClose(Object sender, CloseEventArgs e)
         {
+            Log(LogLevel.INFO, $"Websocket closed; code: {e.Code}, reason: {e.Reason}");
+
             ws.OnMessage -= OnMessage;
             ws.OnClose -= OnClose;
 
-            Log(LogLevel.INFO, $"Websocket closed; code: {e.Code}, reason: {e.Reason}");
+            CreateLogin(e.Reason);
         }
 
         #endregion

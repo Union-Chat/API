@@ -56,6 +56,7 @@
             this.Username.Size = new System.Drawing.Size(315, 25);
             this.Username.TabIndex = 1;
             this.Username.Text = "Username";
+            this.Username.Paint += new System.Windows.Forms.PaintEventHandler(this.Username_Paint);
             // 
             // Message
             // 

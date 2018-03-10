@@ -33,6 +33,7 @@ namespace Union
         {
             ClientManager.Connect(textBox1.Text, textBox2.Text);
             textBox2.Clear();
+            Dispose();
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
