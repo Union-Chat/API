@@ -11,6 +11,7 @@
   "author": "Kromatic",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "ws": "^5.1.0"
   }
 }

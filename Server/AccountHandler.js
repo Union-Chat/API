@@ -11,9 +11,9 @@ const r = require('rethinkdbdash')({
  * @returns {boolean} Whether the account was created or not
  */
 async function create(username, password) { // eslint-disable-line
-    const accountExists = await r.table('users').get('username');
+    const account = await r.table('users').get(username);
 
-    if (accountExists !== null) {
+    if (account !== null) {
         return false;
     } else {
         await r.table('users').insert({
@@ -35,7 +35,7 @@ async function create(username, password) { // eslint-disable-line
  * @returns {boolean} Whether the authentication completed successfully
  */
 async function authenticate(username, password) { // eslint-disable-line
-    const account = await r.table('users').get('username');
+    const account = await r.table('users').get(username);
 
     if (account === null) {
         return false;
