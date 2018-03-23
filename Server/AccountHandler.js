@@ -32,7 +32,7 @@ async function create(username, password) { // eslint-disable-line
  *
  * @param {string} username The username of the account to check
  * @param {string} password The password of the account to check
- * @returns {boolean} Whether the authentication completed successfully
+ * @returns {(null|object)} The user object if authentication was successful, otherwise null
  */
 async function authenticate(username, password) { // eslint-disable-line
     const account = await r.table('users').get(username);
@@ -41,6 +41,15 @@ async function authenticate(username, password) { // eslint-disable-line
         return false;
     } else {
         const isPasswordValid = await compare(password, account.password);
-        return isPasswordValid;
+        if (isPasswordValid) {
+            return account;
+        } else {
+            return null;
+        }
     }
 }
+
+module.exports = {
+    create,
+    authenticate
+};

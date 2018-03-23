@@ -1,4 +1,7 @@
 const WebSocket = require('ws');
+const AccountHandler = require('./AccountHandler');
+const Dispatcher = require('./Dispatcher.js');
+
 //const RethinkDB = require('rethinkdbdash');
 
 const server = new WebSocket.Server({ port: 443 }, () => {
@@ -6,47 +9,30 @@ const server = new WebSocket.Server({ port: 443 }, () => {
     setInterval(sweepClients, 60e3);
 });
 
-server.on('connection', (client, req) => {
-    const auth = authenticate(client, req);
-    if (auth.authenticated) {
-        client.user = auth.user;
-        client.hasPinged = false;
-        client.lastHeartbeat = Date.now();
-
-        client.send(JSON.stringify({
-            op: OPCODES.Hello,
-            d: null
-        }));
-
-        dispatchServers(client);
-        updatePresence(client);
-        client.on('message', (data) => handleIncomingData(data, client));
-        client.on('error', () => {});
-        client.on('close', () => updatePresence(client));
+server.on('connection', async (client, req) => {
+    if (!req.headers.authorization) {
+        client.close(4001, 'Unauthorized: Invalid credentials');
     } else {
-        client.close(4001, 'Unauthorized: Invalid Credentials');
-    }
-});
+        const auth = req.headers.authorization.split(' ')[1];
+        const decrypted = Buffer.from(auth, 'base64').toString();
+        const [name, password] = decrypted.split(':');
+        const user = await AccountHandler.authenticate(name, password);
 
-function authenticate(client, req) {
-    const auth = { authenticated: false };
+        if (user === null) {
+            client.close(4001, 'Unauthorized: Invalid credentials');
+        } else {
+            client.on('message', (data) => handleIncomingData(data, client));
+            client.on('error', () => {});
+            client.on('close', () => updatePresence(client));
 
-    if (req.headers.authorization) {
-        const encryptedAuth = req.headers.authorization.split(' ')[1];
-        if (encryptedAuth) {
-            const decryptedAuth = Buffer.from(encryptedAuth, 'base64').toString();
-            const [name, password] = decryptedAuth.split(':');
+            client.user = user;
+            client.hasPinged = false;
+            client.lastHeartbeat = Date.now();
 
-            const user = users.find(u => u.name === name && u.password === password);
-            if (user) {
-                auth.authenticated = true;
-                auth.user = user;
-            }
+            Dispatcher.dispatchHello(client);
         }
     }
-
-    return auth;
-}
+});
 
 function updatePresence(client) {
     const { user } = client;
@@ -73,17 +59,6 @@ function updatePresence(client) {
         };
         send(null, presence);
     }
-}
-
-function dispatchServers(client) {
-    const dispatch = client.user.servers
-        .filter(server => servers.find(s => s.id === server))
-        .map(server => servers.find(s => s.id === server));
-
-    client.send(JSON.stringify({
-        op: OPCODES.DispatchServers,
-        d: dispatch
-    }));
 }
 
 function handleIncomingData(data, client) {
@@ -153,28 +128,6 @@ function sweepClients() {
     }, 10e3);
 }
 
-const OPCODES = {
-    'Heartbeat': 0,
-    'Hello': 1,
-    'DispatchJoin': 2,
-    'DispatchMessage': 3,
-    'DispatchServers': 4,
-    'DispatchPresence': 5,
-    'DispatchMembers': 6,
-    'SyncMembers': 7,
-    'Message': 8,
-    'JoinServer': 9
-};
-
-const users = [
-    {
-        id: 1,
-        name: 'Test',
-        password: 'test',
-        servers: [11111, 11112],
-        online: false
-    }
-];
 
 const servers = [
     {
