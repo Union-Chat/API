@@ -1,5 +1,45 @@
-const r = require('rethinkdbdash')
+const { hash, compare } = require('bcrypt');
+const r = require('rethinkdbdash')({
+    db: 'union'
+});
 
-function create(username, password) {
 
+/**
+ *
+ * @param {string} username The username of the account to create
+ * @param {string} password The password of the account to create
+ * @returns {boolean} Whether the account was created or not
+ */
+async function create(username, password) { // eslint-disable-line
+    const accountExists = await r.table('users').get('username');
+
+    if (accountExists !== null) {
+        return false;
+    } else {
+        await r.table('users').insert({
+            id: username,
+            password: await hash(password, 10),
+            createdAt: Date.now(),
+            servers: []
+        });
+
+        return true;
+    }
+}
+
+
+/**
+ *
+ * @param {string} username The username of the account to check
+ * @param {string} password The password of the account to check
+ * @returns {boolean} Whether the authentication completed successfully
+ */
+async function authenticate(username, password) { // eslint-disable-line
+    const account = await r.table('users').get('username');
+
+    if (account === null) {
+        return false;
+    } else {
+        return await compare(password, account.password);
+    }
 }

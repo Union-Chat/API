@@ -146,7 +146,7 @@ function sweepClients() {
     setTimeout(() => {
         clients.forEach(client => {
             if (!client.hasPinged)
-                client.close(4002, 'Missed heartbeat')
+                client.close(4002, 'Missed heartbeat');
 
             client.hasPinged = false;
         });
