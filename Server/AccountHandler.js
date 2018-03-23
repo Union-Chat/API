@@ -40,6 +40,7 @@ async function authenticate(username, password) { // eslint-disable-line
     if (account === null) {
         return false;
     } else {
-        return await compare(password, account.password);
+        const isPasswordValid = await compare(password, account.password);
+        return isPasswordValid;
     }
 }
