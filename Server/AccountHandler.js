@@ -20,7 +20,7 @@ async function create(username, password) {
             id: username,
             password: await hash(password, 10),
             createdAt: Date.now(),
-            servers: [],
+            servers: await getServers(), // Throw them in every server because why not
             online: false
         });
 
@@ -84,6 +84,12 @@ async function getServersOfUser(username) {
  */
 async function updatePresenceOf(username, online) {
     await r.table('users').get(username).update({ online })
+}
+
+
+async function getServers() {
+    const servers = await r.table('servers');
+    return servers.map(s => s.id);
 }
 
 
