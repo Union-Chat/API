@@ -1,6 +1,6 @@
 const OPCODES = require('./OpCodes.json');
 const { filter } = require('./Utils.js');
-const AccountHandler = require('./AccountHandler.js');
+const { authenticate } = require('./AccountHandler.js');
 const { dispatchHello, dispatchPresenceUpdate } = require('./Dispatcher.js');
 const { handleIncomingData } = require('./EventHandler.js');
 const WebSocket = require('ws');
@@ -17,7 +17,7 @@ server.on('connection', async (client, req) => {
         const auth = req.headers.authorization.split(' ')[1];
         const decrypted = Buffer.from(auth, 'base64').toString();
         const [name, password] = decrypted.split(':');
-        const user = await AccountHandler.authenticate(name, password);
+        const user = await authenticate(name, password);
 
         if (user === null) {
             client.close(4001, 'Unauthorized: Invalid credentials');
@@ -38,7 +38,7 @@ server.on('connection', async (client, req) => {
 
 function sweepClients() {
     const ping = JSON.stringify({ op: OPCODES.Heartbeat, d: null }); // TODO: Move this to dispatcher
-    const clients = filter(ws => ws.readyState === WebSocket.OPEN && Date.now() - ws.lastHeartbeat >= 60e3, server.clients);
+    const clients = filter(server.clients, ws => ws.readyState === WebSocket.OPEN && Date.now() - ws.lastHeartbeat >= 60e3);
 
     clients.forEach(client => client.send(ping));
 

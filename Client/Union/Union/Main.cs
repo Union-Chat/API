@@ -27,6 +27,7 @@ namespace Union
             Invoke(new Action(() => panel1.Controls.Clear()));
             foreach (JObject server in servers)
             {
+                //Console.WriteLine(server);
                 Button b = new Button()
                 {
                     Height = panel1.Width,

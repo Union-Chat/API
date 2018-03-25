@@ -60,8 +60,25 @@ async function getUsersInServer(serverId) {
     return inServer;
 }
 
+/**
+ * TODO: Description
+ * @param {String} username Username of the user to retrieve the servers of
+ */
+async function getServersOfUser(username) {
+    const user = await r.table('users').get(username);
+
+    if (!user) {
+        return []; // This shouldn't happen but you can never be too careful
+    }
+
+    const servers = await r.table('servers').getAll(...user.servers).coerceTo('array');
+    return servers;
+}
+
+
 module.exports = {
     create,
     authenticate,
-    getUsersInServer
+    getUsersInServer,
+    getServersOfUser
 };

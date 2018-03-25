@@ -1,9 +1,8 @@
 const OPCODES = require('./OpCodes.json');
 const { filter } = require('./Utils.js');
+const { getServersOfUser } = require('./AccountHandler.js');
 const WebSocket = require('ws');
-const r = require('rethinkdbdash')({
-    db: 'union'
-});
+
 
 
 /**
@@ -11,7 +10,7 @@ const r = require('rethinkdbdash')({
  * @param {WebSocket} client The client to dispatch to
  */
 async function dispatchHello(client) {
-    const servers = await r.table('servers').getAll(...client.user.servers).coerceTo('array');
+    const servers = await getServersOfUser(client.user.id)
     const payload = JSON.stringify({
         op: OPCODES.Hello,
         d: servers
@@ -73,7 +72,7 @@ function dispatchMembers(client, members) {
         op: OPCODES.DispatchMembers,
         d: members
     };
-    send(client, payload);
+    send([client], payload);
 }
 
 

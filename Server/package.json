@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^1.0.3",
+    "rethinkdbdash": "^2.3.31",
     "ws": "^5.1.0"
   }
 }

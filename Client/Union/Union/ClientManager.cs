@@ -18,7 +18,7 @@ namespace Union
         public static Main client;
 
         private static TextWriter LogFile = File.AppendText("union-log.txt");
-        public static WebSocket ws = new WebSocket("ws://serux.pro:8080");
+        public static WebSocket ws = new WebSocket("ws://127.0.0.1:443"); // ws://union.serux.pro:8080
         public static Form currentForm;
         private static Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
 
@@ -102,10 +102,15 @@ namespace Union
             messageCache.Clear();
         }
 
-        static void Log(LogLevel level, Object content)
+        static void Log(LogLevel level, Object content, params Object[] extra)
         {
-            Console.WriteLine($"[{level.ToString()}] {content.ToString()}");
-            LogFile.WriteLine($"[{level.ToString()}] {content.ToString()}");
+            String log = content.ToString() + "\n\t";
+            foreach (Object o in extra)
+            {
+                log += o.ToString() + "\n\t";
+            }
+            Console.WriteLine($"[{level.ToString()}] {log.Trim()}");
+            LogFile.WriteLine($"[{level.ToString()}] {log.Trim()}");
         }
 
         public static void WriteLog()
@@ -120,52 +125,60 @@ namespace Union
 
         static void OnMessage(Object sender, MessageEventArgs e)
         {
-            JObject data = JObject.Parse(e.Data);
-            int op = (int)data.Property("op").Value;
+            Log(LogLevel.INFO, e.Data);
 
-            OPCODES code = (OPCODES)Enum.Parse(typeof(OPCODES), op.ToString());
-            Log(LogLevel.INFO, $"Received message with opcode {code}");
+            try
+            {
+                JObject data = JObject.Parse(e.Data);
+                int op = (int)data.Property("op").Value;
 
-            switch (code) {
-                case OPCODES.Heartbeat:
-                    SendHeartbeat();
-                    break;
+                OPCODES code = (OPCODES)Enum.Parse(typeof(OPCODES), op.ToString());
+                Log(LogLevel.INFO, $"Received message with opcode {code}");
 
-                case OPCODES.Hello:
-                    CreateClient();
-                    break;
+                switch (code)
+                {
+                    case OPCODES.Heartbeat:
+                        SendHeartbeat();
+                        break;
 
-                case OPCODES.DispatchServers:
-                    JArray d = (JArray)data.Property("d").Value;
-                    client.AddServers(d);
-                    break;
+                    case OPCODES.Hello:
+                        CreateClient();
+                        JArray d = (JArray)data.Property("d").Value;
+                        Log(LogLevel.DEBUG, d);
+                        client.AddServers(d);
+                        break;
 
-                case OPCODES.DispatchMessage:
-                    JObject messageData = (JObject)data.Property("d").Value;
-                    JObject message = (JObject)messageData.Property("message").Value;
+                    case OPCODES.DispatchMessage:
+                        JObject messageData = (JObject)data.Property("d").Value;
+                        JObject message = (JObject)messageData.Property("message").Value;
 
-                    int server = (int)messageData.Property("server").Value;
-                    string content = message.Property("content").Value.ToString();
-                    string author = message.Property("author").Value.ToString();
+                        int server = (int)message.Property("server").Value;
+                        string content = message.Property("content").Value.ToString();
+                        string author = message.Property("author").Value.ToString();
 
-                    Message m = new Message(author, content);
-                    AddOrUpdate(server, m);
+                        Message m = new Message(author, content);
+                        AddOrUpdate(server, m);
 
-                    if (client.selectedServer == server)
-                        client.messages.Invoke(new Action(() => client.messages.Controls.Add(m)));
-                    break;
+                        if (client.selectedServer == server)
+                            client.messages.Invoke(new Action(() => client.messages.Controls.Add(m)));
+                        break;
 
-                case OPCODES.DispatchPresence:
-                    JObject presenceData = (JObject)data.Property("d").Value;
-                    int userId = (int)presenceData.Property("user_id").Value;
-                    bool online = (bool)presenceData.Property("status").Value;
-                    client.UpdatePresence(userId, online);
-                    break;
+                    case OPCODES.DispatchPresence:
+                        JObject presenceData = (JObject)data.Property("d").Value;
+                        int userId = (int)presenceData.Property("user_id").Value;
+                        bool online = (bool)presenceData.Property("status").Value;
+                        client.UpdatePresence(userId, online);
+                        break;
 
-                case OPCODES.DispatchMembers:
-                    JArray members = (JArray)data.Property("d").Value;
-                    client.AddMembers(members);
-                    break;
+                    case OPCODES.DispatchMembers:
+                        JArray members = (JArray)data.Property("d").Value;
+                        client.AddMembers(members);
+                        break;
+                }
+            }
+            catch (Exception err)
+            {
+                Log(LogLevel.ERROR, err.ToString());
             }
         }
 
@@ -202,7 +215,6 @@ namespace Union
             Hello,
             DispatchJoin,
             DispatchMessage,
-            DispatchServers,
             DispatchPresence,
             DispatchMembers,
             SyncMembers,
