@@ -1,3 +1,5 @@
+const OPCODES = require('./OpCodes.json');
+const { filter } = require('./Utils.js');
 const WebSocket = require('ws');
 const r = require('rethinkdbdash')({
     db: 'union'
@@ -8,7 +10,7 @@ const r = require('rethinkdbdash')({
  * Dispatch a HELLO payload to a client
  * @param {WebSocket} client The client to dispatch to
  */
-async function dispatchHello(client) { // eslint-disable-line
+async function dispatchHello(client) {
     const servers = await r.table('servers').getAll(...client.user.servers).coerceTo('array');
     const payload = JSON.stringify({
         op: OPCODES.Hello,
@@ -24,15 +26,17 @@ async function dispatchHello(client) { // eslint-disable-line
  * @param {WebSocket} client The client whose presence was updated
  * @param {Set<WebSocket>} clients The clients to dispatch the payload to
  */
-async function dispatchPresenceUpdate(client, clients) {
+function dispatchPresenceUpdate(client, clients) {
+    // TODO: Make this update in RethinkDB
+
     const { user } = client;
-    const sessions = clients.filter(ws => ws.user.id === user.id);
+    const sessions = filter(clients, ws => ws.user.id === user.id);
     const payload = {
         op: OPCODES.DispatchPresence,
         d: {
             user_id: user.id
         }
-    }
+    };
 
     if (sessions.length === 0) {
         user.online = false;
@@ -41,7 +45,35 @@ async function dispatchPresenceUpdate(client, clients) {
     }
 
     payload.d.status = user.online;
-    send(clients, data);
+    send(clients, payload);
+}
+
+
+/**
+ * Dispatches a user message to the provided clients
+ * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the message to
+ * @param {Object} message The message to send to the clients
+ */
+function dispatchMessage(clients, message) {
+    const payload = {
+        op: OPCODES.DispatchMessage,
+        d: message
+    };
+    send(clients, payload);
+}
+
+
+/**
+ * Dispatches a list of members to the given client
+ * @param {WebSocket} client The client to dispatch the members to
+ * @param {Array} members The list of members
+ */
+function dispatchMembers(client, members) {
+    const payload = {
+        op: OPCODES.DispatchMembers,
+        d: members
+    };
+    send(client, payload);
 }
 
 
@@ -50,7 +82,7 @@ async function dispatchPresenceUpdate(client, clients) {
  * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the payload to
  * @param {Object} payload The payload to send to the clients
  */
-async function send(clients, payload) {
+function send(clients, payload) {
     payload = JSON.stringify(payload);
     clients.forEach(ws => {
         if (ws.readyState === WebSocket.OPEN) {
@@ -60,24 +92,9 @@ async function send(clients, payload) {
 }
 
 
-const OPCODES = {
-    'Heartbeat': 0,
-    'Hello': 1,
-    'DispatchJoin': 2,
-    'DispatchMessage': 3,
-    'DispatchPresence': 4,
-    'DispatchMembers': 5,
-    'SyncMembers': 6,
-    'Message': 7,
-    'JoinServer': 8
+module.exports = {
+    dispatchHello,
+    dispatchPresenceUpdate,
+    dispatchMessage,
+    dispatchMembers
 };
-
-
-/* Polyfill */
-Object.assign(Set.prototype, 'filter', {
-    value(expression) {
-        const results = [];
-        this.forEach(item => expression(item) && results.push(item));
-        return results;
-    }
-});
