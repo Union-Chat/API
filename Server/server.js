@@ -1,12 +1,15 @@
 const OPCODES = require('./OpCodes.json');
 const { filter } = require('./Utils.js');
-const { authenticate } = require('./AccountHandler.js');
+const { authenticate, create } = require('./AccountHandler.js');
 const { dispatchHello, dispatchPresenceUpdate } = require('./Dispatcher.js');
 const { handleIncomingData } = require('./EventHandler.js');
 const WebSocket = require('ws');
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
 const server = new WebSocket.Server({ port: 443 }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
-    setInterval(sweepClients, 60e3);
+    //setInterval(sweepClients, 60e3);
 });
 
 
@@ -31,6 +34,7 @@ server.on('connection', async (client, req) => {
             client.lastHeartbeat = Date.now();
 
             dispatchHello(client);
+            dispatchPresenceUpdate(client, server.clients);
         }
     }
 });
@@ -51,3 +55,22 @@ function sweepClients() {
         });
     }, 10e3);
 }
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(`${__dirname}/views`));
+
+app.post('/create', async (req, res) => {
+    const { username, password } = req.body;
+    const created = await create(username, password);
+
+    if (created) {
+        return res.send('Account created! Login with the Union client.');
+    } else {
+        return res.send('Looks like that account exists, sad.');
+    }
+
+});
+
+app.listen(42069);

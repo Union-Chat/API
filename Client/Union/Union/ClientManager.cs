@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Union
 {
@@ -18,7 +19,7 @@ namespace Union
         public static Main client;
 
         private static TextWriter LogFile = File.AppendText("union-log.txt");
-        public static WebSocket ws = new WebSocket("ws://127.0.0.1:443"); // ws://union.serux.pro:8080
+        public static WebSocket ws = new WebSocket("ws://union.serux.pro:8080");
         public static Form currentForm;
         private static Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
 
@@ -123,17 +124,16 @@ namespace Union
 
         #region Events
 
-        static void OnMessage(Object sender, MessageEventArgs e)
+        async static void OnMessage(Object sender, MessageEventArgs e)
         {
-            Log(LogLevel.INFO, e.Data);
-
             try
             {
                 JObject data = JObject.Parse(e.Data);
                 int op = (int)data.Property("op").Value;
 
                 OPCODES code = (OPCODES)Enum.Parse(typeof(OPCODES), op.ToString());
-                Log(LogLevel.INFO, $"Received message with opcode {code}");
+                Log(LogLevel.DEBUG, $"Received message with opcode {op} ({code})");
+                Log(LogLevel.DEBUG, e.Data);
 
                 switch (code)
                 {
@@ -144,13 +144,13 @@ namespace Union
                     case OPCODES.Hello:
                         CreateClient();
                         JArray d = (JArray)data.Property("d").Value;
-                        Log(LogLevel.DEBUG, d);
+
+                        await Task.Delay(500); // Fuck off raceconditions
                         client.AddServers(d);
                         break;
 
                     case OPCODES.DispatchMessage:
-                        JObject messageData = (JObject)data.Property("d").Value;
-                        JObject message = (JObject)messageData.Property("message").Value;
+                        JObject message = (JObject)data.Property("d").Value;
 
                         int server = (int)message.Property("server").Value;
                         string content = message.Property("content").Value.ToString();
@@ -165,8 +165,10 @@ namespace Union
 
                     case OPCODES.DispatchPresence:
                         JObject presenceData = (JObject)data.Property("d").Value;
-                        int userId = (int)presenceData.Property("user_id").Value;
+                        string userId = presenceData.Property("id").Value.ToString();
                         bool online = (bool)presenceData.Property("status").Value;
+
+                        await Task.Delay(500); // Fuck off raceconditions
                         client.UpdatePresence(userId, online);
                         break;
 
@@ -194,6 +196,11 @@ namespace Union
             ws.OnMessage -= OnMessage;
             ws.OnClose -= OnClose;
             ws.OnError -= OnError;
+
+            if (client != null)
+            {
+                client.Invoke(new Action(() => client.Dispose()));
+            }
 
             CreateLogin(e.Reason);
         }

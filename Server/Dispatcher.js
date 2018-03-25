@@ -1,6 +1,6 @@
 const OPCODES = require('./OpCodes.json');
 const { filter } = require('./Utils.js');
-const { getServersOfUser } = require('./AccountHandler.js');
+const { getServersOfUser, updatePresenceOf } = require('./AccountHandler.js');
 const WebSocket = require('ws');
 
 
@@ -10,11 +10,11 @@ const WebSocket = require('ws');
  * @param {WebSocket} client The client to dispatch to
  */
 async function dispatchHello(client) {
-    const servers = await getServersOfUser(client.user.id)
-    const payload = JSON.stringify({
+    const servers = await getServersOfUser(client.user.id);
+    const payload = {
         op: OPCODES.Hello,
         d: servers
-    });
+    };
 
     send([client], payload);
 }
@@ -26,14 +26,12 @@ async function dispatchHello(client) {
  * @param {Set<WebSocket>} clients The clients to dispatch the payload to
  */
 function dispatchPresenceUpdate(client, clients) {
-    // TODO: Make this update in RethinkDB
-
     const { user } = client;
     const sessions = filter(clients, ws => ws.user.id === user.id);
     const payload = {
         op: OPCODES.DispatchPresence,
         d: {
-            user_id: user.id
+            id: user.id
         }
     };
 
@@ -44,6 +42,7 @@ function dispatchPresenceUpdate(client, clients) {
     }
 
     payload.d.status = user.online;
+    updatePresenceOf(user.id, user.online);
     send(clients, payload);
 }
 

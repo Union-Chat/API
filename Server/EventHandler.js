@@ -10,7 +10,7 @@ const { getUsersInServer } = require('./AccountHandler.js');
  * @param {String} data The data sent by the client
  * @param {Set<WebSocket>} clients The clients that payloads should be forwarded to if necessary
  */
-function handleIncomingData(client, data, clients) {
+async function handleIncomingData(client, data, clients) {
     data = safeParse(data);
     if (!data || !data.op) {
         return;
@@ -19,21 +19,20 @@ function handleIncomingData(client, data, clients) {
     if (data.op === OPCODES.Message) {
         const { server, content } = data.d;
 
-        if (!data.client.user.servers.includes(server) || content.trim().length === 0) {
+        if (!client.user.servers.includes(server) || content.trim().length === 0) {
             return;
         }
 
-        const recipients = filter(clients, ws => ws.user.servers.includes(server));
         const message = {
             server,
             content: content.trim(),
-            author: client.user.name
+            author: client.user.id
         };
 
+        const recipients = filter(clients, ws => ws.user.servers.includes(server));
         dispatchMessage(recipients, message);
     } else if (data.op === OPCODES.SyncMembers) {
-        const { server } = data.d;
-        const members = getUsersInServer(server);
+        const members = await getUsersInServer(data.d);
         dispatchMembers(client, members);
     } else if (data.op === OPCODES.Heartbeat) {
         if (!client.hasPinged) {

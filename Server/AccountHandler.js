@@ -20,7 +20,8 @@ async function create(username, password) {
             id: username,
             password: await hash(password, 10),
             createdAt: Date.now(),
-            servers: []
+            servers: [],
+            online: false
         });
 
         return true;
@@ -38,7 +39,7 @@ async function authenticate(username, password) {
     const account = await r.table('users').get(username);
 
     if (account === null) {
-        return false;
+        return null;
     } else {
         const isPasswordValid = await compare(password, account.password);
         if (isPasswordValid) {
@@ -76,9 +77,20 @@ async function getServersOfUser(username) {
 }
 
 
+/**
+ * Updates the online status of the given uesr
+ * @param {String} username Username of the user to update the presence of
+ * @param {Boolean} online Whether the user is online or not
+ */
+async function updatePresenceOf(username, online) {
+    await r.table('users').get(username).update({ online })
+}
+
+
 module.exports = {
     create,
     authenticate,
     getUsersInServer,
-    getServersOfUser
+    getServersOfUser,
+    updatePresenceOf
 };

@@ -27,7 +27,6 @@ namespace Union
             Invoke(new Action(() => panel1.Controls.Clear()));
             foreach (JObject server in servers)
             {
-                //Console.WriteLine(server);
                 Button b = new Button()
                 {
                     Height = panel1.Width,
@@ -51,14 +50,14 @@ namespace Union
             Invoke(new Action(() => Members.Controls.Clear()));
             foreach (JObject member in members)
             {
-                Member m = new Member((int)member.Property("id").Value, member.Property("name").Value.ToString(), (bool)member.Property("online").Value);
+                Member m = new Member(member.Property("id").Value.ToString(), (bool)member.Property("online").Value);
                 Invoke(new Action(() => Members.Controls.Add(m))); 
             }
         }
 
-        public void UpdatePresence(int userId, bool online)
+        public void UpdatePresence(string userId, bool online)
         {
-            Member m = Members.Controls.OfType<Member>().FirstOrDefault(member => member.id == userId);
+            Member m = Members.Controls.OfType<Member>().FirstOrDefault(member => member.id.Equals(userId));
             if (m != null)
                 m.setPresence(online);
         }

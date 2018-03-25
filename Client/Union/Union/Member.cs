@@ -14,16 +14,14 @@ namespace Union
     {
 
         public bool online = false;
-        public string name = "";
-        public int id = 0;
+        public string id = "";
 
-        public Member(int id, string name, bool online)
+        public Member(string id, bool online)
         {
             InitializeComponent();
 
             this.online = online;
-            this.id = id;
-            label1.Text = this.name = name;
+            label1.Text = this.id = id;
 
             setPresence(online);
             Dock = DockStyle.Top;
