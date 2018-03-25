@@ -1,13 +1,11 @@
 const WebSocket = require('ws');
 const AccountHandler = require('./AccountHandler');
 const Dispatcher = require('./Dispatcher.js');
-
-//const RethinkDB = require('rethinkdbdash');
-
 const server = new WebSocket.Server({ port: 443 }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
     setInterval(sweepClients, 60e3);
 });
+
 
 server.on('connection', async (client, req) => {
     if (!req.headers.authorization) {
@@ -33,33 +31,6 @@ server.on('connection', async (client, req) => {
         }
     }
 });
-
-function updatePresence(client) {
-    const { user } = client;
-    const sessions = filter(c => c.user.id === user.id, server.clients);
-
-    if (sessions.length === 0) {
-        user.online = false;
-        const presence = {
-            op: OPCODES.DispatchPresence,
-            d: {
-                user_id: client.user.id,
-                status: user.online
-            }
-        };
-        send(null, presence);
-    } else if (sessions.length === 1 && !user.online) {
-        user.online = true;
-        const presence = {
-            op: OPCODES.DispatchPresence,
-            d: {
-                user_id: client.user.id,
-                status: user.online
-            }
-        };
-        send(null, presence);
-    }
-}
 
 function handleIncomingData(data, client) {
     const j = safeParse(data);
@@ -105,13 +76,6 @@ function handleIncomingData(data, client) {
     }
 }
 
-function send(serverID, data) {
-    server.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN && (!serverID || client.user.servers.includes(serverID)))
-            client.send(JSON.stringify(data));
-    });
-}
-
 function sweepClients() {
     const ping = JSON.stringify({ op: OPCODES.Heartbeat, d: null });
     const clients = filter(ws => ws.readyState === WebSocket.OPEN && Date.now() - ws.lastHeartbeat >= 60e3, server.clients);
@@ -128,27 +92,10 @@ function sweepClients() {
     }, 10e3);
 }
 
-
-const servers = [
-    {
-        id: 11111,
-        name: 'Default Server'
-    },
-    {
-        id: 11112,
-        name: 'Test Server'
-    }
-];
-
 /*
  * Patch-in functions
  */
 
-function filter(expression, set) {
-    const results = [];
-    set.forEach(item => expression(item) && results.push(item));
-    return results;
-}
 
 function safeParse(data) {
     try {
