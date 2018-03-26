@@ -53,7 +53,7 @@ namespace Union
                 new KeyValuePair<string, string>("authorization", $"Basic {b64Encoded}")
             };
 
-            ws = new WebSocket("ws://127.0.0.1:443", customHeaderItems: headers); //union.serux.pro:2082
+            ws = new WebSocket("ws://union.serux.pro:2082", customHeaderItems: headers);
             ws.Closed += OnClose;
             ws.Error += OnError;
             ws.MessageReceived += OnMessage;
@@ -129,7 +129,7 @@ namespace Union
 
         #region Events
 
-        static void OnMessage(Object sender,  EventArgs eventArgs)
+        async static void OnMessage(Object sender,  EventArgs eventArgs)
         {
             MessageReceivedEventArgs e = (MessageReceivedEventArgs)eventArgs;
             try
@@ -150,6 +150,7 @@ namespace Union
                         CreateClient();
                         JArray d = (JArray)data.Property("d").Value;
 
+                        await Task.Delay(300);
                         client?.AddServers(d);
                         break;
 

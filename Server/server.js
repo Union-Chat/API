@@ -26,28 +26,28 @@ const server = new WebSocket.Server({ port: 443 }, () => {
 
 server.on('connection', async (client, req) => {
     if (!req.headers.authorization) {
-        client.close(4001, 'Unauthorized: Invalid credentials');
-    } else {
-        const auth = req.headers.authorization.split(' ')[1];
-        const decrypted = Buffer.from(auth, 'base64').toString();
-        const [name, password] = decrypted.split(':');
-        const user = await authenticate(name, password);
-
-        if (user === null) {
-            client.close(4001, 'Unauthorized: Invalid credentials');
-        } else {
-            client.on('message', (data) => handleIncomingData(client, data, server.clients));
-            client.on('error', () => {});
-            client.on('close', () => dispatchPresenceUpdate(client, server.clients));
-            client.on('pong', () => client.isAlive = true);
-
-            client.user = user;
-            client.isAlive = true;
-
-            await dispatchHello(client);
-            await dispatchPresenceUpdate(client, server.clients);
-        }
+        return client.close(4001, 'Unauthorized: Invalid credentials');
     }
+
+    const auth = req.headers.authorization.split(' ')[1];
+    const decrypted = Buffer.from(auth, 'base64').toString();
+    const [name, password] = decrypted.split(':');
+    const user = await authenticate(name, password);
+
+    if (user === null) {
+        return client.close(4001, 'Unauthorized: Invalid credentials');
+    }
+
+    client.on('message', (data) => handleIncomingData(client, data, server.clients));
+    client.on('error', () => {});
+    client.on('close', () => dispatchPresenceUpdate(client, server.clients));
+    client.on('pong', () => client.isAlive = true);
+
+    client.user = user;
+    client.isAlive = true;
+
+    await dispatchHello(client);
+    await dispatchPresenceUpdate(client, server.clients);
 });
 
 
