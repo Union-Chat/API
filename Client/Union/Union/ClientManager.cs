@@ -129,7 +129,7 @@ namespace Union
 
         #region Events
 
-        async static void OnMessage(Object sender,  EventArgs eventArgs)
+        static void OnMessage(Object sender,  EventArgs eventArgs)
         {
             MessageReceivedEventArgs e = (MessageReceivedEventArgs)eventArgs;
             try
@@ -150,7 +150,6 @@ namespace Union
                         CreateClient();
                         JArray d = (JArray)data.Property("d").Value;
 
-                        await Task.Delay(500); // Fuck off raceconditions
                         client?.AddServers(d);
                         break;
 
@@ -173,7 +172,6 @@ namespace Union
                         string userId = presenceData.Property("id").Value.ToString();
                         bool online = (bool)presenceData.Property("status").Value;
 
-                        await Task.Delay(500); // Fuck off raceconditions
                         client?.UpdatePresence(userId, online);
                         break;
 
@@ -196,16 +194,22 @@ namespace Union
 
         static void OnClose(Object sender, EventArgs eventArgs)
         {
-            ClosedEventArgs e = (ClosedEventArgs)eventArgs;
-            
-            Log(LogLevel.INFO, $"Websocket closed - code: {e.Code}, reason: {e.Reason}");
             ws.MessageReceived -= OnMessage;
             ws.Error -= OnError;
             ws.Closed -= OnClose;
 
-            client?.Invoke(new Action(() => client.Dispose()));
+            string closeReason = "";
 
-            CreateLogin(e.Reason);
+            if (eventArgs.GetType().Equals(typeof(ClosedEventArgs)))
+            {
+                ClosedEventArgs e = (ClosedEventArgs)eventArgs;
+                Log(LogLevel.INFO, $"Websocket closed - code: {e.Code}, reason: {e.Reason}");
+                closeReason = e.Reason;
+            }
+
+            client?.Invoke(new Action(() => client.Dispose()));
+            CreateLogin(closeReason);
+
         }
 
         #endregion
