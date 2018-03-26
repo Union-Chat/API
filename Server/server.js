@@ -1,15 +1,26 @@
+/* Server middleware */
 const OPCODES = require('./OpCodes.json');
 const { filter } = require('./Utils.js');
 const { authenticate, create } = require('./AccountHandler.js');
 const { dispatchHello, dispatchPresenceUpdate } = require('./Dispatcher.js');
 const { handleIncomingData } = require('./EventHandler.js');
+
+/* Server */
 const WebSocket = require('ws');
 const express = require('express');
 const bodyParser = require('body-parser');
+
+/* Apps */
 const app = express();
 const server = new WebSocket.Server({ port: 443 }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
-    setInterval(sweepClients, 60e3);
+    setInterval(() => {
+        server.clients.forEach(ws => {
+            if (!ws.isAlive) return ws.terminate();
+            ws.isAlive = false;
+            ws.ping();
+        });
+    }, 60e3);
 });
 
 
@@ -38,18 +49,6 @@ server.on('connection', async (client, req) => {
         }
     }
 });
-
-
-function sweepClients() {
-    server.clients.forEach(ws => {
-        if (!ws.isAlive) {
-            return ws.terminate();
-        } else {
-            ws.isAlive = false;
-            ws.ping();
-        }
-    });
-}
 
 
 app.use(bodyParser.json());
