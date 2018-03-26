@@ -1,15 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows.Forms;
-using WebSocketSharp;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.Text;
 using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
+using WebSocket4Net;
+using System.Text;
 
 namespace Union
 {
@@ -19,7 +18,7 @@ namespace Union
         public static Main client;
 
         private static TextWriter LogFile = File.AppendText("union-log.txt");
-        public static WebSocket ws = new WebSocket("ws://union.serux.pro:8080");
+        public static WebSocket ws;
         public static Form currentForm;
         private static Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
 
@@ -48,11 +47,17 @@ namespace Union
 
         public static void Connect(String name, String password)
         {
-            ws.OnMessage += OnMessage;
-            ws.OnClose += OnClose;
-            ws.OnError += OnError;
-            ws.SetCredentials(name, password, true);
-            ws.ConnectAsync();
+            string b64Encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{name}:{password}"));
+            List<KeyValuePair<string, string>> headers = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("authorization", $"Basic {b64Encoded}")
+            };
+
+            ws = new WebSocket("ws://union.serux.pro:2082", customHeaderItems: headers);
+            ws.Closed += OnClose;
+            ws.Error += OnError;
+            ws.MessageReceived += OnMessage;
+            ws.Open();
         }
 
         public static List<Message> GetMessagesFor(int server)
@@ -72,7 +77,7 @@ namespace Union
             };
 
             string compiled = JsonConvert.SerializeObject(wsm);
-            ws.Send(Encoding.ASCII.GetBytes(compiled));
+            ws.Send(compiled);
         }
 
         public static void AddOrUpdate(int server, Message m)
@@ -95,7 +100,7 @@ namespace Union
             };
 
             string compiled = JsonConvert.SerializeObject(wsm);
-            ws.Send(Encoding.ASCII.GetBytes(compiled));
+            ws.Send(compiled);
         }
 
         public static void PurgeMessageCache()
@@ -124,16 +129,18 @@ namespace Union
 
         #region Events
 
-        async static void OnMessage(Object sender, MessageEventArgs e)
+        async static void OnMessage(Object sender,  EventArgs eventArgs)
         {
+            MessageReceivedEventArgs e = (MessageReceivedEventArgs)eventArgs;
+            Log(LogLevel.DEBUG, e.Message);
             try
             {
-                JObject data = JObject.Parse(e.Data);
+                JObject data = JObject.Parse(e.Message);
                 int op = (int)data.Property("op").Value;
 
                 OPCODES code = (OPCODES)Enum.Parse(typeof(OPCODES), op.ToString());
                 Log(LogLevel.DEBUG, $"Received message with opcode {op} ({code})");
-                Log(LogLevel.DEBUG, e.Data);
+                Log(LogLevel.DEBUG, e.Message);
 
                 switch (code)
                 {
@@ -184,18 +191,19 @@ namespace Union
             }
         }
 
-        static void OnError(Object sender, WebSocketSharp.ErrorEventArgs error)
+        static void OnError(Object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
         {
-            Log(LogLevel.ERROR, $"Websocket encountered an error: {error.Message}");
+            Log(LogLevel.ERROR, $"Websocket encountered an exception", e.Exception);
         }
 
-        static void OnClose(Object sender, CloseEventArgs e)
+        static void OnClose(Object sender, EventArgs eventArgs)
         {
-            Log(LogLevel.INFO, $"Websocket closed; code: {e.Code}, reason: {e.Reason}");
-
-            ws.OnMessage -= OnMessage;
-            ws.OnClose -= OnClose;
-            ws.OnError -= OnError;
+            ClosedEventArgs e = (ClosedEventArgs)eventArgs;
+            
+            Log(LogLevel.INFO, $"Websocket closed - code: {e.Code}, reason: {e.Reason}");
+            ws.MessageReceived -= OnMessage;
+            ws.Closed -= OnClose;
+            ws.Error -= OnError;
 
             if (client != null)
             {

@@ -23,7 +23,7 @@ namespace Union
             foreach (Form form in Application.OpenForms.Cast<Form>().ToList())
                 form.Invoke(new Action(() => form.Dispose()));
 
-            if (ClientManager.ws.IsAlive)
+            //if (ClientManager.ws.IsAlive)
                 ClientManager.ws.Close();
 
             Application.Exit();
