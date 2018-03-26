@@ -23,21 +23,10 @@ namespace Union
             Invoke(new Action(() => panel1.Controls.Clear()));
             foreach (JObject server in servers)
             {
-                Button b = new Button()
-                {
-                    Height = panel1.Width,
-                    Dock = DockStyle.Top,
-                    BackColor = Color.FromArgb(50, 50, 50),
-                    FlatStyle = FlatStyle.Flat
-                };
+                Server s = new Server(server.Property("name").Value.ToString(), (int)server.Property("id").Value, panel1.Width);
+                s.MouseClick += OnServerSwitch;
 
-                b.FlatAppearance.BorderSize = 0;
-                b.Tag = (int)server.Property("id").Value;
-                b.Text = server.Property("name").Value.ToString();
-                b.ForeColor = Color.White;
-                b.MouseClick += OnServerSwitch;
-
-                Invoke(new Action(() => panel1.Controls.Add(b)));
+                Invoke(new Action(() => panel1.Controls.Add(s)));
             }
         }
 
@@ -60,14 +49,14 @@ namespace Union
 
         private void OnServerSwitch(Object sender, MouseEventArgs e)
         {
-            Button b = (Button)sender;
+            Server s = (Server)sender;
 
-            if (selectedServer == (int)b.Tag)
+            if (selectedServer == s.Id)
                 return;
 
-            b.BackColor = Color.FromArgb(70, 70, 70);
-            Text = $"Union - {b.Text}";
-            selectedServer = (int)b.Tag;
+            s.BackColor = Color.FromArgb(60, 60, 60);
+            Text = $"Union - {s.FullName}";
+            selectedServer = s.Id;
 
             messages.Controls.Clear();
             List<Message> msgs = ClientManager.GetMessagesFor(selectedServer);
@@ -77,11 +66,10 @@ namespace Union
             ClientManager.GetMembersFor(selectedServer);
 
             textBox1.Enabled = true;
-            textBox1.Text = "Send a message...";
 
-            foreach (Button server in panel1.Controls)
+            foreach (Server server in panel1.Controls)
             {
-                if (server != b)
+                if (server != s)
                     server.BackColor = Color.FromArgb(50, 50, 50);
             }
         }
