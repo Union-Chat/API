@@ -56,7 +56,7 @@ async function authenticate(username, password) {
  * @param {Number} serverId The user to get the servers of
  */
 async function getUsersInServer(serverId) {
-    const users = await r.table('users');
+    const users = await r.table('users').without('password');
     const inServer = users.filter(user => user.servers.includes(serverId));
     return inServer;
 }
