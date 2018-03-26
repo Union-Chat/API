@@ -210,6 +210,9 @@ namespace Union
                 ClosedEventArgs e = (ClosedEventArgs)eventArgs;
                 Log(LogLevel.INFO, $"Websocket closed - code: {e.Code}, reason: {e.Reason}");
                 closeReason = e.Reason;
+            } else
+            {
+                Log(LogLevel.INFO, "Websocket closed");
             }
 
             client?.Invoke(new Action(() => client.Dispose()));

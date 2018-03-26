@@ -94,6 +94,7 @@
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.Members);
             this.Controls.Add(this.panel1);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Main";
             this.ShowIcon = false;

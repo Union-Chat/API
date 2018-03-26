@@ -1,6 +1,4 @@
 /* Server middleware */
-const OPCODES = require('./OpCodes.json');
-const { filter } = require('./Utils.js');
 const { authenticate, create } = require('./AccountHandler.js');
 const { dispatchHello, dispatchPresenceUpdate } = require('./Dispatcher.js');
 const { handleIncomingData } = require('./EventHandler.js');
@@ -57,7 +55,20 @@ app.use(express.static(`${__dirname}/views`));
 
 app.post('/create', async (req, res) => {
     const { username, password } = req.body;
-    const created = await create(username, password);
+
+    if (username.trim().length === 0) {
+        return res.send('Username cannot be empty.');
+    }
+
+    if (username.trim().length > 15) {
+        return res.send('Username cannot exceed 15 characters.');
+    }
+
+    if (password.length === 0) {
+        return res.send('Password cannot be empty.');
+    }
+
+    const created = await create(username.trim(), password);
 
     if (created) {
         return res.send('Account created! Login with the Union client.');

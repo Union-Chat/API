@@ -83,7 +83,7 @@ async function getServersOfUser(username) {
  * @param {Boolean} online Whether the user is online or not
  */
 async function updatePresenceOf(username, online) {
-    await r.table('users').get(username).update({ online })
+    await r.table('users').get(username).update({ online });
 }
 
 
