@@ -180,6 +180,10 @@ namespace Union
                         JArray members = (JArray)data.Property("d").Value;
                         client?.AddMembers(members);
                         break;
+                    case OPCODES.Error:
+                        string error = data.Property("d").Value.ToString();
+                        MessageBox.Show(error);
+                        break;
                 }
             }
             catch (Exception err)
@@ -234,7 +238,8 @@ namespace Union
             DispatchMembers,
             SyncMembers,
             Message,
-            JoinServer
+            JoinServer,
+            Error
         }
 
         #endregion
