@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const server = new WebSocket.Server({ port: 443 }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
-    //setInterval(sweepClients, 60e3);
+    setInterval(sweepClients, 60e3);
 });
 
 
@@ -28,32 +28,27 @@ server.on('connection', async (client, req) => {
             client.on('message', (data) => handleIncomingData(client, data, server.clients));
             client.on('error', () => {});
             client.on('close', () => dispatchPresenceUpdate(client, server.clients));
+            client.on('pong', () => client.isAlive = true);
 
             client.user = user;
-            client.hasPinged = false;
-            client.lastHeartbeat = Date.now();
+            client.isAlive = true;
 
-            dispatchHello(client);
-            dispatchPresenceUpdate(client, server.clients);
+            await dispatchHello(client);
+            await dispatchPresenceUpdate(client, server.clients);
         }
     }
 });
 
 
 function sweepClients() {
-    const ping = JSON.stringify({ op: OPCODES.Heartbeat, d: null }); // TODO: Move this to dispatcher
-    const clients = filter(server.clients, ws => ws.readyState === WebSocket.OPEN && Date.now() - ws.lastHeartbeat >= 60e3);
-
-    clients.forEach(client => client.send(ping));
-
-    setTimeout(() => {
-        clients.forEach(client => {
-            if (!client.hasPinged)
-                client.close(4002, 'Missed heartbeat');
-
-            client.hasPinged = false;
-        });
-    }, 10e3);
+    server.clients.forEach(ws => {
+        if (!ws.isAlive) {
+            return ws.terminate();
+        } else {
+            ws.isAlive = false;
+            ws.ping();
+        }
+    });
 }
 
 

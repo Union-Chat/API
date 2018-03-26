@@ -53,7 +53,7 @@ namespace Union
                 new KeyValuePair<string, string>("authorization", $"Basic {b64Encoded}")
             };
 
-            ws = new WebSocket("ws://union.serux.pro:2082", customHeaderItems: headers);
+            ws = new WebSocket("ws://127.0.0.1:443", customHeaderItems: headers); //union.serux.pro:2082
             ws.Closed += OnClose;
             ws.Error += OnError;
             ws.MessageReceived += OnMessage;
@@ -132,15 +132,13 @@ namespace Union
         async static void OnMessage(Object sender,  EventArgs eventArgs)
         {
             MessageReceivedEventArgs e = (MessageReceivedEventArgs)eventArgs;
-            Log(LogLevel.DEBUG, e.Message);
             try
             {
                 JObject data = JObject.Parse(e.Message);
                 int op = (int)data.Property("op").Value;
 
                 OPCODES code = (OPCODES)Enum.Parse(typeof(OPCODES), op.ToString());
-                Log(LogLevel.DEBUG, $"Received message with opcode {op} ({code})");
-                Log(LogLevel.DEBUG, e.Message);
+                Log(LogLevel.DEBUG, $"Received message", $"opcode {op} ({code})", e.Message);
 
                 switch (code)
                 {
@@ -153,7 +151,7 @@ namespace Union
                         JArray d = (JArray)data.Property("d").Value;
 
                         await Task.Delay(500); // Fuck off raceconditions
-                        client.AddServers(d);
+                        client?.AddServers(d);
                         break;
 
                     case OPCODES.DispatchMessage:
@@ -166,7 +164,7 @@ namespace Union
                         Message m = new Message(author, content);
                         AddOrUpdate(server, m);
 
-                        if (client.selectedServer == server)
+                        if (client?.selectedServer == server)
                             client.messages.Invoke(new Action(() => client.messages.Controls.Add(m)));
                         break;
 
@@ -176,18 +174,18 @@ namespace Union
                         bool online = (bool)presenceData.Property("status").Value;
 
                         await Task.Delay(500); // Fuck off raceconditions
-                        client.UpdatePresence(userId, online);
+                        client?.UpdatePresence(userId, online);
                         break;
 
                     case OPCODES.DispatchMembers:
                         JArray members = (JArray)data.Property("d").Value;
-                        client.AddMembers(members);
+                        client?.AddMembers(members);
                         break;
                 }
             }
             catch (Exception err)
             {
-                Log(LogLevel.ERROR, err.ToString());
+                Log(LogLevel.ERROR, "Websocket encountered an error while receiving", err);
             }
         }
 
@@ -202,13 +200,10 @@ namespace Union
             
             Log(LogLevel.INFO, $"Websocket closed - code: {e.Code}, reason: {e.Reason}");
             ws.MessageReceived -= OnMessage;
-            ws.Closed -= OnClose;
             ws.Error -= OnError;
+            ws.Closed -= OnClose;
 
-            if (client != null)
-            {
-                client.Invoke(new Action(() => client.Dispose()));
-            }
+            client?.Invoke(new Action(() => client.Dispose()));
 
             CreateLogin(e.Reason);
         }

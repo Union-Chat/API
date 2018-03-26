@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -23,7 +19,7 @@ namespace Union
             foreach (Form form in Application.OpenForms.Cast<Form>().ToList())
                 form.Invoke(new Action(() => form.Dispose()));
 
-            //if (ClientManager.ws.IsAlive)
+            if (ClientManager.ws?.State == WebSocket4Net.WebSocketState.Open)
                 ClientManager.ws.Close();
 
             Application.Exit();
@@ -45,6 +41,11 @@ namespace Union
         private void Form1_Shown(object sender, EventArgs e)
         {
             textBox1.Focus();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Process.Start("http://162.212.157.37:42069/");
         }
     }
 }
