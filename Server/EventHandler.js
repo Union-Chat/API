@@ -19,8 +19,25 @@ async function handleIncomingData(client, data, clients) {
     if (data.op === OPCODES.Message) {
         const { server, content } = data.d;
 
-        if (!client.user.servers.includes(server) || content.trim().length === 0) {
-            return;
+        if (!client.user.servers.includes(server)) {
+            return client.send(JSON.stringify({
+                op: OPCODES.Error,
+                d: 'You cannot send messages to this server'
+            }));
+        }
+
+        if (content.trim().length === 0) {
+            return client.send(JSON.stringify({
+                op: OPCODES.Error,
+                d: 'You cannot send empty messages'
+            }));
+        }
+
+        if (content.trim().length > 500) {
+            return client.send(JSON.stringify({
+                op: OPCODES.Error,
+                d: 'Content cannot exceed 500 characters'
+            }));
         }
 
         const message = {

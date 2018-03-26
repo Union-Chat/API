@@ -7,5 +7,6 @@
     "DispatchMembers": 5,
     "SyncMembers": 6,
     "Message": 7,
-    "JoinServer": 8
+    "JoinServer": 8,
+    "Error": 9
 }

@@ -95,7 +95,6 @@
             this.Controls.Add(this.Members);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
             this.Name = "Main";
             this.ShowIcon = false;
             this.Text = "Union";
