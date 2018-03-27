@@ -1,7 +1,7 @@
 /* Server middleware */
-const { authenticate, create } = require('./AccountHandler.js');
-const { dispatchHello, dispatchPresenceUpdate } = require('./Dispatcher.js');
-const { handleIncomingData } = require('./EventHandler.js');
+const { authenticate, create } = require('./DatabaseHandler.js');
+const { dispatchHello } = require('./Dispatcher.js');
+const { handleIncomingData, handlePresenceUpdate } = require('./EventHandler.js');
 
 /* Server */
 const WebSocket = require('ws');
@@ -14,11 +14,14 @@ const server = new WebSocket.Server({ port: 443 }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
     setInterval(() => {
         server.clients.forEach(ws => {
-            if (!ws.isAlive) return ws.terminate();
+            if (!ws.isAlive) {
+                handlePresenceUpdate(ws.user.id, server.clients);
+                return ws.terminate();
+            }
             ws.isAlive = false;
             ws.ping();
         });
-    }, 60e3);
+    }, 10e3);
 });
 
 
@@ -38,14 +41,14 @@ server.on('connection', async (client, req) => {
 
     client.on('message', (data) => handleIncomingData(client, data, server.clients));
     client.on('error', () => {});
-    client.on('close', () => dispatchPresenceUpdate(client, server.clients));
+    client.on('close', () => handlePresenceUpdate(client.user.id, server.clients));
     client.on('pong', () => client.isAlive = true);
 
     client.user = user;
     client.isAlive = true;
 
     await dispatchHello(client);
-    await dispatchPresenceUpdate(client, server.clients);
+    handlePresenceUpdate(client.user.id, server.clients);
 });
 
 

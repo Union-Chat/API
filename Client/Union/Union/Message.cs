@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Newtonsoft.Json;
+using System;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Union
 {
     public partial class Message : UserControl
     {
-        public Message(String author, String content)
+        private bool isSelfMessage = false;
+        public string Id { get; }
+
+        public Message(String author, String content, Boolean self, string id)
         {
             InitializeComponent();
-            String ct = content.Replace("\n", Environment.NewLine);
+            Id = id;
+            isSelfMessage = self;
+            String ct = content.Replace("\r\n", Environment.NewLine).Replace("\n", Environment.NewLine);
 
             Username.Text = author;
             Content.Text = ct;
@@ -23,11 +23,23 @@ namespace Union
             Dock = DockStyle.Bottom;
         }
 
+        private void Delete_Click(object sender, EventArgs e)
+        {
+            IWSMessage m = new IWSMessage()
+            {
+                op = (int)ClientManager.OPCODES.DeleteMessage,
+                d = Id
+            };
+            ClientManager.ws.Send(JsonConvert.SerializeObject(m));
+        }
+
         private void Username_Paint(object sender, PaintEventArgs e)
         {
+            Delete.Visible = isSelfMessage;
+
             using (Graphics g = CreateGraphics())
             {
-                float height = g.MeasureString(Content.Text, Content.Font).Height + Username.Height + 20;
+                float height = g.MeasureString(Content.Text, Content.Font, Content.Width).Height + Username.Height + 20;
                 Height = (int)Math.Round(height);
             }
         }

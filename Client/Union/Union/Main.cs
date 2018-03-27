@@ -47,6 +47,16 @@ namespace Union
                 m.setPresence(online);
         }
 
+        public void DeleteMessage(string id)
+        {
+            Control ctl = messages.Controls.OfType<Message>().Where(m => m.Id == id).First();
+
+            if (ctl != null)
+            {
+                messages.Invoke(new Action(() => messages.Controls.Remove(ctl)));
+            }
+        }
+
         private void OnServerSwitch(Object sender, MouseEventArgs e)
         {
             Server s = (Server)sender;
@@ -79,13 +89,16 @@ namespace Union
             if (e.KeyChar == Convert.ToChar(Keys.Enter) && !ModifierKeys.HasFlag(Keys.Shift))
             {
                 e.Handled = true;
+
                 if (String.IsNullOrWhiteSpace(textBox1.Text))
                     return;
+
                 IWSMessage msg = new IWSMessage()
                 {
                     op = (int)ClientManager.OPCODES.Message,
                     d = new IMessage(selectedServer, textBox1.Text)
                 };
+
                 string compiled = JsonConvert.SerializeObject(msg);
                 ClientManager.ws.Send(compiled);
                 textBox1.Clear();
@@ -111,6 +124,11 @@ namespace Union
         }
 
         private void messages_ControlAdded(object sender, ControlEventArgs e)
+        {
+            messages.AutoScrollPosition = new Point(0, messages.VerticalScroll.Maximum);
+        }
+
+        private void messages_ControlRemoved(object sender, ControlEventArgs e)
         {
             messages.AutoScrollPosition = new Point(0, messages.VerticalScroll.Maximum);
         }

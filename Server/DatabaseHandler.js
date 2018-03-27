@@ -82,8 +82,13 @@ async function getServersOfUser(username) {
  * @param {String} username Username of the user to update the presence of
  * @param {Boolean} online Whether the user is online or not
  */
-async function updatePresenceOf(username, online) {
-    await r.table('users').get(username).update({ online });
+function updatePresenceOf(username, online) {
+    r.table('users').get(username).update({ online }).run();
+}
+
+async function getUser(username) {
+    const user = await r.table('users').get(username);
+    return user;
 }
 
 
@@ -92,11 +97,23 @@ async function getServers() {
     return servers.map(s => s.id);
 }
 
+function storeMessage(id, author) {
+    r.table('messages').insert({ id, author }).run();
+}
+
+async function retrieveMessage(id) {
+    const msg = await r.table('messages').get(id);
+    return msg;
+}
+
 
 module.exports = {
     create,
     authenticate,
     getUsersInServer,
     getServersOfUser,
-    updatePresenceOf
+    updatePresenceOf,
+    getUser,
+    storeMessage,
+    retrieveMessage
 };

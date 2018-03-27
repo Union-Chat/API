@@ -24,4 +24,19 @@ function safeParse(data) {
 }
 
 
-module.exports = { filter, safeParse };
+/**
+ * Gets the number of sessions of the given user ID
+ * @param {String} userId The user ID to get the sessions of
+ * @param {Set<WebSocket>} clients The clients to filter
+ */
+function getSessionsOf(userId, clients) {
+    const sessions = filter(clients, ws => ws.user.id === userId);
+    return sessions.length;
+}
+
+
+module.exports = {
+    filter,
+    safeParse,
+    getSessionsOf
+};

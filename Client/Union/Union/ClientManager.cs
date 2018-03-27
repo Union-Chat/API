@@ -21,6 +21,7 @@ namespace Union
         public static WebSocket ws;
         public static Form currentForm;
         private static Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
+        private static string self = "";
 
         public static void CreateLogin(String errorMessage = "")
         {
@@ -58,6 +59,7 @@ namespace Union
             ws.Error += OnError;
             ws.MessageReceived += OnMessage;
             ws.Open();
+            self = name;
         }
 
         public static List<Message> GetMessagesFor(int server)
@@ -90,17 +92,6 @@ namespace Union
                 List<Message> messages = new List<Message>() { m };
                 messageCache.Add(server, messages);
             }
-        }
-
-        public static void SendHeartbeat()
-        {
-            IWSMessage wsm = new IWSMessage()
-            {
-                op = (int)OPCODES.Heartbeat
-            };
-
-            string compiled = JsonConvert.SerializeObject(wsm);
-            ws.Send(compiled);
         }
 
         public static void PurgeMessageCache()
@@ -142,10 +133,6 @@ namespace Union
 
                 switch (code)
                 {
-                    case OPCODES.Heartbeat:
-                        SendHeartbeat();
-                        break;
-
                     case OPCODES.Hello:
                         CreateClient();
                         JArray d = (JArray)data.Property("d").Value;
@@ -158,10 +145,11 @@ namespace Union
                         JObject message = (JObject)data.Property("d").Value;
 
                         int server = (int)message.Property("server").Value;
+                        string id = message.Property("id").Value.ToString();
                         string content = message.Property("content").Value.ToString();
                         string author = message.Property("author").Value.ToString();
 
-                        Message m = new Message(author, content);
+                        Message m = new Message(author, content, author == self, id);
                         AddOrUpdate(server, m);
 
                         if (client?.selectedServer == server)
@@ -180,9 +168,14 @@ namespace Union
                         JArray members = (JArray)data.Property("d").Value;
                         client?.AddMembers(members);
                         break;
+
                     case OPCODES.Error:
                         string error = data.Property("d").Value.ToString();
-                        MessageBox.Show(error);
+                        //MessageBox.Show(error);
+                        break;
+
+                    case OPCODES.DispatchDeleteMessage:
+                        client?.DeleteMessage(data.Property("d").Value.ToString());
                         break;
                 }
             }
@@ -233,16 +226,17 @@ namespace Union
 
         public enum OPCODES
         {
-            Heartbeat,
-            Hello,
-            DispatchJoin,
+            Hello = 1,
+            DispatchMemberAdd,
             DispatchMessage,
             DispatchPresence,
             DispatchMembers,
+            DispatchDeleteMessage,
             SyncMembers,
             Message,
-            JoinServer,
-            Error
+            MemberAdd,
+            DeleteMessage,
+            Error,
         }
 
         #endregion

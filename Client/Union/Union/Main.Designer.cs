@@ -53,6 +53,7 @@
             this.messages.Size = new System.Drawing.Size(518, 458);
             this.messages.TabIndex = 2;
             this.messages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.messages_ControlAdded);
+            this.messages.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.messages_ControlRemoved);
             // 
             // Members
             // 
@@ -95,7 +96,6 @@
             this.Controls.Add(this.Members);
             this.Controls.Add(this.panel1);
             this.DoubleBuffered = true;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Main";
             this.ShowIcon = false;
             this.Text = "Union";

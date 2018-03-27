@@ -1,8 +1,6 @@
 const OPCODES = require('./OpCodes.json');
-const { filter } = require('./Utils.js');
-const { getServersOfUser, updatePresenceOf } = require('./AccountHandler.js');
+const { getServersOfUser } = require('./DatabaseHandler.js');
 const WebSocket = require('ws');
-
 
 
 /**
@@ -22,27 +20,19 @@ async function dispatchHello(client) {
 
 /**
  * Dispatch a presence update to all connected clients
- * @param {WebSocket} client The client whose presence was updated
+ * @param {String} userId The user whose presence was updated
+ * @param {Boolean} status The status of the user
  * @param {Set<WebSocket>} clients The clients to dispatch the payload to
  */
-function dispatchPresenceUpdate(client, clients) {
-    const { user } = client;
-    const sessions = filter(clients, ws => ws.user.id === user.id);
+function dispatchPresenceUpdate(userId, status, clients) {
     const payload = {
         op: OPCODES.DispatchPresence,
         d: {
-            id: user.id
+            id: userId,
+            status
         }
     };
 
-    if (sessions.length === 0) {
-        user.online = false;
-    } else {
-        user.online = true;
-    }
-
-    payload.d.status = user.online;
-    updatePresenceOf(user.id, user.online);
     send(clients, payload);
 }
 
