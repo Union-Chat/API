@@ -13,6 +13,16 @@ namespace Union
 
         public int selectedServer;
 
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                var cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;  // Windows flag that makes this form render off-screen to reduce flickering
+                return cp;
+            }
+        }
+
         public Main()
         {
             InitializeComponent();

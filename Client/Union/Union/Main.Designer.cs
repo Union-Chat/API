@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.messages = new System.Windows.Forms.Panel();
             this.Members = new System.Windows.Forms.Panel();
             this.textBox1 = new WatermarkTextbox.WatermarkTextbox();
+            this.messages = new Union.ExPanel();
             this.SuspendLayout();
             // 
             // panel1
@@ -42,18 +42,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(60, 518);
             this.panel1.TabIndex = 0;
-            // 
-            // messages
-            // 
-            this.messages.AutoScroll = true;
-            this.messages.AutoScrollMinSize = new System.Drawing.Size(10, 10);
-            this.messages.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.messages.Location = new System.Drawing.Point(60, 0);
-            this.messages.Name = "messages";
-            this.messages.Size = new System.Drawing.Size(518, 458);
-            this.messages.TabIndex = 2;
-            this.messages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.messages_ControlAdded);
-            this.messages.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.messages_ControlRemoved);
             // 
             // Members
             // 
@@ -85,6 +73,18 @@
             this.textBox1.WatermarkText = "Send a message...";
             this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
             // 
+            // messages
+            // 
+            this.messages.AutoScroll = true;
+            this.messages.AutoScrollMinSize = new System.Drawing.Size(10, 10);
+            this.messages.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messages.Location = new System.Drawing.Point(60, 0);
+            this.messages.Name = "messages";
+            this.messages.Size = new System.Drawing.Size(518, 458);
+            this.messages.TabIndex = 5;
+            this.messages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.messages_ControlAdded);
+            this.messages.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.messages_ControlRemoved);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -108,8 +108,8 @@
         #endregion
 
         private System.Windows.Forms.Panel panel1;
-        public System.Windows.Forms.Panel messages;
         public System.Windows.Forms.Panel Members;
         private WatermarkTextbox.WatermarkTextbox textBox1;
+        public ExPanel messages;
     }
 }
