@@ -75,7 +75,7 @@ async function handleIncomingData(client, data, clients) {
         }
 
         const payload = JSON.stringify({
-            op: OPCODES.DispatchMessageDelete,
+            op: OPCODES.DispatchDeleteMessage,
             d: data.d
         });
 
