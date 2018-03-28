@@ -10,15 +10,15 @@ namespace Union
         private bool isSelfMessage = false;
         public string Id { get; }
 
-        public Message(String author, String content, Boolean self, string id)
+        public Message(String author, String content, Boolean self, string id, long time)
         {
             InitializeComponent();
             Id = id;
             isSelfMessage = self;
-            String ct = content.Replace("\r\n", Environment.NewLine).Replace("\n", Environment.NewLine);
 
             Username.Text = author;
-            Content.Text = ct;
+            Content.Text = content.Replace("\r\n", Environment.NewLine).Replace("\n", Environment.NewLine);
+            Timestamp.Text = ParseTime(time);
 
             Dock = DockStyle.Bottom;
         }
@@ -47,6 +47,24 @@ namespace Union
                 float height = g.MeasureString(Content.Text, Content.Font, Content.Width).Height + Username.Height + 20;
                 Height = (int)Math.Round(height);
             }
+        }
+        
+        private string ParseTime(long time)
+        {
+            DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0).AddMilliseconds(Convert.ToDouble(time)).ToLocalTime();
+            String formatted = "";
+
+            if (dt.Date == DateTime.Today.Date)
+            {
+                formatted += "Today at ";
+            }
+            else
+            {
+                formatted += $"{dt.Date.ToShortDateString()} at ";
+            }
+
+            formatted += dt.ToString("HH:mm");
+            return formatted;
         }
     }
 

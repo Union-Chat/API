@@ -49,7 +49,8 @@ async function handleIncomingData(client, data, clients) {
             id,
             server,
             content: content.trim(),
-            author: client.user.id
+            author: client.user.id,
+            createdAt: Date.now()
         };
 
         const recipients = filter(clients, ws => ws.user.servers.includes(server));

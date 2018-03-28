@@ -122,8 +122,9 @@ namespace Union
                         string id = message.Property("id").Value.ToString();
                         string content = message.Property("content").Value.ToString();
                         string author = message.Property("author").Value.ToString();
+                        long time = (long)message.Property("createdAt").Value;
 
-                        Message m = new Message(author, content, author == self, id);
+                        Message m = new Message(author, content, author == self, id, time);
                         client?.CacheMessage(server, m);
                         break;
 
