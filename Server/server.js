@@ -15,6 +15,7 @@ const server = new WebSocket.Server({ port: 443 }, () => {
     setInterval(() => {
         server.clients.forEach(ws => {
             if (!ws.isAlive) {
+                console.log(`WS Died\n\t${ws.user}\n\t${ws}`);
                 handlePresenceUpdate(ws.user.id, server.clients);
                 return ws.terminate();
             }
