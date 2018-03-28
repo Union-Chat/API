@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace Union
@@ -41,9 +40,6 @@ namespace Union
         {
             if (!messageCache.ContainsKey(server))
                 messageCache.Add(server, new List<Message>());
-
-            m.Content.ContextMenuStrip = contextMenuStrip1;
-            m.Username.ContextMenuStrip = contextMenuStrip1;
 
             messageCache[server].Add(m);
             messages.Invoke(new Action(() =>
