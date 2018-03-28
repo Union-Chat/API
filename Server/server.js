@@ -15,7 +15,7 @@ const server = new WebSocket.Server({ port: 443 }, () => {
     setInterval(() => {
         server.clients.forEach(ws => {
             if (!ws.isAlive) {
-                console.log(`WS Died\n\t${ws.user}\n\t${ws}`);
+                console.log(`WS Died\n\t${ws._un}\n\t${server.clients.size} clients`);
                 handlePresenceUpdate(ws.user.id, server.clients);
                 return ws.terminate();
             }
@@ -45,6 +45,8 @@ server.on('connection', async (client, req) => {
     client.on('close', () => handlePresenceUpdate(client.user.id, server.clients));
     client.on('pong', () => client.isAlive = true);
 
+    client._un = name;
+    console.log(`Got connection from ${name} | Clients: ${server.clients.size}`);
     client.user = user;
     client.isAlive = true;
 
