@@ -32,7 +32,7 @@
             this.Content = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.Username = new System.Windows.Forms.Label();
-            this.Delete = new System.Windows.Forms.Button();
+            this.DeleteBtn = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,11 +48,12 @@
             this.Content.TabIndex = 0;
             this.Content.Text = "Content";
             this.Content.UseCompatibleTextRendering = true;
+            this.Content.UseMnemonic = false;
             // 
             // panel1
             // 
             this.panel1.Controls.Add(this.Username);
-            this.panel1.Controls.Add(this.Delete);
+            this.panel1.Controls.Add(this.DeleteBtn);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -70,25 +71,26 @@
             this.Username.Size = new System.Drawing.Size(290, 25);
             this.Username.TabIndex = 2;
             this.Username.Text = "Username";
+            this.Username.UseMnemonic = false;
             this.Username.Paint += new System.Windows.Forms.PaintEventHandler(this.Username_Paint);
             // 
-            // Delete
+            // DeleteBtn
             // 
-            this.Delete.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("Delete.BackgroundImage")));
-            this.Delete.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.Delete.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Delete.FlatAppearance.BorderSize = 0;
-            this.Delete.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.Delete.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-            this.Delete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Delete.ForeColor = System.Drawing.Color.White;
-            this.Delete.Location = new System.Drawing.Point(290, 0);
-            this.Delete.Name = "Delete";
-            this.Delete.Size = new System.Drawing.Size(25, 25);
-            this.Delete.TabIndex = 3;
-            this.Delete.UseVisualStyleBackColor = true;
-            this.Delete.Visible = false;
-            this.Delete.Click += new System.EventHandler(this.Delete_Click);
+            this.DeleteBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("DeleteBtn.BackgroundImage")));
+            this.DeleteBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.DeleteBtn.Dock = System.Windows.Forms.DockStyle.Right;
+            this.DeleteBtn.FlatAppearance.BorderSize = 0;
+            this.DeleteBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.DeleteBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.DeleteBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.DeleteBtn.ForeColor = System.Drawing.Color.White;
+            this.DeleteBtn.Location = new System.Drawing.Point(290, 0);
+            this.DeleteBtn.Name = "DeleteBtn";
+            this.DeleteBtn.Size = new System.Drawing.Size(25, 25);
+            this.DeleteBtn.TabIndex = 3;
+            this.DeleteBtn.UseVisualStyleBackColor = true;
+            this.DeleteBtn.Visible = false;
+            this.DeleteBtn.Click += new System.EventHandler(this.Delete_Click);
             // 
             // Message
             // 
@@ -110,6 +112,6 @@
         public System.Windows.Forms.Label Content;
         private System.Windows.Forms.Panel panel1;
         public System.Windows.Forms.Label Username;
-        private System.Windows.Forms.Button Delete;
+        private System.Windows.Forms.Button DeleteBtn;
     }
 }

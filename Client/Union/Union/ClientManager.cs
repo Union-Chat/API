@@ -14,13 +14,12 @@ namespace Union
 {
     public partial class ClientManager : Component
     {
-        public static Form1 login;
-        public static Main client;
-
         private static TextWriter LogFile = File.AppendText("union-log.txt");
         public static WebSocket ws;
-        public static Form currentForm;
-        private static Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
+
+        public static Form1 login;
+        public static Main client;
+        
         private static string self = "";
 
         public static void CreateLogin(String errorMessage = "")
@@ -62,14 +61,6 @@ namespace Union
             self = name;
         }
 
-        public static List<Message> GetMessagesFor(int server)
-        {
-            List<Message> temp = new List<Message>();
-            messageCache.TryGetValue(server, out temp);
-
-            return temp;
-        }
-
         public static void GetMembersFor(int server)
         {
             IWSMessage wsm = new IWSMessage()
@@ -80,23 +71,6 @@ namespace Union
 
             string compiled = JsonConvert.SerializeObject(wsm);
             ws.Send(compiled);
-        }
-
-        public static void AddOrUpdate(int server, Message m)
-        {
-            if (messageCache.ContainsKey(server)) {
-                messageCache[server].Add(m);
-            }
-            else
-            {
-                List<Message> messages = new List<Message>() { m };
-                messageCache.Add(server, messages);
-            }
-        }
-
-        public static void PurgeMessageCache()
-        {
-            messageCache.Clear();
         }
 
         static void Log(LogLevel level, Object content, params Object[] extra)
@@ -150,10 +124,7 @@ namespace Union
                         string author = message.Property("author").Value.ToString();
 
                         Message m = new Message(author, content, author == self, id);
-                        AddOrUpdate(server, m);
-
-                        if (client?.selectedServer == server)
-                            client.messages.Invoke(new Action(() => client.messages.Controls.Add(m)));
+                        client?.CacheMessage(server, m);
                         break;
 
                     case OPCODES.DispatchPresence:
@@ -208,7 +179,9 @@ namespace Union
                 Log(LogLevel.INFO, "Websocket closed");
             }
 
-            client?.Invoke(new Action(() => client.Dispose()));
+            if (!client.Disposing && !client.IsDisposed)
+                client?.Invoke(new Action(() => client.Dispose()));
+
             CreateLogin(closeReason);
 
         }

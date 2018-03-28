@@ -55,23 +55,28 @@
             // 
             // textBox1
             // 
-            this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.textBox1.Enabled = false;
             this.textBox1.Font = new System.Drawing.Font("Arial", 9.75F);
             this.textBox1.ForeColor = System.Drawing.Color.White;
-            this.textBox1.Location = new System.Drawing.Point(60, 458);
+            this.textBox1.Location = new System.Drawing.Point(60, 493);
             this.textBox1.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox1.MaximumSize = new System.Drawing.Size(0, 100);
+            this.textBox1.MinimumSize = new System.Drawing.Size(0, 25);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(518, 60);
+            this.textBox1.Size = new System.Drawing.Size(518, 25);
             this.textBox1.TabIndex = 4;
             this.textBox1.WatermarkCentered = false;
             this.textBox1.WatermarkColour = System.Drawing.Color.LightGray;
             this.textBox1.WatermarkItalics = true;
             this.textBox1.WatermarkText = "Send a message...";
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.textBox1.Enter += new System.EventHandler(this.textBox1_Enter);
             this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
+            this.textBox1.Leave += new System.EventHandler(this.textBox1_Leave);
             // 
             // messages
             // 
@@ -80,7 +85,7 @@
             this.messages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.messages.Location = new System.Drawing.Point(60, 0);
             this.messages.Name = "messages";
-            this.messages.Size = new System.Drawing.Size(518, 458);
+            this.messages.Size = new System.Drawing.Size(518, 493);
             this.messages.TabIndex = 5;
             this.messages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.messages_ControlAdded);
             this.messages.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.messages_ControlRemoved);

@@ -23,6 +23,11 @@ namespace Union
             Dock = DockStyle.Bottom;
         }
 
+        public void Delete()
+        {
+            Parent.Invoke(new Action(() => Parent.Controls.Remove(this)));
+        }
+
         private void Delete_Click(object sender, EventArgs e)
         {
             IWSMessage m = new IWSMessage()
@@ -35,7 +40,7 @@ namespace Union
 
         private void Username_Paint(object sender, PaintEventArgs e)
         {
-            Delete.Visible = isSelfMessage;
+            DeleteBtn.Visible = isSelfMessage;
 
             using (Graphics g = CreateGraphics())
             {

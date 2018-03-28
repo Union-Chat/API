@@ -11,6 +11,7 @@ namespace Union
     public partial class Main : Form
     {
 
+        private Dictionary<int, List<Message>> messageCache = new Dictionary<int, List<Message>>();
         public int selectedServer;
 
         protected override CreateParams CreateParams
@@ -28,43 +29,73 @@ namespace Union
             InitializeComponent();
         }
 
+        public List<Message> GetMessagesFor(int server)
+        {
+            List<Message> messages = new List<Message>();
+            messageCache.TryGetValue(server, out messages);
+            return messages;
+        }
+
+        public void CacheMessage(int server, Message m)
+        {
+            if (!messageCache.ContainsKey(server))
+                messageCache.Add(server, new List<Message>());
+
+            messageCache[server].Add(m);
+            messages.Invoke(new Action(() =>
+            {
+                messages.SuspendLayout();
+                messages.Controls.Add(m);
+                messages.ResumeLayout();
+            }));
+        }
+
         public void AddServers(JArray servers)
         {
-            Invoke(new Action(() => panel1.Controls.Clear()));
-            foreach (JObject server in servers)
+            Invoke(new Action(() =>
             {
-                Server s = new Server(server.Property("name").Value.ToString(), (int)server.Property("id").Value, panel1.Width);
-                s.MouseClick += OnServerSwitch;
-
-                Invoke(new Action(() => panel1.Controls.Add(s)));
-            }
+                panel1.SuspendLayout();
+                panel1.Controls.Clear();
+                foreach (JObject server in servers)
+                {
+                    Server s = new Server(server.Property("name").Value.ToString(), (int)server.Property("id").Value, panel1.Width);
+                    s.MouseClick += OnServerSwitch;
+                    panel1.Controls.Add(s);
+                }
+                panel1.ResumeLayout();
+            }));
         }
 
         public void AddMembers(JArray members)
         {
-            Invoke(new Action(() => Members.Controls.Clear()));
-            foreach (JObject member in members)
+            Invoke(new Action(() =>
             {
-                Member m = new Member(member.Property("id").Value.ToString(), (bool)member.Property("online").Value);
-                Invoke(new Action(() => Members.Controls.Add(m))); 
-            }
+                Members.SuspendLayout();
+                Members.Controls.Clear();
+                members = new JArray(members.OrderByDescending(m => (string)m["id"]));
+                foreach (JObject member in members)
+                {
+                    Member m = new Member(member.Property("id").Value.ToString(), (bool)member.Property("online").Value);
+                    Members.Controls.Add(m);
+                }
+                Members.ResumeLayout();
+            }));
         }
 
         public void UpdatePresence(string userId, bool online)
         {
-            Member m = Members.Controls.OfType<Member>().FirstOrDefault(member => member.id.Equals(userId));
-            if (m != null)
-                m.setPresence(online);
+            Members.Controls
+                .OfType<Member>()
+                .FirstOrDefault(member => member.id.Equals(userId))
+                ?.setPresence(online);
         }
 
         public void DeleteMessage(string id)
         {
-            Control ctl = messages.Controls.OfType<Message>().Where(m => m.Id == id).First();
-
-            if (ctl != null)
-            {
-                messages.Invoke(new Action(() => messages.Controls.Remove(ctl)));
-            }
+            messages.Controls
+                .OfType<Message>()
+                .FirstOrDefault(msg => msg.Id == id)
+                ?.Delete();
         }
 
         private void OnServerSwitch(Object sender, MouseEventArgs e)
@@ -79,7 +110,7 @@ namespace Union
             selectedServer = s.Id;
 
             messages.Controls.Clear();
-            List<Message> msgs = ClientManager.GetMessagesFor(selectedServer);
+            List<Message> msgs = GetMessagesFor(selectedServer);
             if (msgs?.Count > 0)
                 messages.Controls.AddRange(msgs.ToArray());
 
@@ -117,20 +148,8 @@ namespace Union
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            panel1.Controls.Clear();
-            messages.Controls.Clear();
-            Members.Controls.Clear();
-            ClientManager.PurgeMessageCache();
-            selectedServer = 0;
-
-            e.Cancel = true;
-            Hide();
-
-            Application.Exit();
-
             if (ClientManager.ws.State == WebSocket4Net.WebSocketState.Open)
                 ClientManager.ws.Close();
-            
         }
 
         private void messages_ControlAdded(object sender, ControlEventArgs e)
@@ -141,6 +160,25 @@ namespace Union
         private void messages_ControlRemoved(object sender, ControlEventArgs e)
         {
             messages.AutoScrollPosition = new Point(0, messages.VerticalScroll.Maximum);
+        }
+
+        private void textBox1_Enter(object sender, EventArgs e)
+        {
+            textBox1.BackColor = Color.FromArgb(90, 90, 90);
+        }
+
+        private void textBox1_Leave(object sender, EventArgs e)
+        {
+            textBox1.BackColor = Color.FromArgb(70, 70, 70);
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            using (Graphics g = textBox1.CreateGraphics())
+            {
+                int height = (int)g.MeasureString(textBox1.Text, textBox1.Font, textBox1.Width).Height;
+                textBox1.Height = height + 9;
+            }
         }
     }
 }
