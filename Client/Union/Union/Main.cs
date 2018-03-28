@@ -47,6 +47,7 @@ namespace Union
                 messages.SuspendLayout();
                 messages.Controls.Add(m);
                 messages.ResumeLayout();
+                messages.AutoScrollPosition = new Point(0, messages.VerticalScroll.Maximum);
             }));
         }
 
@@ -150,11 +151,6 @@ namespace Union
         {
             if (ClientManager.ws.State == WebSocket4Net.WebSocketState.Open)
                 ClientManager.ws.Close();
-        }
-
-        private void messages_ControlAdded(object sender, ControlEventArgs e)
-        {
-            messages.AutoScrollPosition = new Point(0, messages.VerticalScroll.Maximum);
         }
 
         private void messages_ControlRemoved(object sender, ControlEventArgs e)

@@ -87,7 +87,6 @@
             this.messages.Name = "messages";
             this.messages.Size = new System.Drawing.Size(518, 493);
             this.messages.TabIndex = 5;
-            this.messages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.messages_ControlAdded);
             this.messages.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.messages_ControlRemoved);
             // 
             // Main
