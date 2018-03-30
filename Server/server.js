@@ -1,3 +1,5 @@
+const config = require('./config.json');
+
 /* Server middleware */
 const { authenticate, create } = require('./DatabaseHandler.js');
 const { dispatchHello } = require('./Dispatcher.js');
@@ -10,7 +12,7 @@ const bodyParser = require('body-parser');
 
 /* Apps */
 const app = express();
-const server = new WebSocket.Server({ port: 443 }, () => {
+const server = new WebSocket.Server({ port: config.ws.port }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
     setInterval(() => {
         server.clients.forEach(ws => {
@@ -104,4 +106,4 @@ app.post('/create', async (req, res) => {
 
 });
 
-app.listen(42069);
+app.listen(config.web.port);
