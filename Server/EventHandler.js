@@ -53,7 +53,7 @@ async function handleIncomingData(client, data, clients) {
             createdAt: Date.now()
         };
 
-        const recipients = filter(clients, ws => ws.user.servers.includes(server));
+        const recipients = filter(clients, ws => ws.user && ws.user.servers.includes(server));
         dispatchMessage(recipients, message);
     } else if (data.op === OPCODES.SyncMembers) {
         const members = await getUsersInServer(data.d);
