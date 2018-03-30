@@ -1,6 +1,7 @@
 const boldRegex = /(\*\*).+(\*\*)/g;
 
 let ws = null;
+let selectedServer = null;
 
 window.onload = requestUsername;
 
@@ -48,11 +49,28 @@ function handleWSMessage(message) {
             const chatbox = document.getElementById('whatthefuckdidyoujustsayaboutme');
             chatbox.addEventListener('keydown', snedMeHarder);
 
-            chatbox.removeAttribute('readonly');
-            chatbox.setAttribute('placeholder', 'Roast your friends! Oh wait, you have none');
+            j.d.forEach(server => {
+                const s = document.createElement('div');
+                s.setAttribute('class', 'server');
+                s.setAttribute('server-id', server.id);
+                s.setAttribute('server-name', server.name);
+
+                const icon = document.createElement('img');
+                icon.setAttribute('src', server.iconUrl);
+
+                icon.addEventListener('click', () => switchServer(s));
+
+                s.appendChild(icon);
+
+                document.getElementById('servers').appendChild(s);
+            });
         }
 
         if (j.op === 3) {
+            if (j.d.server !== selectedServer) {
+                return;
+            }
+
             const m = document.createElement('div');
             m.setAttribute('class', 'message');
 
@@ -104,6 +122,16 @@ function snedMeHarder(event) {
             elemelon.value = '';
         }
     }
+}
+
+function switchServer(server) {
+    const chatbox = document.getElementById('whatthefuckdidyoujustsayaboutme');
+    const id = server.getAttribute('server-id');
+    const name = server.getAttribute('server-name');
+    selectedServer = Number(id);
+
+    chatbox.removeAttribute('readonly');
+    chatbox.setAttribute('placeholder', `Message ${name}...`);
 }
 
 const emojis = new Map([
