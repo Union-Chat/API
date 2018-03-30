@@ -95,6 +95,7 @@ body {
     margin-top: 5px;
     margin-bottom: 20px;
     padding: 10px 10px 0px;
+    resize: none;
 }
 
 .chatbox::-moz-placeholder {
