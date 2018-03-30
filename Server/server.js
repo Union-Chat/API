@@ -17,7 +17,7 @@ const wss = https.createServer({
     cert: fs.readFileSync('./certificate.pem'),
     key: fs.readFileSync('./key.pem')
 });
-const app = express();
+const app = express.Router();
 const server = new WebSocket.Server({ wss }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
     setInterval(() => {
@@ -112,4 +112,5 @@ app.post('/create', async (req, res) => {
 
 });
 
-app.listen(config.web.port);
+exports.router = router;
+//app.listen(config.web.port);
