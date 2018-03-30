@@ -116,5 +116,5 @@ wss.listen(config.ws.port, () => {
     }, 10e3);
 })
 
-exports.router = router;
+exports.router = app;
 //app.listen(config.web.port);
