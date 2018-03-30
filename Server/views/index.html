@@ -1,26 +1,25 @@
 <head>
     <title>Union</title>
-    <script>
-        function createMeHarderDaddy() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            const req = new XMLHttpRequest();
-            req.open('POST', '/create', true);
-            req.setRequestHeader('Content-type', 'application/json');
-            req.onload = () => {
-                if (req.readyState === 4) {
-                    alert(req.responseText);
-                }
-            };
-            req.onerror = () => alert(req.responseText);
-            req.send(JSON.stringify({ username, password }));
-        }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="style.css">
+    <script src="union.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
-
 <body>
-    <input placeholder="Username" id="username">
-    <input type="password" placeholder="Password" id="password">
-    <button onclick="createMeHarderDaddy()">Create!</button>
+  <div class="content">
+    <div class="server-list">
+        <div class="server">
+            <img src="https://cdn.discordapp.com/icons/330777295952543744/d141576b5199457211312462a1a571af.webp?size=1024">
+        </div>
+        <div class="server">
+            <img src="https://cdn.discordapp.com/icons/293171309557579786/569b36c30706ccdadf76394a0f788940.webp?size=1024">
+        </div>
+    </div>
+    <div class="message-wrapper">
+        <div class="messages">
+          <div class="message-scroller" id="message-container"></div>
+        </div>
+        <textarea class="chatbox" placeholder="No server selected" id="whatthefuckdidyoujustsayaboutme" readonly></textarea>
+    </div>
+  </div>
 </body>

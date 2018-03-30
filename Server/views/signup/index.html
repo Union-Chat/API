@@ -1,0 +1,26 @@
+<head>
+    <title>Union</title>
+    <script>
+        function createMeHarderDaddy() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const req = new XMLHttpRequest();
+            req.open('POST', '/create', true);
+            req.setRequestHeader('Content-type', 'application/json');
+            req.onload = () => {
+                if (req.readyState === 4) {
+                    alert(req.responseText);
+                }
+            };
+            req.onerror = () => alert(req.responseText);
+            req.send(JSON.stringify({ username, password }));
+        }
+    </script>
+</head>
+
+<body>
+    <input placeholder="Username" id="username">
+    <input type="password" placeholder="Password" id="password">
+    <button onclick="createMeHarderDaddy()">Create!</button>
+</body>
