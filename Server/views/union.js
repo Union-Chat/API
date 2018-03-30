@@ -1,9 +1,11 @@
+const boldRegex = /(\*\*).+(\*\*)/g;
+
 let ws = null;
 
 window.onload = requestUsername;
 
 function requestUsername() {
-    const username = prompt('Please enter your Union username\n\nIf you need an account, go to /signup');
+    const username = prompt('Please enter your Union username');
 
     if (username.length === 0) {
         return requestUsername();
@@ -58,7 +60,10 @@ function handleWSMessage(message) {
             author.innerText = j.d.author;
 
             const content = document.createElement('div');
-            let filtered = j.d.content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace('\r\n', '<br>').replace(/\n/g, '<br>');
+            let filtered = j.d.content.replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace('\r\n', '<br>')
+                .replace(/\n/g, '<br>');
 
             for (let emoji of emojis) {
                 while (filtered.includes(emoji[0])) {
@@ -82,11 +87,11 @@ function handleWSMessage(message) {
 
 function snedMeHarder(event) {
     const elemelon = document.getElementById('whatthefuckdidyoujustsayaboutme');
-    const msg = elemelon.value;
+    const msg = elemelon.value.trim();
 
     if (event.keyCode === 13 && !event.shiftKey) {
+        event.preventDefault();
         if (ws !== null && ws.readyState === WebSocket.OPEN && msg.length > 0) {
-            event.preventDefault();
             const payload = {
                 op: 8,
                 d: {
@@ -102,6 +107,8 @@ function snedMeHarder(event) {
 }
 
 const emojis = new Map([
-    [':thinkMan:', 'https://cdn.discordapp.com/emojis/427561917989650444.png?v=1'],
-    [':sad:', 'https://cdn.discordapp.com/emojis/409499960128569346.png?v=1']
+    [':thinkman:', 'https://cdn.discordapp.com/emojis/427561917989650444.png?v=1'],
+    [':sad:', 'https://cdn.discordapp.com/emojis/409499960128569346.png?v=1'],
+    [':eyes:', 'https://canary.discordapp.com/assets/ccf4c733929efd9762ab02cd65175377.svg'],
+    [':mmspin:', 'https://cdn.discordapp.com/emojis/422820729042763777.gif?v=1']
 ]);
