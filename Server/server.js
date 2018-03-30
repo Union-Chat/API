@@ -1,4 +1,5 @@
 const config = require('./config.json');
+const fs = require('fs');
 
 /* Server middleware */
 const { authenticate, create } = require('./DatabaseHandler.js');
@@ -6,13 +7,18 @@ const { dispatchHello } = require('./Dispatcher.js');
 const { handleIncomingData, handlePresenceUpdate } = require('./EventHandler.js');
 
 /* Server */
+const https = require('https');
 const WebSocket = require('ws');
 const express = require('express');
 const bodyParser = require('body-parser');
 
 /* Apps */
+const wss = https.createServer({
+    cert: fs.readFileSync('./certificate.pem'),
+    key: fs.readFileSync('./key.pem')
+});
 const app = express();
-const server = new WebSocket.Server({ port: config.ws.port }, () => {
+const server = new WebSocket.Server({ wss }, () => {
     console.log(`[WS] Server started on port ${server.options.port}`); // eslint-disable-line
     setInterval(() => {
         server.clients.forEach(ws => {
