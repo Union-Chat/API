@@ -40,7 +40,7 @@ server.on('connection', async (client, req) => {
     client.on('message', (data) => {
         if (typeof data === 'string' && data.startsWith('Basic ') && !client.user) {
             checkLogin(client, data);
-        } else {
+        } else if (client.user) { // Heck off unauth'd users
             handleIncomingData(client, data, server.clients);
         }
     });
