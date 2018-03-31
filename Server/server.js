@@ -16,7 +16,6 @@ const bodyParser = require('body-parser');
 const wss = https.createServer({
     cert: fs.readFileSync('./certificate.pem'),
     key: fs.readFileSync('./key.pem'),
-    port: 2096
 });
 const app = express.Router();
 const server = new WebSocket.Server({ server: wss });
