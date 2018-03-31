@@ -113,7 +113,7 @@ wss.listen(config.ws.port, () => {
             ws.ping();
         });
     }, 10e3);
-})
+});
 
 exports.router = app;
 //app.listen(config.web.port);
