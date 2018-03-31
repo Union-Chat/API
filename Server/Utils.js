@@ -30,7 +30,7 @@ function safeParse(data) {
  * @param {Set<WebSocket>} clients The clients to filter
  */
 function getSessionsOf(userId, clients) {
-    const sessions = filter(clients, ws => ws.user.id === userId);
+    const sessions = filter(clients, ws => ws.user && ws.user.id === userId);
     return sessions.length;
 }
 
