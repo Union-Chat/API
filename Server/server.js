@@ -118,3 +118,7 @@ wss.listen(config.ws.port, () => {
 
 exports.router = app;
 //app.listen(config.web.port);
+
+process.on('SIGINT', () => {
+    server.clients.forEach(ws => ws.close(1000));
+});
