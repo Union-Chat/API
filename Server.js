@@ -127,4 +127,5 @@ exports.router = app;
 
 process.on('SIGINT', () => {
     server.clients.forEach(ws => ws.close(1000));
+    process.exit();
 });

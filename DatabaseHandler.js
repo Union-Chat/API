@@ -58,8 +58,8 @@ async function authenticate(username, password) {
  */
 async function getUsersInServer(serverId) {
     const users = await r.table('users').without('password');
-    const inServer = users.filter(user => user.servers.includes(serverId));
-    return inServer;
+    const inServer = users.filter(user => user.servers.includes(serverId))
+    return inServer
 }
 
 /**
@@ -73,13 +73,23 @@ async function getServersOfUser(username) {
         return []; // This shouldn't happen but you can never be too careful
     }
 
-    const servers = await r.table('servers').getAll(...user.servers).coerceTo('array');
+    const servers = await r.table('servers')
+        .getAll(...user.servers)
+        .merge(server => ({
+            members: r.table('users').without('password').filter(u => u('servers').nth(0).eq(server('id'))).coerceTo('array')
+        }))
+        .coerceTo('array');
+
+    servers.forEach(serv => {
+        serv.members.forEach(m => delete m.servers);
+    });
+
     return servers;
 }
 
 
 /**
- * Updates the online status of the given uesr
+ * Updates the online status of the given user
  * @param {String} username Username of the user to update the presence of
  * @param {Boolean} online Whether the user is online or not
  */
