@@ -1,0 +1,9 @@
+{
+    "ws": {
+        "port": 2096
+    },
+    "rules": {
+        "messageCharacterLimit": 1000,
+        "usernameCharacterLimit": 15
+    }
+}

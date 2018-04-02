@@ -1,3 +1,4 @@
+const config = require('./Configuration.json');
 const OPCODES = require('./OpCodes.json');
 const { filter, safeParse, getSessionsOf } = require('./Utils.js');
 const { dispatchMessage, dispatchMembers, dispatchPresenceUpdate } = require('./Dispatcher.js');
@@ -35,10 +36,10 @@ async function handleIncomingData(client, data, clients) {
             }));
         }
 
-        if (content.trim().length > 500) {
+        if (content.trim().length > config.rules.messageCharacterLimit) {
             return client.send(JSON.stringify({
                 op: OPCODES.Error,
-                d: 'Content cannot exceed 500 characters'
+                d: `Content cannot exceed ${config.rules.messageCharacterLimit} characters`
             }));
         }
 
@@ -53,9 +54,9 @@ async function handleIncomingData(client, data, clients) {
             createdAt: Date.now()
         };
 
-        const recipients = filter(clients, ws => ws.user && ws.user.servers.includes(server));
+        const recipients = filter(clients, ws => ws.isAuthenticated && ws.user.servers.includes(server));
         dispatchMessage(recipients, message);
-    } else if (data.op === OPCODES.SyncMembers) {
+    } else if (data.op === OPCODES.SyncMembers) { // TODO: Deprecate
         const members = await getUsersInServer(data.d);
         dispatchMembers(client, members);
     } else if (data.op === OPCODES.DeleteMessage) {

@@ -1,10 +1,11 @@
-const config = require('./config.json');
+const config = require('./Configuration.json');
 const fs = require('fs');
 
 /* Server middleware */
 const { authenticate, create } = require('./DatabaseHandler.js');
 const { dispatchHello } = require('./Dispatcher.js');
 const { handleIncomingData, handlePresenceUpdate } = require('./EventHandler.js');
+const { formatString } = require('./Utils.js');
 
 /* Server */
 const https = require('https');
@@ -33,13 +34,13 @@ server.on('connection', async (client, req) => {
     }
 
     client.on('message', (data) => {
-        if (typeof data === 'string' && data.startsWith('Basic ') && !client.user) {
+        if (typeof data === 'string' && data.startsWith('Basic ') && !client.isAuthenticated) {
             checkLogin(client, data);
-        } else if (client.user) { // Heck off unauth'd users
+        } else if (client.isAuthenticated) { // Heck off unauth'd users
             handleIncomingData(client, data, server.clients);
         }
     });
-    client.on('error', () => {});
+    client.on('error', (error) => console.log(formatString('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error)));
     client.on('close', () => client.user && handlePresenceUpdate(client.user.id, server.clients));
     client.on('pong', () => client.isAlive = true);
 });
@@ -64,6 +65,7 @@ async function checkLogin(client, data) {
     client._un = username;
     client.user = user;
     client.isAlive = true;
+    client.isAuthenticated = true;
 
     await dispatchHello(client);
     handlePresenceUpdate(client.user.id, server.clients);
@@ -81,8 +83,8 @@ app.post('/create', async (req, res) => {
         return res.send('Username cannot be empty.');
     }
 
-    if (username.trim().length > 15) {
-        return res.send('Username cannot exceed 15 characters.');
+    if (username.trim().length > config.rules.usernameCharacterLimit) {
+        return res.send(`Username cannot exceed ${config.rules.usernameCharacterLimit} characters.`);
     }
 
     if (password.length === 0) {
@@ -108,7 +110,7 @@ wss.listen(config.ws.port, () => {
                 return;
             }
 
-            if (!ws.isAlive && ws.user) {
+            if (!ws.isAlive && ws.isAuthenticated) {
                 console.log(`WS Died\n\t${ws._un}\n\t${server.clients.size - 1} clients`); // eslint-disable-line
                 handlePresenceUpdate(ws.user.id, server.clients);
                 return ws.terminate();
