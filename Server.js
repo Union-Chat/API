@@ -12,6 +12,7 @@ const https = require('https');
 const WebSocket = require('ws');
 const express = require('express');
 const bodyParser = require('body-parser');
+const api = require('./API.js');
 
 /* Apps */
 const wss = https.createServer({
@@ -75,6 +76,7 @@ async function checkLogin(client, data) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/views`));
+app.use('/api', api);
 
 app.post('/create', async (req, res) => {
     const { username, password } = req.body;
@@ -98,7 +100,6 @@ app.post('/create', async (req, res) => {
     } else {
         return res.send('Looks like that account exists, sad.');
     }
-
 });
 
 
