@@ -36,6 +36,10 @@ async function create(username, password) {
  * @returns {(Null|Object)} The user object if authentication was successful, otherwise null
  */
 async function authenticate(username, password) {
+    if (!username || !password) {
+        return null;
+    }
+
     const user = await r.table('users').get(username);
 
     if (!user) {
