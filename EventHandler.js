@@ -94,11 +94,7 @@ async function handlePresenceUpdate(userId, clients) {
     if (sessions === 0) { // User logs off
         updatePresenceOf(userId, false);
         dispatchPresenceUpdate(userId, false, clients);
-    } else {
-        if (online) {
-            return; // User is already cached as online in the database, don't update
-        }
-
+    } else if (!online) { // User is already cached as online in the database, don't update
         updatePresenceOf(userId, true);
         dispatchPresenceUpdate(userId, true, clients);
     }
