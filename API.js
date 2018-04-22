@@ -9,7 +9,7 @@ const api = express.Router();
 
 api.use(bodyParser.json());
 api.use(bodyParser.urlencoded({ extended: true }));
-api.use(notFound);
+//api.use(notFound);
 
 api.get('/', (req, res) => {
     res.send('Welcome to the Union API!');
