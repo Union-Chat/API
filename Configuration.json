@@ -2,6 +2,9 @@
     "ws": {
         "port": 2096
     },
+    "web": {
+        "port": 889
+    },
     "rules": {
         "messageCharacterLimit": 1000,
         "usernameCharacterLimit": 15

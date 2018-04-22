@@ -35,7 +35,20 @@ async function create(username, password) {
  * @param {String} password The password of the account to check
  * @returns {(Null|Object)} The user object if authentication was successful, otherwise null
  */
-async function authenticate(username, password) {
+async function authenticate(auth) {
+    if (!auth) {
+        return null;
+    }
+
+    const [type, creds] = auth.split(' ');
+
+    if (type !== 'Basic' || !creds) {
+        return null;
+    }
+
+    const decrypted = Buffer.from(creds, 'base64').toString();
+    const [username, password] = decrypted.split(':');
+
     if (!username || !password) {
         return null;
     }
