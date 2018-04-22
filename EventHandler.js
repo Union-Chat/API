@@ -19,44 +19,7 @@ async function handleIncomingData(client, data, clients) {
         return;
     }
 
-    if (data.op === OPCODES.Message) {
-        const { server, content } = data.d;
-
-        if (!client.user.servers.includes(server)) {
-            return client.send(JSON.stringify({
-                op: OPCODES.Error,
-                d: 'You cannot send messages to this server'
-            }));
-        }
-
-        if (content.trim().length === 0) {
-            return client.send(JSON.stringify({
-                op: OPCODES.Error,
-                d: 'You cannot send empty messages'
-            }));
-        }
-
-        if (content.trim().length > config.rules.messageCharacterLimit) {
-            return client.send(JSON.stringify({
-                op: OPCODES.Error,
-                d: `Content cannot exceed ${config.rules.messageCharacterLimit} characters`
-            }));
-        }
-
-        const id = randomBytes(15).toString('hex');
-        storeMessage(id, client.user.id);
-
-        const message = {
-            id,
-            server,
-            content: content.trim(),
-            author: client.user.id,
-            createdAt: Date.now()
-        };
-
-        const recipients = filter(clients, ws => ws.isAuthenticated && ws.user.servers.includes(server));
-        dispatchMessage(recipients, message);
-    } else if (data.op === OPCODES.SyncMembers) { // TODO: Deprecate
+    if (data.op === OPCODES.SyncMembers) { // TODO: Deprecate
         const members = await getUsersInServer(data.d);
         dispatchMembers(client, members);
     } else if (data.op === OPCODES.DeleteMessage) {

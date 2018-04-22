@@ -65,7 +65,7 @@ api.post('/message', async (req, res) => {
 api.post('/create', async (req, res) => {
     const { username, password } = req.body;
 
-    if (username.trim().length === 0) {
+    if (!username || username.trim().length === 0) {
         return res.send('Username cannot be empty.');
     }
 
@@ -73,7 +73,7 @@ api.post('/create', async (req, res) => {
         return res.send(`Username cannot exceed ${config.rules.usernameCharacterLimit} characters.`);
     }
 
-    if (password.length === 0) {
+    if (!password || password.length === 0) {
         return res.send('Password cannot be empty.');
     }
 
