@@ -1,6 +1,8 @@
 {
     "ws": {
-        "port": 2096
+        "port": 2096,
+        "certPath": "/root/union/certificate.pem",
+        "keyPath": "/root/union/key.pem"
     },
     "web": {
         "port": 889
