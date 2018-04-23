@@ -1,0 +1,14 @@
+{
+    "ws": {
+        "port": 2096,
+        "certPath": "/path/to/certificate.pem",
+        "keyPath": "/path/to/key.pem"
+    },
+    "web": {
+        "port": 80
+    },
+    "rules": {
+        "messageCharacterLimit": 1000,
+        "usernameCharacterLimit": 15
+    }
+}
