@@ -70,6 +70,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/views`));
 app.use('/api', api);
+app.use(allowCORS);
+
+function allowCORS(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+}
 
 wss.listen(config.ws.port, () => {
     console.log(`[WS] Server started on port ${config.ws.port}`); // eslint-disable-line

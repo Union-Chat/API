@@ -1,9 +1,7 @@
-const config = require('./Configuration.json');
 const OPCODES = require('./OpCodes.json');
-const { filter, safeParse, getSessionsOf } = require('./Utils.js');
-const { dispatchMessage, dispatchMembers, dispatchPresenceUpdate } = require('./Dispatcher.js');
-const { getUsersInServer, storeMessage, retrieveMessage, getUser, updatePresenceOf } = require('./DatabaseHandler.js');
-const { randomBytes } = require('crypto');
+const { safeParse, getSessionsOf } = require('./Utils.js');
+const { dispatchMembers, dispatchPresenceUpdate } = require('./Dispatcher.js');
+const { getUsersInServer, retrieveMessage, getUser, updatePresenceOf } = require('./DatabaseHandler.js');
 
 
 /**

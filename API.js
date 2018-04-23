@@ -9,6 +9,7 @@ const api = express.Router();
 
 api.use(bodyParser.json());
 api.use(bodyParser.urlencoded({ extended: true }));
+api.use(allowCORS);
 //api.use(notFound);
 
 api.get('/', (req, res) => {
@@ -91,8 +92,14 @@ async function authorize(auth) {
     return user;
 }
 
-function notFound(req, res, next) {
-    res.status(404).send('The requested URL wasn\'t found!');
+//function notFound(req, res, next) {
+//    res.status(404).send('The requested URL wasn\'t found!');
+//}
+
+function allowCORS(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
 }
 
 module.exports = api;
