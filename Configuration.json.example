@@ -1,0 +1,7 @@
+{
+    "ws": {
+        "port": 2096,
+        "certPath": "/path/to/ssl/certificate.crt",
+        "keyPath": "/path/to/ssl/privkey.pem"
+    }
+}
