@@ -6,7 +6,7 @@ const formatterRegex = /(\{(\d+)\})+/gm;
  * @param {Function} expression The predicate to match against
  * @returns {Array} The filtered elements
  */
-function filter(set, expression) {
+function filter (set, expression) {
     const results = [];
     set.forEach(item => expression(item) && results.push(item));
     return results;
@@ -17,7 +17,7 @@ function filter(set, expression) {
  * Tries to parse a string into an object, otherwise returns null
  * @param {String} data The string to convert to an object
  */
-function safeParse(data) {
+function safeParse (data) {
     try {
         return JSON.parse(data);
     } catch (exception) {
@@ -31,7 +31,7 @@ function safeParse(data) {
  * @param {String} userId The user ID to get the sessions of
  * @param {Set<WebSocket>} clients The clients to filter
  */
-function getSessionsOf(userId, clients) {
+function getSessionsOf (userId, clients) {
     const sessions = filter(clients, ws => ws.user && ws.user.id === userId);
     return sessions.length;
 }
@@ -42,7 +42,7 @@ function getSessionsOf(userId, clients) {
  * @param {String} content The string to format
  * @param {...Object} args The args to format the string with
  */
-function formatString(content, ...args) {
+function formatString (content, ...args) {
     let match;
     while ((match = formatterRegex.exec(content)) !== null) {
         content = content.substring(0, match.index) + args[Number(match[2])].toString() + content.substring(match.index + match[0].length, content.length);

@@ -34,7 +34,7 @@ api.post('/message', async (req, res) => {
     }
 
     if (!user.servers.includes(Number(req.body.server))) {
-        return res.status(400).json({ 'error': 'You cannot send messages to this server'});
+        return res.status(400).json({ 'error': 'You cannot send messages to this server' });
     }
 
     if (!req.body.content || req.body.content.trim().length === 0) {
@@ -87,7 +87,7 @@ api.post('/create', async (req, res) => {
     }
 });
 
-async function authorize(auth) {
+async function authorize (auth) {
     const user = await authenticate(auth);
     return user;
 }
@@ -96,7 +96,7 @@ async function authorize(auth) {
 //    res.status(404).send('The requested URL wasn\'t found!');
 //}
 
-function allowCORS(req, res, next) {
+function allowCORS (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();

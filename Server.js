@@ -48,7 +48,7 @@ server.on('connection', async (client, req) => {
 });
 
 
-async function checkLogin(client, data) {
+async function checkLogin (client, data) {
     const user = await authenticate(data);
 
     if (!user) {
@@ -72,7 +72,7 @@ app.use(express.static(`${__dirname}/views`));
 app.use('/api', api);
 app.use(allowCORS);
 
-function allowCORS(req, res, next) {
+function allowCORS (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();

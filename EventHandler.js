@@ -10,7 +10,7 @@ const { getUsersInServer, retrieveMessage, getUser, updatePresenceOf } = require
  * @param {String} data The data sent by the client
  * @param {Set<WebSocket>} clients The clients that payloads should be forwarded to if necessary
  */
-async function handleIncomingData(client, data, clients) {
+async function handleIncomingData (client, data, clients) {
     data = safeParse(data);
 
     if (!data || !data.op) {
@@ -48,7 +48,7 @@ async function handleIncomingData(client, data, clients) {
 }
 
 
-async function handlePresenceUpdate(userId, clients) {
+async function handlePresenceUpdate (userId, clients) {
     const { online } = await getUser(userId);
     const sessions = getSessionsOf(userId, clients);
 

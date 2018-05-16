@@ -7,7 +7,7 @@ const WebSocket = require('ws');
  * Dispatch a HELLO payload to a client
  * @param {WebSocket} client The client to dispatch to
  */
-async function dispatchHello(client) {
+async function dispatchHello (client) {
     const servers = await getServersOfUser(client.user.id);
     const payload = {
         op: OPCODES.Hello,
@@ -24,7 +24,7 @@ async function dispatchHello(client) {
  * @param {Boolean} status The status of the user
  * @param {Set<WebSocket>} clients The clients to dispatch the payload to
  */
-function dispatchPresenceUpdate(userId, status, clients) {
+function dispatchPresenceUpdate (userId, status, clients) {
     const payload = {
         op: OPCODES.DispatchPresence,
         d: {
@@ -42,7 +42,7 @@ function dispatchPresenceUpdate(userId, status, clients) {
  * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the message to
  * @param {Object} message The message to send to the clients
  */
-function dispatchMessage(clients, message) {
+function dispatchMessage (clients, message) {
     const payload = {
         op: OPCODES.DispatchMessage,
         d: message
@@ -56,7 +56,7 @@ function dispatchMessage(clients, message) {
  * @param {WebSocket} client The client to dispatch the members to
  * @param {Array} members The list of members
  */
-function dispatchMembers(client, members) {
+function dispatchMembers (client, members) {
     const payload = {
         op: OPCODES.DispatchMembers,
         d: members
@@ -70,7 +70,7 @@ function dispatchMembers(client, members) {
  * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the payload to
  * @param {Object} payload The payload to send to the clients
  */
-function send(clients, payload) {
+function send (clients, payload) {
     payload = JSON.stringify(payload);
     clients.forEach(ws => {
         if (ws.readyState === WebSocket.OPEN) {

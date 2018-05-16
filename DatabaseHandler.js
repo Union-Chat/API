@@ -10,7 +10,7 @@ const r = require('rethinkdbdash')({
  * @param {String} password The password of the account to create
  * @returns {Boolean} Whether the account was created or not
  */
-async function create(username, password) {
+async function create (username, password) {
     const account = await r.table('users').get(username);
 
     if (account !== null) {
@@ -35,7 +35,7 @@ async function create(username, password) {
  * @param {String} password The password of the account to check
  * @returns {(Null|Object)} The user object if authentication was successful, otherwise null
  */
-async function authenticate(auth) {
+async function authenticate (auth) {
     if (!auth) {
         return null;
     }
@@ -73,7 +73,7 @@ async function authenticate(auth) {
  * TODO: Description
  * @param {Number} serverId The user to get the servers of
  */
-async function getUsersInServer(serverId) {
+async function getUsersInServer (serverId) {
     const users = await r.table('users').without('password');
     return users.filter(user => user.servers.includes(serverId));
 }
@@ -82,7 +82,7 @@ async function getUsersInServer(serverId) {
  * TODO: Description
  * @param {String} username Username of the user to retrieve the servers of
  */
-async function getServersOfUser(username) {
+async function getServersOfUser (username) {
     const user = await r.table('users').get(username);
 
     if (!user) {
@@ -109,26 +109,26 @@ async function getServersOfUser(username) {
  * @param {String} username Username of the user to update the presence of
  * @param {Boolean} online Whether the user is online or not
  */
-function updatePresenceOf(username, online) {
+function updatePresenceOf (username, online) {
     r.table('users').get(username).update({ online }).run();
 }
 
-async function getUser(username) {
+async function getUser (username) {
     const user = await r.table('users').get(username);
     return user;
 }
 
 
-async function getServers() {
+async function getServers () {
     const servers = await r.table('servers');
     return servers.map(s => s.id);
 }
 
-function storeMessage(id, author) {
+function storeMessage (id, author) {
     r.table('messages').insert({ id, author }).run();
 }
 
-async function retrieveMessage(id) {
+async function retrieveMessage (id) {
     const msg = await r.table('messages').get(id);
     return msg;
 }
