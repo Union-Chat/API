@@ -63,6 +63,7 @@ async function addMemberToServer (username, id) {
   const serverExists = await r.table('servers').getAll(id).count().eq(1).run();
 
   if (!userExists || !serverExists) {
+    console.log(username, id, userExists, serverExists);
     return;
   }
 
