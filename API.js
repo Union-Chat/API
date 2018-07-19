@@ -2,7 +2,7 @@ const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { filter } = require('./Utils.js');
 const { authenticate, create, storeMessage } = require('./DatabaseHandler.js');
-const { dispatchMessage } = require('./Dispatcher.js');
+const { dispatchMessage, dispatchServerJoin } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = express.Router();
@@ -23,14 +23,14 @@ api.patch('/self', (req, res) => {
 });
 
 api.post('/message', async (req, res) => {
-    const user = await authorize(req.headers.authorization);
+    const user = await authenticate(req.headers.authorization);
 
     if (!user) {
         return res.status(401).json({ 'error': 'You are not permitted to use this endpoint' });
     }
 
     if (!req.body.server || !Number(req.body.server)) {
-        return res.status(400).json({ 'error': 'server must be a number' });
+        return res.status(400).json({ 'error': 'Server must be a number' });
     }
 
     if (!user.servers.includes(Number(req.body.server))) {
@@ -38,11 +38,11 @@ api.post('/message', async (req, res) => {
     }
 
     if (!req.body.content || req.body.content.trim().length === 0) {
-        return res.status(400).json({ 'error': 'content must be a string and not empty' });
+        return res.status(400).json({ 'error': 'Content must be a string and not empty' });
     }
 
     if (req.body.content.length > config.rules.messageCharacterLimit) {
-        return res.status(400).json({ 'error': `content cannot exceed ${config.rules.messageCharacterLimit} characters` });
+        return res.status(400).json({ 'error': `Content cannot exceed ${config.rules.messageCharacterLimit} characters` });
     }
 
     const { server, content } = req.body;
@@ -87,10 +87,10 @@ api.post('/create', async (req, res) => {
     }
 });
 
-async function authorize (auth) {
-    const user = await authenticate(auth);
-    return user;
-}
+api.post('/serverCreate', async (req, res) => {  // this feels so inconsistent lul
+    // do stuff
+})
+
 
 //function notFound(req, res, next) {
 //    res.status(404).send('The requested URL wasn\'t found!');

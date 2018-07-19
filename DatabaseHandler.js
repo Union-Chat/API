@@ -46,8 +46,7 @@ async function authenticate (auth) {
         return null;
     }
 
-    const decrypted = Buffer.from(creds, 'base64').toString();
-    const [username, password] = decrypted.split(':');
+    const [username, password] = Buffer.from(creds, 'base64').toString().split(':');
 
     if (!username || !password) {
         return null;
@@ -77,6 +76,7 @@ async function getUsersInServer (serverId) {
     const users = await r.table('users').without('password');
     return users.filter(user => user.servers.includes(serverId));
 }
+
 
 /**
  * TODO: Description
@@ -113,9 +113,9 @@ function updatePresenceOf (username, online) {
     r.table('users').get(username).update({ online }).run();
 }
 
-async function getUser (username) {
-    const user = await r.table('users').get(username);
-    return user;
+
+function getUser (username) {
+    return r.table('users').get(username);
 }
 
 
@@ -124,13 +124,14 @@ async function getServers () {
     return servers.map(s => s.id);
 }
 
+
 function storeMessage (id, author) {
     r.table('messages').insert({ id, author }).run();
 }
 
-async function retrieveMessage (id) {
-    const msg = await r.table('messages').get(id);
-    return msg;
+
+function retrieveMessage (id) {
+    return r.table('messages').get(id);
 }
 
 

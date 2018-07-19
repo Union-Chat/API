@@ -66,6 +66,16 @@ function dispatchMembers (client, members) {
 
 
 /**
+ * Dispatches a guildJoin op to the given client
+ * @param {WebSocket} client The client to dispatch the server to
+ * @param {Object} server The server object to be dispatched
+ */
+function dispatchServerJoin (client, server) {
+    
+}
+
+
+/**
  * Dispatch a payload to the provided clients
  * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the payload to
  * @param {Object} payload The payload to send to the clients
@@ -84,5 +94,6 @@ module.exports = {
     dispatchHello,
     dispatchPresenceUpdate,
     dispatchMessage,
-    dispatchMembers
+    dispatchMembers,
+    dispatchServerJoin
 };
