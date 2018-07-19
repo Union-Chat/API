@@ -52,6 +52,23 @@ async function createServer (name, iconUrl, owner) {
 
 
 /**
+ * Adds a member to a server
+ * @param {String} username The member to add to the server
+ * @param {Number} id The server to add the member to
+ */
+async function addMemberToServer (username, id) {
+  const userExists = await r.table('users').getAll(username).count().eq(1).run();
+  const serverExists = await r.table('servers').getAll(id).count().eq(1).run();
+
+  if (!userExists || !serverExists) {
+    return;
+  }
+
+  await r.table('users').get(username)('servers').append(id).run();
+}
+
+
+/**
  * Validates username and password from the provided auth
  * @param {String} auth The authentication type + base64-encoded credentials
  * @returns {(Null|Object)} The user object if authentication was successful, otherwise null
