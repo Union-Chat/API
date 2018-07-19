@@ -92,6 +92,7 @@ async function getUsersInServer (serverId) {
 /**
  * Gets a list of servers that the given user is in
  * @param {String} username Username of the user to retrieve the servers of
+ * @returns {Array<Object>} A list of servers that the user is in
  */
 async function getServersOfUser (username) {
   const user = await r.table('users').get(username);
