@@ -5,12 +5,12 @@ const r = require('rethinkdbdash')({
 
 
 /**
- * TODO: Description
+ * Creates a user object with the provided username and password, and stores it in the DB
  * @param {String} username The username of the account to create
  * @param {String} password The password of the account to create
  * @returns {Boolean} Whether the account was created or not
  */
-async function create (username, password) {
+async function createUser (username, password) {
   const account = await r.table('users').get(username);
 
   if (account !== null) {
@@ -30,9 +30,19 @@ async function create (username, password) {
 
 
 /**
- * TODO: Description
- * @param {String} username The username of the account to check
- * @param {String} password The password of the account to check
+ * Creates a server with the provided name and iconUrl
+ * @param {String} name The name of the server
+ * @param {String} iconUrl A URL leading to an image to be used as the server's icon
+ * @returns {Object} The created server
+ */
+async function createServer (name, iconUrl) {
+
+}
+
+
+/**
+ * Validates username and password from the provided auth
+ * @param {String} auth The authentication type + base64-encoded credentials
  * @returns {(Null|Object)} The user object if authentication was successful, otherwise null
  */
 async function authenticate (auth) {
@@ -69,8 +79,9 @@ async function authenticate (auth) {
 
 
 /**
- * TODO: Description
+ * Retrieves a list of users in the server with the provided serverId
  * @param {Number} serverId The user to get the servers of
+ * @returns {Array<Object>} A list of users in the server
  */
 async function getUsersInServer (serverId) {
   const users = await r.table('users').without('password');
@@ -79,7 +90,7 @@ async function getUsersInServer (serverId) {
 
 
 /**
- * TODO: Description
+ * Gets a list of servers that the given user is in
  * @param {String} username Username of the user to retrieve the servers of
  */
 async function getServersOfUser (username) {
@@ -136,12 +147,13 @@ function retrieveMessage (id) {
 
 
 module.exports = {
-  create,
   authenticate,
+  createUser,
+  createServer,
+  getUser,
   getUsersInServer,
   getServersOfUser,
-  updatePresenceOf,
-  getUser,
+  retrieveMessage,
   storeMessage,
-  retrieveMessage
+  updatePresenceOf
 };

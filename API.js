@@ -1,7 +1,7 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { filter } = require('./Utils.js');
-const { authenticate, create, storeMessage } = require('./DatabaseHandler.js');
+const { authenticate, createUser, storeMessage } = require('./DatabaseHandler.js');
 const { dispatchMessage, dispatchServerJoin } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -78,7 +78,7 @@ api.post('/create', async (req, res) => {
     return res.send('Password cannot be empty.');
   }
 
-  const created = await create(username.trim(), password);
+  const created = await createUser(username.trim(), password);
 
   if (created) {
     return res.send('Account created! You may now login.');
