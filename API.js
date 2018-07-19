@@ -24,8 +24,6 @@ api.patch('/self', (req, res) => {
 
 api.post('/message', async (req, res) => {
   const user = await authenticate(req.headers.authorization);
-  console.log(req.headers.authorization);
-  console.log(user);
 
   if (!user) {
     return res.status(401).json({ 'error': 'Unauthorized: You must be logged in to send messages.' });
