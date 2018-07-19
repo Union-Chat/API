@@ -37,16 +37,18 @@ async function createUser (username, password) {
  */
 async function createServer (name, iconUrl, owner) {
   const serverCount = await r.table('servers').count().run();
+  const id = serverCount + 1;
 
   const server = {
     name,
     iconUrl,
     owner,
     members: [await getMember(owner)],
-    id: serverCount + 1
+    id
   };
 
   await r.table('servers').insert(server).run();
+  await addMemberToServer(owner, id);
   return server;
 }
 
