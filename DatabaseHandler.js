@@ -42,7 +42,7 @@ async function createServer (name, iconUrl, owner) {
     name,
     iconUrl,
     owner,
-    members: [await getUser(owner)],
+    members: [await getMember(owner)],
     id: serverCount + 1
   };
 
@@ -142,6 +142,11 @@ function getUser (username) {
 }
 
 
+function getMember (username) {
+  return r.table('users').get(username).without('password');
+}
+
+
 async function getServers () {
   const servers = await r.table('servers');
   return servers.map(s => s.id);
@@ -162,6 +167,7 @@ module.exports = {
   authenticate,
   createUser,
   createServer,
+  getMember,
   getUser,
   getUsersInServer,
   getServersOfUser,
