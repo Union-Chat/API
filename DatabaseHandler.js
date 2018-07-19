@@ -36,7 +36,7 @@ async function createUser (username, password) {
  * @returns {Object} The created server
  */
 async function createServer (name, iconUrl, owner) {
-  const serverCount = await r.table('servers').count().run();
+  const serverCount = await r.table('servers').count();
   const id = serverCount + 1;
 
   const server = {
@@ -47,7 +47,7 @@ async function createServer (name, iconUrl, owner) {
     id
   };
 
-  await r.table('servers').insert(server).run();
+  await r.table('servers').insert(server);
   await addMemberToServer(owner, id);
   return server;
 }
@@ -59,10 +59,10 @@ async function createServer (name, iconUrl, owner) {
  * @param {Number} id The server to add the member to
  */
 async function addMemberToServer (username, id) {
-  const userExists = await r.table('users').getAll(username).count().eq(1).run();
-  const serverExists = await r.table('servers').getAll(id).count().eq(1).run();
+  const user = await r.table('users').get(username).run();
+  const server = await r.table('servers').get(id).run();
 
-  if (!userExists || !serverExists) {
+  if (!user || !server) {
     console.log(username, id, userExists, serverExists);
     return;
   }
