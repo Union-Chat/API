@@ -1,6 +1,6 @@
 const { hash, compare } = require('bcrypt');
 const r = require('rethinkdbdash')({
-    db: 'union'
+  db: 'union'
 });
 
 
@@ -11,21 +11,21 @@ const r = require('rethinkdbdash')({
  * @returns {Boolean} Whether the account was created or not
  */
 async function create (username, password) {
-    const account = await r.table('users').get(username);
+  const account = await r.table('users').get(username);
 
-    if (account !== null) {
-        return false;
-    } else {
-        await r.table('users').insert({
-            id: username,
-            password: await hash(password, 10),
-            createdAt: Date.now(),
-            servers: await getServers(), // Throw them in every server because why not
-            online: false
-        });
+  if (account !== null) {
+    return false;
+  } else {
+    await r.table('users').insert({
+      id: username,
+      password: await hash(password, 10),
+      createdAt: Date.now(),
+      servers: await getServers(), // Throw them in every server because why not
+      online: false
+    });
 
-        return true;
-    }
+    return true;
+  }
 }
 
 
@@ -36,35 +36,35 @@ async function create (username, password) {
  * @returns {(Null|Object)} The user object if authentication was successful, otherwise null
  */
 async function authenticate (auth) {
-    if (!auth) {
-        return null;
-    }
+  if (!auth) {
+    return null;
+  }
 
-    const [type, creds] = auth.split(' ');
+  const [type, creds] = auth.split(' ');
 
-    if (type !== 'Basic' || !creds) {
-        return null;
-    }
+  if (type !== 'Basic' || !creds) {
+    return null;
+  }
 
-    const [username, password] = Buffer.from(creds, 'base64').toString().split(':');
+  const [username, password] = Buffer.from(creds, 'base64').toString().split(':');
 
-    if (!username || !password) {
-        return null;
-    }
+  if (!username || !password) {
+    return null;
+  }
 
-    const user = await r.table('users').get(username);
+  const user = await r.table('users').get(username);
 
-    if (!user) {
-        return null;
-    }
+  if (!user) {
+    return null;
+  }
 
-    const isPasswordValid = await compare(password, user.password);
+  const isPasswordValid = await compare(password, user.password);
 
-    if (!isPasswordValid) {
-        return null;
-    }
+  if (!isPasswordValid) {
+    return null;
+  }
 
-    return user;
+  return user;
 }
 
 
@@ -73,8 +73,8 @@ async function authenticate (auth) {
  * @param {Number} serverId The user to get the servers of
  */
 async function getUsersInServer (serverId) {
-    const users = await r.table('users').without('password');
-    return users.filter(user => user.servers.includes(serverId));
+  const users = await r.table('users').without('password');
+  return users.filter(user => user.servers.includes(serverId));
 }
 
 
@@ -83,24 +83,24 @@ async function getUsersInServer (serverId) {
  * @param {String} username Username of the user to retrieve the servers of
  */
 async function getServersOfUser (username) {
-    const user = await r.table('users').get(username);
+  const user = await r.table('users').get(username);
 
-    if (!user) {
-        return []; // This shouldn't happen but you can never be too careful
-    }
+  if (!user) {
+    return []; // This shouldn't happen but you can never be too careful
+  }
 
-    const servers = await r.table('servers')
-        .getAll(...user.servers)
-        .merge(server => ({
-            members: r.table('users').without('password').filter(u => u('servers').nth(0).eq(server('id'))).coerceTo('array')
-        }))
-        .coerceTo('array');
+  const servers = await r.table('servers')
+    .getAll(...user.servers)
+    .merge(server => ({
+      members: r.table('users').without('password').filter(u => u('servers').nth(0).eq(server('id'))).coerceTo('array')
+    }))
+    .coerceTo('array');
 
-    servers.forEach(serv => {
-        serv.members.forEach(m => delete m.servers);
-    });
+  servers.forEach(serv => {
+    serv.members.forEach(m => delete m.servers);
+  });
 
-    return servers;
+  return servers;
 }
 
 
@@ -110,38 +110,38 @@ async function getServersOfUser (username) {
  * @param {Boolean} online Whether the user is online or not
  */
 function updatePresenceOf (username, online) {
-    r.table('users').get(username).update({ online }).run();
+  r.table('users').get(username).update({ online }).run();
 }
 
 
 function getUser (username) {
-    return r.table('users').get(username);
+  return r.table('users').get(username);
 }
 
 
 async function getServers () {
-    const servers = await r.table('servers');
-    return servers.map(s => s.id);
+  const servers = await r.table('servers');
+  return servers.map(s => s.id);
 }
 
 
 function storeMessage (id, author) {
-    r.table('messages').insert({ id, author }).run();
+  r.table('messages').insert({ id, author }).run();
 }
 
 
 function retrieveMessage (id) {
-    return r.table('messages').get(id);
+  return r.table('messages').get(id);
 }
 
 
 module.exports = {
-    create,
-    authenticate,
-    getUsersInServer,
-    getServersOfUser,
-    updatePresenceOf,
-    getUser,
-    storeMessage,
-    retrieveMessage
+  create,
+  authenticate,
+  getUsersInServer,
+  getServersOfUser,
+  updatePresenceOf,
+  getUser,
+  storeMessage,
+  retrieveMessage
 };

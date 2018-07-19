@@ -8,13 +8,13 @@ const WebSocket = require('ws');
  * @param {WebSocket} client The client to dispatch to
  */
 async function dispatchHello (client) {
-    const servers = await getServersOfUser(client.user.id);
-    const payload = {
-        op: OPCODES.Hello,
-        d: servers
-    };
+  const servers = await getServersOfUser(client.user.id);
+  const payload = {
+    op: OPCODES.Hello,
+    d: servers
+  };
 
-    send([client], payload);
+  send([client], payload);
 }
 
 
@@ -25,15 +25,15 @@ async function dispatchHello (client) {
  * @param {Set<WebSocket>} clients The clients to dispatch the payload to
  */
 function dispatchPresenceUpdate (userId, status, clients) {
-    const payload = {
-        op: OPCODES.DispatchPresence,
-        d: {
-            id: userId,
-            status
-        }
-    };
+  const payload = {
+    op: OPCODES.DispatchPresence,
+    d: {
+      id: userId,
+      status
+    }
+  };
 
-    send(clients, payload);
+  send(clients, payload);
 }
 
 
@@ -43,11 +43,11 @@ function dispatchPresenceUpdate (userId, status, clients) {
  * @param {Object} message The message to send to the clients
  */
 function dispatchMessage (clients, message) {
-    const payload = {
-        op: OPCODES.DispatchMessage,
-        d: message
-    };
-    send(clients, payload);
+  const payload = {
+    op: OPCODES.DispatchMessage,
+    d: message
+  };
+  send(clients, payload);
 }
 
 
@@ -57,11 +57,11 @@ function dispatchMessage (clients, message) {
  * @param {Array} members The list of members
  */
 function dispatchMembers (client, members) {
-    const payload = {
-        op: OPCODES.DispatchMembers,
-        d: members
-    };
-    send([client], payload);
+  const payload = {
+    op: OPCODES.DispatchMembers,
+    d: members
+  };
+  send([client], payload);
 }
 
 
@@ -71,7 +71,7 @@ function dispatchMembers (client, members) {
  * @param {Object} server The server object to be dispatched
  */
 function dispatchServerJoin (client, server) {
-    
+
 }
 
 
@@ -81,19 +81,19 @@ function dispatchServerJoin (client, server) {
  * @param {Object} payload The payload to send to the clients
  */
 function send (clients, payload) {
-    payload = JSON.stringify(payload);
-    clients.forEach(ws => {
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(payload);
-        }
-    });
+  payload = JSON.stringify(payload);
+  clients.forEach(ws => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(payload);
+    }
+  });
 }
 
 
 module.exports = {
-    dispatchHello,
-    dispatchPresenceUpdate,
-    dispatchMessage,
-    dispatchMembers,
-    dispatchServerJoin
+  dispatchHello,
+  dispatchPresenceUpdate,
+  dispatchMessage,
+  dispatchMembers,
+  dispatchServerJoin
 };

@@ -16,8 +16,8 @@ const api = require('./API.js');
 
 /* Apps */
 const wss = https.createServer({
-    cert: fs.readFileSync(config.ws.certPath),
-    key: fs.readFileSync(config.ws.keyPath),
+  cert: fs.readFileSync(config.ws.certPath),
+  key: fs.readFileSync(config.ws.keyPath),
 });
 const app = express.Router();
 const server = new WebSocket.Server({ server: wss });
@@ -25,44 +25,44 @@ global.server = server;
 
 
 server.on('connection', async (client, req) => {
-    if (!req.headers.authorization) {
-        setTimeout(() => {
-            if (!client.user && client.readyState !== WebSocket.CLOSED) { // Not logged in
-                client.close(4001, 'Unauthorized: Invalid credentials');
-            }
-        }, 30e3); // 30 second grace period to login
-    } else {
-        checkLogin(client, req.headers.authorization);
-    }
+  if (!req.headers.authorization) {
+    setTimeout(() => {
+      if (!client.user && client.readyState !== WebSocket.CLOSED) { // Not logged in
+        client.close(4001, 'Unauthorized: Invalid credentials');
+      }
+    }, 30e3); // 30 second grace period to login
+  } else {
+    checkLogin(client, req.headers.authorization);
+  }
 
-    client.on('message', (data) => {
-        if (typeof data === 'string' && data.startsWith('Basic ') && !client.isAuthenticated) {
-            checkLogin(client, data);
-        } else if (client.isAuthenticated) { // Heck off unauth'd users
-            handleIncomingData(client, data, server.clients);
-        }
-    });
-    client.on('error', (error) => console.log(formatString('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error)));
-    client.on('close', () => client.user && handlePresenceUpdate(client.user.id, server.clients));
-    client.on('pong', () => client.isAlive = true);
+  client.on('message', (data) => {
+    if (typeof data === 'string' && data.startsWith('Basic ') && !client.isAuthenticated) {
+      checkLogin(client, data);
+    } else if (client.isAuthenticated) { // Heck off unauth'd users
+      handleIncomingData(client, data, server.clients);
+    }
+  });
+  client.on('error', (error) => console.log(formatString('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error)));
+  client.on('close', () => client.user && handlePresenceUpdate(client.user.id, server.clients));
+  client.on('pong', () => client.isAlive = true);
 });
 
 
 async function checkLogin (client, data) {
-    const user = await authenticate(data);
+  const user = await authenticate(data);
 
-    if (!user) {
-        return client.close(4001, 'Unauthorized: Invalid credentials');
-    }
+  if (!user) {
+    return client.close(4001, 'Unauthorized: Invalid credentials');
+  }
 
     console.log(`Connection from ${user.id} established | Clients: ${server.clients.size}`); // eslint-disable-line
-    client._un = user.id;
-    client.user = user;
-    client.isAlive = true;
-    client.isAuthenticated = true;
+  client._un = user.id;
+  client.user = user;
+  client.isAlive = true;
+  client.isAuthenticated = true;
 
-    await dispatchHello(client);
-    handlePresenceUpdate(client.user.id, server.clients);
+  await dispatchHello(client);
+  handlePresenceUpdate(client.user.id, server.clients);
 }
 
 
@@ -73,34 +73,34 @@ app.use('/api', api);
 app.use(allowCORS);
 
 function allowCORS (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
 }
 
 wss.listen(config.ws.port, () => {
     console.log(`[WS] Server started on port ${config.ws.port}`); // eslint-disable-line
-    setInterval(() => {
-        server.clients.forEach(ws => {
-            if (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) {
-                return;
-            }
+  setInterval(() => {
+    server.clients.forEach(ws => {
+      if (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) {
+        return;
+      }
 
-            if (!ws.isAlive && ws.isAuthenticated) {
+      if (!ws.isAlive && ws.isAuthenticated) {
                 console.log(`WS Died\n\t${ws._un}\n\t${server.clients.size - 1} clients`); // eslint-disable-line
-                handlePresenceUpdate(ws.user.id, server.clients);
-                return ws.terminate();
-            }
+        handlePresenceUpdate(ws.user.id, server.clients);
+        return ws.terminate();
+      }
 
-            ws.isAlive = false;
-            ws.ping();
-        });
-    }, 10e3);
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 10e3);
 });
 
 exports.router = app;
 
 process.on('SIGINT', () => {
-    server.clients.forEach(ws => ws.close(1000));
-    process.exit();
+  server.clients.forEach(ws => ws.close(1000));
+  process.exit();
 });
