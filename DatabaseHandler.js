@@ -61,21 +61,17 @@ async function createServer (name, iconUrl, owner) {
  * @param {Number} id The server to add the member to
  */
 async function addMemberToServer (username, id) {
-  console.log('Getting user...')
   const user = await r.table('users').get(username);
-  console.log('Getting server...');
   const server = await r.table('servers').get(id);
+  console.log(server)
 
-  console.log(user, server)
   if (!user || !server) {
-    console.log('Returning...');
-    console.log(username, id, userExists, serverExists);
     return;
   }
 
-  console.log('Appending server...');
-  await r.table('users').get(username)('servers').append(id)
-    .catch(err => console.log(err));
+  await r.table('users').get(username).update({
+      servers: r.row('servers').append(id)
+  });   
 }
 
 
@@ -171,7 +167,7 @@ function getUser (username) {
 
 
 function getMember (username) {
-  return r.table('users').get(username).without('password');
+  return r.table('users').get(username).without('password').without('servers');
 }
 
 
