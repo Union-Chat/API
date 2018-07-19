@@ -43,7 +43,6 @@ async function createServer (name, iconUrl, owner) {
     name,
     iconUrl,
     owner,
-    members: [await getMember(owner)],
     id
   };
 
