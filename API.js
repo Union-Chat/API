@@ -24,7 +24,7 @@ api.patch('/self', (req, res) => {
 
 api.post('/message', async (req, res) => {
   const user = await authenticate(req.headers.authorization);
-  console.log(req.header.authorization);
+  console.log(req.headers.authorization);
   console.log(user);
 
   if (!user) {
