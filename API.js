@@ -1,8 +1,8 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
-const { filter } = require('./Utils.js');
-const { authenticate, createUser, storeMessage } = require('./DatabaseHandler.js');
-const { dispatchMessage, dispatchServerJoin } = require('./Dispatcher.js');
+const { filter, findFirst } = require('./Utils.js');
+const { authenticate, createUser, createServer, storeMessage } = require('./DatabaseHandler.js');
+const { dispatchMessage, dispatchServerCreate } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = express.Router();
@@ -26,7 +26,7 @@ api.post('/message', async (req, res) => {
   const user = await authenticate(req.headers.authorization);
 
   if (!user) {
-    return res.status(401).json({ 'error': 'You are not permitted to use this endpoint' });
+    return res.status(401).json({ 'error': 'Unauthorized: You must be logged in to send messages.' });
   }
 
   if (!req.body.server || !Number(req.body.server)) {
@@ -74,8 +74,8 @@ api.post('/create', async (req, res) => {
     return res.send(`Username cannot exceed ${config.rules.usernameCharacterLimit} characters.`);
   }
 
-  if (!password || password.length === 0) {
-    return res.send('Password cannot be empty.');
+  if (!password || password.length < 5) {
+    return res.send('Password cannot be empty and must be 5 characters long or more.');
   }
 
   const created = await createUser(username.trim(), password);
@@ -88,7 +88,27 @@ api.post('/create', async (req, res) => {
 });
 
 api.post('/serverCreate', async (req, res) => {  // this feels so inconsistent lul
-  // do stuff
+  const user = await authenticate(req.headers.authorization);
+
+  if (!user) {
+    return res.status(401).json({ 'error': 'Unauthorized: You must be logged in to create servers.' });
+  }
+
+  const { name, iconUrl } = req.body;
+
+  if (!name || name.trim().length === 0) {
+    return res.status(400).json({ 'error': 'Server name cannot be empty.' });
+  }
+
+  const server = await createServer(name, iconUrl, user.id);
+
+  res.status(200).send();
+
+  const client = findFirst(global.server.clients, ws => ws.isAuthenticated && ws.user.id === user.id);
+
+  if (client) {
+    dispatchServerCreate(client, server);
+  }
 });
 
 

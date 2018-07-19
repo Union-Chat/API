@@ -9,5 +9,5 @@
     "Message": 8,
     "MemberAdd": 9,
     "DeleteMessage": 10,
-    "Error": 11
+    "DispatchServerCreate": 11
 }

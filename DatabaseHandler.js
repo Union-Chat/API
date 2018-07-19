@@ -35,8 +35,19 @@ async function createUser (username, password) {
  * @param {String} iconUrl A URL leading to an image to be used as the server's icon
  * @returns {Object} The created server
  */
-async function createServer (name, iconUrl) {
+async function createServer (name, iconUrl, owner) {
+  const serverCount = await r.table('servers').count().run();
 
+  const server = {
+    name,
+    iconUrl,
+    owner,
+    members: [await getUser(owner)],
+    id: serverCount + 1
+  };
+
+  await r.table('servers').insert(server).run();
+  return server;
 }
 
 
@@ -156,5 +167,6 @@ module.exports = {
   getServersOfUser,
   retrieveMessage,
   storeMessage,
-  updatePresenceOf
+  updatePresenceOf,
+  createServer
 };

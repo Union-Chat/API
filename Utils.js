@@ -14,6 +14,17 @@ function filter (set, expression) {
 
 
 /**
+ * Filters the given set by the given predicate and returns the first match, if any.
+ * @param {Set} set The set to filter the elements of
+ * @param {Function} expression The predicate to match elements against
+ * @returns {Any|Null} The first match, if any
+ */
+function findFirst (set, expression) {
+  return filter(set, expression)[0];
+}
+
+
+/**
  * Tries to parse a string into an object, otherwise returns null
  * @param {String} data The string to convert to an object
  */
@@ -53,6 +64,7 @@ function formatString (content, ...args) {
 
 module.exports = {
   filter,
+  findFirst,
   safeParse,
   getSessionsOf,
   formatString

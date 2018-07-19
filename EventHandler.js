@@ -21,6 +21,7 @@ async function handleIncomingData (client, data, clients) {
     const members = await getUsersInServer(data.d);
     dispatchMembers(client, members);
   } else if (data.op === OPCODES.DeleteMessage) {
+    /*
     const msg = await retrieveMessage(data.d);
 
     if (!msg) {
@@ -43,6 +44,9 @@ async function handleIncomingData (client, data, clients) {
     });
 
     clients.forEach(ws => ws.send(payload)); // move to dispatcher
+    */
+
+    // TODO: Needs to be a REST request
 
   }
 }

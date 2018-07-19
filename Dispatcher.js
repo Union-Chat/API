@@ -70,8 +70,12 @@ function dispatchMembers (client, members) {
  * @param {WebSocket} client The client to dispatch the server to
  * @param {Object} server The server object to be dispatched
  */
-function dispatchServerJoin (client, server) {
-
+function dispatchServerCreate (client, server) {
+  const payload = {
+    op: OPCODES.DispatchServerCreate,
+    d: server
+  };
+  send([client], payload);
 }
 
 
@@ -95,5 +99,5 @@ module.exports = {
   dispatchPresenceUpdate,
   dispatchMessage,
   dispatchMembers,
-  dispatchServerJoin
+  dispatchServerCreate
 };
