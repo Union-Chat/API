@@ -61,7 +61,7 @@ async function addMemberToServer (username, id) {
   const user = await r.table('users').get(username);
   const server = await r.table('servers').get(id);
 
-  if (!user || !server) {
+  if (!user || !server || user.servers.includes(id)) {
     return;
   }
 
