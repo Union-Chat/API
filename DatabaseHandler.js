@@ -135,13 +135,13 @@ async function getServersOfUser (username) {
   const servers = await r.table('servers')
     .getAll(...user.servers)
     .merge(server => ({
-      members: r.table('users').without('password').filter(u => u('servers').contains(server('id'))).coerceTo('array')
+      members: r.table('users').without('password').filter(u => u('servers').contains(server('id'))).without('servers').coerceTo('array')
     }))
     .coerceTo('array');
 
-  servers.forEach(serv => {
-    serv.members.forEach(m => delete m.servers);
-  });
+  //servers.forEach(serv => {
+  //  serv.members.forEach(m => delete m.servers);
+  //});
 
   return servers;
 }
