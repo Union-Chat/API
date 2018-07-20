@@ -49,6 +49,7 @@ api.post('/create', async (req, res) => {
 api.post('/server/:serverId/messages', authorize, async (req, res) => {
   const { serverId } = req.params;
   const { content } = req.body;
+  console.log(serverId, content)
 
   if (!Number(serverId)) {
     return res.status(400).json({ 'error': 'Server must be a number' });
