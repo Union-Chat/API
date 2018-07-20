@@ -37,7 +37,7 @@ async function createUser (username, password) {
  */
 async function createServer (name, iconUrl, owner) {
   const largestId = await r.table('servers').max('id');
-  const id = largestId + 1;
+  const id = largestId.id + 1;
 
   const server = {
     name,
