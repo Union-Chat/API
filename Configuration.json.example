@@ -9,6 +9,7 @@
     },
     "rules": {
         "messageCharacterLimit": 1000,
-        "usernameCharacterLimit": 15
+        "usernameCharacterLimit": 15,
+        "maxServersPerUser": 5
     }
 }

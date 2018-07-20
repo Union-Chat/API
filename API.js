@@ -1,7 +1,7 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { filter, findFirst } = require('./Utils.js');
-const { authenticate, createUser, createServer, storeMessage } = require('./DatabaseHandler.js');
+const { authenticate, createUser, createServer, getOwnedServers, storeMessage } = require('./DatabaseHandler.js');
 const { dispatchMessage, dispatchServerCreate } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -98,6 +98,10 @@ api.post('/serverCreate', async (req, res) => {  // this feels so inconsistent l
 
   if (!name || name.trim().length === 0) {
     return res.status(400).json({ 'error': 'Server name cannot be empty.' });
+  }
+
+  if (getOwnedServers(user.id) >= config.rules.maxServersPerUser) {
+    return res.status(400).json({ 'error': `You cannot own more than ${config.rules.maxServersPerUser} servers` });
   }
 
   const server = await createServer(name, iconUrl, user.id);

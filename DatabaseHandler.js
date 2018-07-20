@@ -160,6 +160,9 @@ function getMember (username) {
   return r.table('users').get(username).without('password').without('servers');
 }
 
+function getOwnedServers (username) {
+  return r.table('servers').filter(s => s('owner').eq(owner)).count();
+}
 
 async function getServers () {
   const servers = await r.table('servers');
@@ -190,6 +193,7 @@ module.exports = {
   createUser,
   createServer,
   getMember,
+  getOwnedServers,
   getUser,
   getUsersInServer,
   getServersOfUser,
