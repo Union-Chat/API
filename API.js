@@ -107,7 +107,7 @@ api.post('/createServer', authorize, async (req, res) => {  // this feels so inc
 api.post('/deleteServer', authorize, async (req, res) => {
   const { serverId } = req.body;
 
-  if (!serverId || !await ownsServer(serverId)) {
+  if (!serverId || !await ownsServer(req.user.id, serverId)) {
     return res.status(403).json({ 'error': 'You can only delete servers that you own.' });
   }
 
