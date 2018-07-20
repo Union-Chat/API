@@ -112,6 +112,9 @@ api.post('/deleteServer', authorize, async (req, res) => {
   }
 
   const dispatchTo = await deleteServer(serverId);
+
+  res.status(200).send();
+
   const clients = filter(global.server.clients, ws => ws.isAuthenticated && dispatchTo.includes(ws.user.id));
 
   if (clients.length > 0) {
