@@ -49,13 +49,14 @@ api.post('/create', async (req, res) => {
 api.post('/server/:serverId/messages', authorize, async (req, res) => {
   const { serverId } = req.params;
   const { content } = req.body;
-  console.log(serverId, content)
 
-  if (!Number(serverId)) {
+  const server = Number(serverId);
+
+  if (!server) {
     return res.status(400).json({ 'error': 'Server must be a number' });
   }
 
-  if (!req.user.servers.includes(Number(serverId))) {
+  if (!req.user.servers.includes(server)) {
     return res.status(400).json({ 'error': 'You cannot send messages to this server' });
   }
 
@@ -72,13 +73,13 @@ api.post('/server/:serverId/messages', authorize, async (req, res) => {
 
   const message = {
     id,
-    server: serverId,
+    server: server,
     content: content.trim(),
     author: req.user.id,
     createdAt: Date.now()
   };
 
-  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
+  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(server));
   dispatchMessage(recipients, message);
   res.status(200).send();
 });
