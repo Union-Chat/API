@@ -134,9 +134,8 @@ async function getServersOfUser (username) {
   const servers = await r.table('servers')
     .getAll(...user.servers)
     .merge(server => ({
-      members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']) // coerce
-    }))
-    .coerceTo('array');
+      members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']).coerceTo('array')
+    })) // coerce
 
   return servers;
 }
@@ -171,7 +170,7 @@ function getServer (serverId) {
   return r.table('servers')
     .get(serverId)
     .merge(server => ({
-        members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']) // coerce
+        members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']).coerceTo('array')
     }))
 }
 
