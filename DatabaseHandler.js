@@ -161,7 +161,7 @@ function getMember (username) {
 }
 
 function getOwnedServers (username) {
-  return r.table('servers').filter(s => s('owner').eq(owner)).count();
+  return r.table('servers').filter(s => s('owner').eq(username)).count();
 }
 
 async function getServers () {
