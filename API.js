@@ -51,7 +51,7 @@ api.post('/message', authorize, async (req, res) => {
     return res.status(400).json({ 'error': 'Server must be a number' });
   }
 
-  if (!user.servers.includes(Number(req.body.server))) {
+  if (!req.user.servers.includes(Number(req.body.server))) {
     return res.status(400).json({ 'error': 'You cannot send messages to this server' });
   }
 
