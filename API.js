@@ -26,62 +26,63 @@ api.post('/create', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || username.trim().length === 0) {
-    return res.send('Username cannot be empty.');
+    return res.status(400).json({ 'error': 'Username cannot be empty.' });
   }
 
   if (username.trim().length > config.rules.usernameCharacterLimit) {
-    return res.send(`Username cannot exceed ${config.rules.usernameCharacterLimit} characters.`);
+    return res.status(400).json({ 'error': `Username cannot exceed ${config.rules.usernameCharacterLimit} characters.` });
   }
 
   if (!password || password.length < 5) {
-    return res.send('Password cannot be empty and must be 5 characters long or more.');
+    return res.status(400).json({ 'error': 'Password cannot be empty and must be 5 characters long or more.' });
   }
 
   const created = await createUser(username.trim(), password);
 
   if (created) {
-    return res.send('Account created! You may now login.');
+    return res.status(200).send('Account created! You may now login.'); // todo: json
   } else {
-    return res.send('Unable to create account (it may already exist!)');
+    return res.status(200).send('Unable to create account (it may already exist!)'); // also json here
   }
 });
 
-api.post('/message', authorize, async (req, res) => {
-  if (!req.body.server || !Number(req.body.server)) {
+api.post('/server/:serverId/messages', authorize, async (req, res) => {
+  const { serverId } = req.params;
+  const { content } = req.body;
+
+  if (!Number(serverId)) {
     return res.status(400).json({ 'error': 'Server must be a number' });
   }
 
-  if (!req.user.servers.includes(Number(req.body.server))) {
+  if (!req.user.servers.includes(Number(serverId))) {
     return res.status(400).json({ 'error': 'You cannot send messages to this server' });
   }
 
-  if (!req.body.content || req.body.content.trim().length === 0) {
+  if (!content || content.trim().length === 0) {
     return res.status(400).json({ 'error': 'Content must be a string and not empty' });
   }
 
-  if (req.body.content.length > config.rules.messageCharacterLimit) {
+  if (content.length > config.rules.messageCharacterLimit) {
     return res.status(400).json({ 'error': `Content cannot exceed ${config.rules.messageCharacterLimit} characters` });
   }
-
-  const { server, content } = req.body;
 
   const id = randomBytes(15).toString('hex');
   storeMessage(id, req.user.id);
 
   const message = {
     id,
-    server,
+    server: serverId,
     content: content.trim(),
     author: req.user.id,
     createdAt: Date.now()
   };
 
-  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(server));
+  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
   dispatchMessage(recipients, message);
   res.status(200).send();
 });
 
-api.post('/createServer', authorize, async (req, res) => {  // this feels so inconsistent lul
+api.post('/server', authorize, async (req, res) => {  // this feels so inconsistent lul
   const { name, iconUrl } = req.body;
 
   if (!name || name.trim().length === 0) {
@@ -89,7 +90,7 @@ api.post('/createServer', authorize, async (req, res) => {  // this feels so inc
   }
 
   if (await getOwnedServers(req.user.id) >= config.rules.maxServersPerUser) {
-    return res.status(400).json({ 'error': `You cannot own more than ${config.rules.maxServersPerUser} servers` });
+    return res.status(400).json({ 'error': `You cannot create more than ${config.rules.maxServersPerUser} servers` });
   }
 
   const server = await createServer(name, iconUrl, req.user.id);
@@ -104,10 +105,10 @@ api.post('/createServer', authorize, async (req, res) => {  // this feels so inc
 });
 
 
-api.post('/deleteServer', authorize, async (req, res) => {
-  const { serverId } = req.body;
+api.delete('/server/:serverId', authorize, async (req, res) => {
+  const { serverId } = req.params;
 
-  if (!serverId || !await ownsServer(req.user.id, serverId)) {
+  if (!await ownsServer(req.user.id, serverId)) {
     return res.status(403).json({ 'error': 'You can only delete servers that you own.' });
   }
 
