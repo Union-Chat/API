@@ -170,8 +170,8 @@ function getServer (serverId) {
   return r.table('servers')
     .get(serverId)
     .merge(server => ({
-        members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']).coerceTo('array')
-    }))
+      members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']).coerceTo('array')
+    }));
 }
 
 
