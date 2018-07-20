@@ -1,6 +1,6 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
-const { filter, findFirst } = require('./Utils.js');
+const { filter } = require('./Utils.js');
 const { authenticate, createUser, createServer, getOwnedServers, storeMessage } = require('./DatabaseHandler.js');
 const { dispatchMessage, dispatchServerCreate } = require('./Dispatcher.js');
 const express = require('express');
@@ -20,47 +20,6 @@ api.get('/', (req, res) => {
 api.patch('/self', (req, res) => {
   res.send('Not done.');
   // TODO
-});
-
-api.post('/message', async (req, res) => {
-  const user = await authenticate(req.headers.authorization);
-
-  if (!user) {
-    return res.status(401).json({ 'error': 'Unauthorized: You must be logged in to send messages.' });
-  }
-
-  if (!req.body.server || !Number(req.body.server)) {
-    return res.status(400).json({ 'error': 'Server must be a number' });
-  }
-
-  if (!user.servers.includes(Number(req.body.server))) {
-    return res.status(400).json({ 'error': 'You cannot send messages to this server' });
-  }
-
-  if (!req.body.content || req.body.content.trim().length === 0) {
-    return res.status(400).json({ 'error': 'Content must be a string and not empty' });
-  }
-
-  if (req.body.content.length > config.rules.messageCharacterLimit) {
-    return res.status(400).json({ 'error': `Content cannot exceed ${config.rules.messageCharacterLimit} characters` });
-  }
-
-  const { server, content } = req.body;
-
-  const id = randomBytes(15).toString('hex');
-  storeMessage(id, user.id);
-
-  const message = {
-    id,
-    server,
-    content: content.trim(),
-    author: user.id,
-    createdAt: Date.now()
-  };
-
-  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(server));
-  dispatchMessage(recipients, message);
-  res.status(200).send();
 });
 
 api.post('/create', async (req, res) => {
@@ -87,38 +46,83 @@ api.post('/create', async (req, res) => {
   }
 });
 
-api.post('/serverCreate', async (req, res) => {  // this feels so inconsistent lul
-  const user = await authenticate(req.headers.authorization);
-
-  if (!user) {
-    return res.status(401).json({ 'error': 'Unauthorized: You must be logged in to create servers.' });
+api.post('/message', authorize, async (req, res) => {
+  if (!req.body.server || !Number(req.body.server)) {
+    return res.status(400).json({ 'error': 'Server must be a number' });
   }
 
+  if (!user.servers.includes(Number(req.body.server))) {
+    return res.status(400).json({ 'error': 'You cannot send messages to this server' });
+  }
+
+  if (!req.body.content || req.body.content.trim().length === 0) {
+    return res.status(400).json({ 'error': 'Content must be a string and not empty' });
+  }
+
+  if (req.body.content.length > config.rules.messageCharacterLimit) {
+    return res.status(400).json({ 'error': `Content cannot exceed ${config.rules.messageCharacterLimit} characters` });
+  }
+
+  const { server, content } = req.body;
+
+  const id = randomBytes(15).toString('hex');
+  storeMessage(id, req.user.id);
+
+  const message = {
+    id,
+    server,
+    content: content.trim(),
+    author: req.user.id,
+    createdAt: Date.now()
+  };
+
+  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(server));
+  dispatchMessage(recipients, message);
+  res.status(200).send();
+});
+
+api.post('/createServer', authorize, async (req, res) => {  // this feels so inconsistent lul
   const { name, iconUrl } = req.body;
 
   if (!name || name.trim().length === 0) {
     return res.status(400).json({ 'error': 'Server name cannot be empty.' });
   }
 
-  if (await getOwnedServers(user.id) >= config.rules.maxServersPerUser) {
+  if (await getOwnedServers(req.user.id) >= config.rules.maxServersPerUser) {
     return res.status(400).json({ 'error': `You cannot own more than ${config.rules.maxServersPerUser} servers` });
   }
 
-  const server = await createServer(name, iconUrl, user.id);
+  const server = await createServer(name, iconUrl, req.user.id);
 
   res.status(200).send();
 
-  const client = findFirst(global.server.clients, ws => ws.isAuthenticated && ws.user.id === user.id);
+  const clients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.id === req.user.id);
 
-  if (client) {
-    dispatchServerCreate(client, server);
+  if (clients.length > 0) {
+    dispatchServerCreate(clients, server);
   }
+});
+
+
+api.post('/deleteServer', authorize, async (req, res) => {
+
 });
 
 
 //function notFound(req, res, next) {
 //    res.status(404).send('The requested URL wasn\'t found!');
 //}
+
+async function authorize (req, res, next) {
+  const user = await authenticate(req.headers.authorization);
+
+  if (!user) {
+    return res.status(401).json({ 'error': 'Unauthorized: You must be logged in to access this route.' });
+  }
+
+  req.user = user;
+  next();
+}
 
 function allowCORS (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');

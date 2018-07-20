@@ -151,24 +151,51 @@ function updatePresenceOf (username, online) {
 }
 
 
+/**
+ * Updates the online status of the given user
+ * @param {String} username Username of the user to update the presence of
+ * @param {Boolean} online Whether the user is online or not
+ */
 function getUser (username) {
   return r.table('users').get(username);
 }
 
 
+/**
+ * Retrieves a user without private properties
+ * @param {String} username The name of the user to retrieve
+ * @returns {Object|Null} The user, if they exist
+ */
 function getMember (username) {
   return r.table('users').get(username).without('password').without('servers');
 }
 
+
+/**
+ * Returns the number of servers that the given user owns
+ * @param {String} username The username to filter servers against
+ * @returns {Number} The amount of servers the user owns
+ */
 function getOwnedServers (username) {
   return r.table('servers').filter(s => s('owner').eq(username)).count();
 }
 
+
+/**
+ * Retrieves the IDs of all servers in the database
+ * @returns {Array<Number>} The server IDs
+ */
 async function getServers () {
   const servers = await r.table('servers');
   return servers.map(s => s.id);
 }
 
+
+/**
+ * Retrieves a server from the database by its ID
+ * @param {Number} serverId The ID of the server to retrieve
+ * @returns {Object|Null} The server, if it exists
+ */
 function getServer (serverId) {
   return r.table('servers')
     .get(serverId)
@@ -177,6 +204,32 @@ function getServer (serverId) {
     }));
 }
 
+
+/**
+ * Deletes a server by its ID
+ * @param {Number} serverId The ID of the server to delete
+ */
+async function deleteServer (serverId) {
+  await r.table('servers').get(serverId).delete();
+
+  await r.table('users')
+    .filter(u => u('servers').contains(serverId))
+    .update({
+      servers: r.row('servers').difference([serverId])
+    });
+}
+
+
+/**
+ * Checks if the given user is the owner of the given server
+ * @param {String} username The name of the user to check
+ * @param {Number} serverId The id of the server to check
+ * @returns {Boolean} Whether or not the user owns the server
+ */
+async function ownsServer (username, serverId) {
+  const server = await r.table('servers').get(serverId);
+  return server && server.owner === username;
+}
 
 function storeMessage (id, author) {
   r.table('messages').insert({ id, author }).run();
@@ -187,18 +240,21 @@ function retrieveMessage (id) {
   return r.table('messages').get(id);
 }
 
+// TODO: When a server is created and deleted, the changes aren't reflected in the client websocket until it logs back in.
+
 
 module.exports = {
   authenticate,
   createUser,
   createServer,
+  deleteServer,
   getMember,
   getOwnedServers,
   getUser,
   getUsersInServer,
   getServersOfUser,
+  ownsServer,
   retrieveMessage,
   storeMessage,
   updatePresenceOf,
-  createServer
 };

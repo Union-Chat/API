@@ -67,7 +67,7 @@ function dispatchMembers (client, members) {
 
 /**
  * Dispatches a guildJoin op to the given client
- * @param {WebSocket} client The client to dispatch the server to
+ * @param {Set<WebSocket>|WebSocket[]} client The client to dispatch the server to
  * @param {Object} server The server object to be dispatched
  */
 function dispatchServerCreate (client, server) {
@@ -75,7 +75,8 @@ function dispatchServerCreate (client, server) {
     op: OPCODES.DispatchServerJoin,
     d: server
   };
-  send([client], payload);
+
+  send(client, payload);
 }
 
 
@@ -86,6 +87,7 @@ function dispatchServerCreate (client, server) {
  */
 function send (clients, payload) {
   payload = JSON.stringify(payload);
+
   clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) {
       ws.send(payload);
