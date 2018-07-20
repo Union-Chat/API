@@ -115,7 +115,7 @@ async function authenticate (auth) {
  * @returns {Array<Object>} A list of users in the server
  */
 function getUsersInServer (serverId) {
-  return r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']); // coerce
+  return r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']);
 }
 
 
@@ -135,7 +135,7 @@ async function getServersOfUser (username) {
     .getAll(...user.servers)
     .merge(server => ({
       members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']).coerceTo('array')
-    })) // coerce
+    }));
 
   return servers;
 }
