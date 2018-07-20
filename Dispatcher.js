@@ -72,7 +72,7 @@ function dispatchMembers (client, members) {
  */
 function dispatchServerCreate (client, server) {
   const payload = {
-    op: OPCODES.DispatchServerCreate,
+    op: OPCODES.DispatchServerJoin,
     d: server
   };
   send([client], payload);
