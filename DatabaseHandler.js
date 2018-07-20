@@ -48,7 +48,7 @@ async function createServer (name, iconUrl, owner) {
 
   await r.table('servers').insert(server);
   await addMemberToServer(owner, id);
-  return server;
+  return getServer(id);
 }
 
 
@@ -114,9 +114,8 @@ async function authenticate (auth) {
  * @param {Number} serverId The user to get the servers of
  * @returns {Array<Object>} A list of users in the server
  */
-async function getUsersInServer (serverId) {
-  const users = await r.table('users').without('password');
-  return users.filter(user => user.servers.includes(serverId));
+function getUsersInServer (serverId) {
+  return r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']); // coerce
 }
 
 
@@ -135,7 +134,7 @@ async function getServersOfUser (username) {
   const servers = await r.table('servers')
     .getAll(...user.servers)
     .merge(server => ({
-      members: r.table('users').without('password').filter(u => u('servers').contains(server('id'))).without('servers').coerceTo('array')
+      members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']) // coerce
     }))
     .coerceTo('array');
 
@@ -166,6 +165,14 @@ function getMember (username) {
 async function getServers () {
   const servers = await r.table('servers');
   return servers.map(s => s.id);
+}
+
+function getServer (serverId) {
+  return r.table('servers')
+    .get(serverId)
+    .merge(server => ({
+        members: r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']) // coerce
+    }))
 }
 
 
