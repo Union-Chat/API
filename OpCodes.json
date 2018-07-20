@@ -4,9 +4,10 @@
     "DispatchMessage": 3,
     "DispatchPresence": 4,
     "DispatchServerJoin": 5,
-    "DispatchMembers": 6,
-    "DispatchDeleteMessage": 7,
-    "SyncMembers": 8,
-    "Message": 9,
-    "MemberAdd": 10
+    "DispatchServerLeave": 6,
+    "DispatchMembers": 7,
+    "DispatchDeleteMessage": 8,
+    "SyncMembers": 9,
+    "Message": 10,
+    "MemberAdd": 11
 }

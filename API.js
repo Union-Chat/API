@@ -1,8 +1,8 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { filter } = require('./Utils.js');
-const { authenticate, createUser, createServer, getOwnedServers, storeMessage } = require('./DatabaseHandler.js');
-const { dispatchMessage, dispatchServerCreate } = require('./Dispatcher.js');
+const { authenticate, createUser, createServer, getOwnedServers, ownsServer, deleteServer, storeMessage } = require('./DatabaseHandler.js');
+const { dispatchMessage, dispatchServerCreate, dispatchServerLeave } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = express.Router();
@@ -105,7 +105,18 @@ api.post('/createServer', authorize, async (req, res) => {  // this feels so inc
 
 
 api.post('/deleteServer', authorize, async (req, res) => {
+  const { serverId } = req.body;
 
+  if (!serverId || !await ownsServer(serverId)) {
+    return res.status(403).json({ 'error': 'You can only delete servers that you own.' });
+  }
+
+  const dispatchTo = await deleteServer(serverId);
+  const clients = filter(global.server.clients, ws => ws.isAuthenticated && dispatchTo.includes(ws.user.id));
+
+  if (clients.length > 0) {
+    dispatchServerLeave(clients, serverId);
+  }
 });
 
 

@@ -66,17 +66,32 @@ function dispatchMembers (client, members) {
 
 
 /**
- * Dispatches a guildJoin op to the given client
- * @param {Set<WebSocket>|WebSocket[]} client The client to dispatch the server to
+ * Dispatches a guildJoin op to the given clients
+ * @param {Set<WebSocket>|WebSocket[]} clients The client to dispatch the event to
  * @param {Object} server The server object to be dispatched
  */
-function dispatchServerCreate (client, server) {
+function dispatchServerCreate (clients, server) {
   const payload = {
     op: OPCODES.DispatchServerJoin,
     d: server
   };
 
-  send(client, payload);
+  send(clients, payload);
+}
+
+
+/**
+ * Dispatches a guildLeave op to the given clients
+ * @param {Set<WebSocket>|WebSocket[]} clients The client to dispatch the event to
+ * @param {String} serverId The id of the server that was deleted
+ */
+function dispatchServerLeave (clients, serverId) {
+  const payload = {
+    op: OPCODES.DispatchServerLeave,
+    d: serverId
+  };
+
+  send(clients, payload);
 }
 
 
@@ -101,5 +116,6 @@ module.exports = {
   dispatchPresenceUpdate,
   dispatchMessage,
   dispatchMembers,
-  dispatchServerCreate
+  dispatchServerCreate,
+  dispatchServerLeave
 };

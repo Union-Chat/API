@@ -208,15 +208,20 @@ function getServer (serverId) {
 /**
  * Deletes a server by its ID
  * @param {Number} serverId The ID of the server to delete
+ * @returns {String[]} The users to dispatch serverLeave to
  */
 async function deleteServer (serverId) {
   await r.table('servers').get(serverId).delete();
+
+  const inServer = await r.table('users').filter(u => u('servers').contains(serverId));
 
   await r.table('users')
     .filter(u => u('servers').contains(serverId))
     .update({
       servers: r.row('servers').difference([serverId])
     });
+
+  return inServer.map(u => u.id);
 }
 
 
