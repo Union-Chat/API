@@ -100,7 +100,7 @@ api.post('/serverCreate', async (req, res) => {  // this feels so inconsistent l
     return res.status(400).json({ 'error': 'Server name cannot be empty.' });
   }
 
-  if (getOwnedServers(user.id) >= config.rules.maxServersPerUser) {
+  if (await getOwnedServers(user.id) >= config.rules.maxServersPerUser) {
     return res.status(400).json({ 'error': `You cannot own more than ${config.rules.maxServersPerUser} servers` });
   }
 
