@@ -139,10 +139,6 @@ async function getServersOfUser (username) {
     }))
     .coerceTo('array');
 
-  //servers.forEach(serv => {
-  //  serv.members.forEach(m => delete m.servers);
-  //});
-
   return servers;
 }
 
