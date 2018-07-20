@@ -109,19 +109,20 @@ api.post('/server', authorize, async (req, res) => {  // this feels so inconsist
 
 api.delete('/server/:serverId', authorize, async (req, res) => {
   const { serverId } = req.params;
+  const sid = Number(serverId);
 
-  if (!await ownsServer(req.user.id, serverId)) {
+  if (!await ownsServer(req.user.id, sid)) {
     return res.status(403).json({ 'error': 'You can only delete servers that you own.' });
   }
 
-  const dispatchTo = await deleteServer(serverId);
+  const dispatchTo = await deleteServer(sid);
 
   res.status(200).send();
 
   const clients = filter(global.server.clients, ws => ws.isAuthenticated && dispatchTo.includes(ws.user.id));
 
   if (clients.length > 0) {
-    dispatchServerLeave(clients, serverId);
+    dispatchServerLeave(clients, sid);
   }
 });
 

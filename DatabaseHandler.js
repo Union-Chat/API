@@ -115,7 +115,7 @@ async function authenticate (auth) {
  * @returns {Array<Object>} A list of users in the server
  */
 function getUsersInServer (serverId) {
-  return r.table('users').filter(u => u('servers').contains(server('id'))).without(['servers', 'password']);
+  return r.table('users').filter(u => u('servers').contains(serverId)).without(['servers', 'password']);
 }
 
 
