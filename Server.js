@@ -104,3 +104,6 @@ process.on('SIGINT', () => {
   server.clients.forEach(ws => ws.close(1000));
   process.exit();
 });
+
+// TODO
+// Perhaps remove 'online' from user objects to prevent invalid cache state

@@ -84,7 +84,7 @@ function dispatchMembers (client, members) {
  * @param {Set<WebSocket>|WebSocket[]} clients The client to dispatch the event to
  * @param {Object} server The server object to be dispatched
  */
-function dispatchServerCreate (clients, server) {
+function dispatchServerJoin (clients, server) {
   const payload = {
     op: OPCODES.DispatchServerJoin,
     d: server

@@ -25,7 +25,18 @@ function findFirst (set, expression) {
 
 
 /**
- * Tries to parse a string into an object, otherwise returns null
+ * Gets the first websocket client with the given user ID
+ * @param {Set<WebSocket>|WebSocket[]} clients The clients to filter
+ * @param {String} userId The userId to find
+ * @returns {Array<WebSocket>} The matching clients
+ */
+function getClientsById (clients, userId) {
+  return filter(clients, (ws) => ws.isAuthenticated && ws.user.id === userId);
+}
+
+
+/**
+ * Parses a string into an object and suppresses any errors thrown
  * @param {String} data The string to convert to an object
  */
 function safeParse (data) {
@@ -33,6 +44,33 @@ function safeParse (data) {
     return JSON.parse(data);
   } catch (exception) {
     return null;
+  }
+}
+
+
+/**
+ * De-duplicates an array by converting it to a set and back
+ * @param {Array<*>} array The array to deduplicate
+ * @param {*} append Elements to append to the array before deduplicating
+ * @returns {Array<*>} The deduplicated array
+ */
+function deduplicate (array, ...append) {
+  const packed = array.push(...append);
+  const arraySet = new Set(packed);
+  return [...arraySet.values()];
+}
+
+
+/**
+ * Removes an element from an array
+ * @param {Array<*>} array The array to remove the item from
+ * @param {*} item The item to remove
+ */
+function remove (array, item) {
+  const ind = array.indexOf(item);
+
+  if (ind > -1) {
+    array.splice(ind, 1);
   }
 }
 
@@ -62,9 +100,12 @@ function formatString (content, ...args) {
 
 
 module.exports = {
+  deduplicate,
   filter,
   findFirst,
   safeParse,
+  getClientsById,
   getSessionsOf,
-  formatString
+  formatString,
+  remove
 };

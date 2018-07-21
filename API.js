@@ -1,8 +1,8 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
-const { filter } = require('./Utils.js');
+const { deduplicate, filter, getClientsById, remove } = require('./Utils.js');
 const { authenticate, createUser, createServer, generateInvite, getOwnedServers, ownsServer, deleteServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
-const { dispatchMessage, dispatchServerCreate, dispatchServerLeave } = require('./Dispatcher.js');
+const { dispatchMessage, dispatchServerJoin, dispatchServerLeave } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = express.Router();
@@ -93,10 +93,11 @@ api.post('/server', authorize, async (req, res) => {  // this feels so inconsist
 
   res.status(200).send();
 
-  const clients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.id === req.user.id);
+  const clients = getClientsById(global.server.clients, req.user.id);
 
   if (clients.length > 0) {
-    dispatchServerCreate(clients, server);
+    clients.forEach(ws => ws.user.servers = deduplicate(ws.user.servers, server.id));
+    dispatchServerJoin(clients, server);
   }
 });
 
@@ -115,6 +116,7 @@ api.delete('/server/:serverId', validateServer, authorize, async (req, res) => {
   const clients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
 
   if (clients.length > 0) {
+    clients.forEach(ws => remove(ws.user.servers, serverId));
     dispatchServerLeave(clients, serverId);
   }
 });
@@ -132,7 +134,6 @@ api.post('/api/server/:serverId/invites', validateServer, authorize, async (req,
   res.status(200).send({ code: inviteCode });
 
   // TODO:
-  // Update websocket client-user servers when they join a server
   // Method to join servers with invite codes
   // Dispatch memberJoin to users in the server associated with the invite ID
   // Dispatch serverJoin to the user who accepted the invite
