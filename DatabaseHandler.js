@@ -168,7 +168,7 @@ function getUser (username) {
  * @returns {Object|Null} The user, if they exist
  */
 function getMember (username) {
-  return r.table('users').get(username).without('password').without('servers');
+  return r.table('users').get(username).without(['password', 'servers']);
 }
 
 
