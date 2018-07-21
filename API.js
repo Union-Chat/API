@@ -122,7 +122,7 @@ api.delete('/server/:serverId', validateServer, authorize, async (req, res) => {
 });
 
 
-api.post('/api/server/:serverId/invites', validateServer, authorize, async (req, res) => {
+api.post('/server/:serverId/invites', validateServer, authorize, async (req, res) => {
   const { serverId } = req;
 
   if (!await ownsServer(req.user.id, serverId)) {
