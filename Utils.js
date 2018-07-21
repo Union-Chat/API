@@ -55,8 +55,8 @@ function safeParse (data) {
  * @returns {Array<*>} The deduplicated array
  */
 function deduplicate (array, ...append) {
-  const packed = array.push(...append);
-  const arraySet = new Set(packed);
+  array.push(...append);
+  const arraySet = new Set(array);
   return [...arraySet.values()];
 }
 
