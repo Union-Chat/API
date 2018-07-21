@@ -165,6 +165,7 @@ api.post('/invites/:inviteId', authorize, async (req, res) => {
   const server = await getServer(serverId);
 
   if (clients.length > 0) {
+    clients.forEach(ws => ws.user.servers = deduplicate(ws.user.servers, serverId));
     dispatchServerJoin(clients, server);
   }
 
