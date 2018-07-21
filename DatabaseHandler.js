@@ -208,6 +208,8 @@ async function deleteServer (serverId) {
     .update({
       servers: r.row('servers').difference([serverId])
     });
+
+  // todo clear invites associated with the server
 }
 
 
@@ -254,6 +256,17 @@ async function generateInvite (serverId, inviter) {
   return invite;
 }
 
+
+/**
+ * Returns an invite object from the provided code
+ * @param {String} code The code to lookup
+ * @returns {Object|Null} The invite, if it exists
+ */
+function getInvite (code) {
+  return r.table('invites').get(code);
+}
+
+
 function storeMessage (id, author) {
   r.table('messages').insert({ id, author }).run();
 }
@@ -265,15 +278,18 @@ function retrieveMessage (id) {
 
 
 module.exports = {
+  addMemberToServer,
   authenticate,
   createUser,
   createServer,
   deleteServer,
   generateInvite,
+  getInvite,
   getMember,
   getOwnedServers,
   getUser,
   getUsersInServer,
+  getServer,
   getServersOfUser,
   ownsServer,
   retrieveMessage,

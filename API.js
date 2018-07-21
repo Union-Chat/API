@@ -1,8 +1,9 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { deduplicate, filter, getClientsById, remove } = require('./Utils.js');
-const { authenticate, createUser, createServer, generateInvite, getOwnedServers, ownsServer, deleteServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
-const { dispatchMessage, dispatchServerJoin, dispatchServerLeave } = require('./Dispatcher.js');
+const { addMemberToServer, authenticate, createUser, createServer, generateInvite, getMember, getInvite,
+  getOwnedServers, getServer, ownsServer, deleteServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
+const { dispatchMessage, dispatchMember, dispatchServerJoin, dispatchServerLeave } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = express.Router();
@@ -44,38 +45,6 @@ api.post('/create', async (req, res) => {
   } else {
     return res.status(200).send('Unable to create account (it may already exist!)'); // also json here
   }
-});
-
-api.post('/server/:serverId/messages', validateServer, authorize, async (req, res) => {
-  const { serverId } = req;
-  const { content } = req.body;
-
-  if (!req.user.servers.includes(serverId)) {
-    return res.status(400).json({ 'error': 'You cannot send messages to this server' });
-  }
-
-  if (!content || content.trim().length === 0) {
-    return res.status(400).json({ 'error': 'Content must be a string and not empty' });
-  }
-
-  if (content.length > config.rules.messageCharacterLimit) {
-    return res.status(400).json({ 'error': `Content cannot exceed ${config.rules.messageCharacterLimit} characters` });
-  }
-
-  const id = randomBytes(15).toString('hex');
-  storeMessage(id, req.user.id);
-
-  const message = {
-    id,
-    server: serverId,
-    content: content.trim(),
-    author: req.user.id,
-    createdAt: Date.now()
-  };
-
-  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
-  dispatchMessage(recipients, message);
-  res.status(200).send();
 });
 
 api.post('/server', authorize, async (req, res) => {  // this feels so inconsistent lul
@@ -122,7 +91,7 @@ api.delete('/server/:serverId', validateServer, authorize, async (req, res) => {
 });
 
 
-api.post('/server/:serverId/invites', validateServer, authorize, async (req, res) => {
+api.post('/server/:serverId/invite', validateServer, authorize, async (req, res) => {
   const { serverId } = req;
 
   if (!await ownsServer(req.user.id, serverId)) {
@@ -137,6 +106,68 @@ api.post('/server/:serverId/invites', validateServer, authorize, async (req, res
   // Method to join servers with invite codes
   // Dispatch memberJoin to users in the server associated with the invite ID
   // Dispatch serverJoin to the user who accepted the invite
+});
+
+
+api.post('/server/:serverId/messages', validateServer, authorize, async (req, res) => {
+  const { serverId } = req;
+  const { content } = req.body;
+
+  if (!req.user.servers.includes(serverId)) {
+    return res.status(400).json({ 'error': 'You cannot send messages to this server' });
+  }
+
+  if (!content || content.trim().length === 0) {
+    return res.status(400).json({ 'error': 'Content must be a string and not empty' });
+  }
+
+  if (content.length > config.rules.messageCharacterLimit) {
+    return res.status(400).json({ 'error': `Content cannot exceed ${config.rules.messageCharacterLimit} characters` });
+  }
+
+  const id = randomBytes(15).toString('hex');
+  storeMessage(id, req.user.id);
+
+  const message = {
+    id,
+    server: serverId,
+    content: content.trim(),
+    author: req.user.id,
+    createdAt: Date.now()
+  };
+
+  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
+  dispatchMessage(recipients, message);
+  res.status(200).send();
+});
+
+
+api.post('/invites/:inviteId', authorize, async (req, res) => {
+  const invite = await getInvite(req.params.inviteId);
+
+  if (!invite) {
+    return res.status(404).json({ 'error': 'Unknown invite' });
+  }
+
+  if (!await serverExists(invite.serverId)) {
+    return res.status(404).json({ 'error': 'Unknown server; invite expired' });
+  }
+
+  await addMemberToServer(req.user.id, invite.serverId);
+
+  const clients = await getClientsById(global.server.clients, req.user.id);
+  const server = await getServer(invite.serverId);
+
+  if (clients.length > 0) {
+    dispatchServerJoin(clients, server);
+  }
+
+  const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(invite.serverId));
+  const member  = await getMember(req.user.id);
+
+  if (members.length > 0) {
+    dispatchMember(members, member);
+  }
 });
 
 

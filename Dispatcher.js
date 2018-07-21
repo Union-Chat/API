@@ -129,6 +129,7 @@ module.exports = {
   dispatchHello,
   dispatchPresenceUpdate,
   dispatchMessage,
+  dispatchMember,
   dispatchMembers,
   dispatchServerJoin,
   dispatchServerLeave
