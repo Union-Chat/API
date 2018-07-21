@@ -46,18 +46,11 @@ api.post('/create', async (req, res) => {
   }
 });
 
-api.post('/server/:serverId/messages', authorize, async (req, res) => {
-  // USE MIDDLEWARE
-  const { serverId } = req.params;
+api.post('/server/:serverId/messages', validateServer, authorize, async (req, res) => {
+  const { serverId } = req;
   const { content } = req.body;
 
-  const server = Number(serverId);
-
-  if (!server) {
-    return res.status(400).json({ 'error': 'Server must be a number' });
-  }
-
-  if (!req.user.servers.includes(server)) {
+  if (!req.user.servers.includes(serverId)) {
     return res.status(400).json({ 'error': 'You cannot send messages to this server' });
   }
 
@@ -74,13 +67,13 @@ api.post('/server/:serverId/messages', authorize, async (req, res) => {
 
   const message = {
     id,
-    server: server,
+    server: serverId,
     content: content.trim(),
     author: req.user.id,
     createdAt: Date.now()
   };
 
-  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(server));
+  const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
   dispatchMessage(recipients, message);
   res.status(200).send();
 });

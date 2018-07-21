@@ -55,7 +55,7 @@ async function checkLogin (client, data) {
     return client.close(4001, 'Unauthorized: Invalid credentials');
   }
 
-    console.log(`Connection from ${user.id} established | Clients: ${server.clients.size}`); // eslint-disable-line
+  console.log(`Connection from ${user.id} established | Clients: ${server.clients.size}`); // eslint-disable-line
   client._un = user.id;
   client.user = user;
   client.isAlive = true;
@@ -79,7 +79,7 @@ function allowCORS (req, res, next) {
 }
 
 wss.listen(config.ws.port, () => {
-    console.log(`[WS] Server started on port ${config.ws.port}`); // eslint-disable-line
+  console.log(`[WS] Server started on port ${config.ws.port}`); // eslint-disable-line
   setInterval(() => {
     server.clients.forEach(ws => {
       if (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) {
@@ -87,7 +87,7 @@ wss.listen(config.ws.port, () => {
       }
 
       if (!ws.isAlive && ws.isAuthenticated) {
-                console.log(`WS Died\n\t${ws._un}\n\t${server.clients.size - 1} clients`); // eslint-disable-line
+        console.log(`WS Died\n\t${ws._un}\n\t${server.clients.size - 1} clients`); // eslint-disable-line
         handlePresenceUpdate(ws.user.id, server.clients);
         return ws.terminate();
       }

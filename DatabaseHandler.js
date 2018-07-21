@@ -268,8 +268,6 @@ function retrieveMessage (id) {
   return r.table('messages').get(id);
 }
 
-// TODO: When a server is created and deleted, the changes aren't reflected in the client websocket until it logs back in.
-
 
 module.exports = {
   authenticate,
