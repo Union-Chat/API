@@ -108,12 +108,11 @@ api.delete('/server/:serverId', validateServer, authorize, async (req, res) => {
     return res.status(403).json({ 'error': 'You can only delete servers that you own.' });
   }
 
-  const dispatchTo = await deleteServer(serverId);
+  await deleteServer(serverId);
 
   res.status(200).send();
 
-  const clients = filter(global.server.clients, ws => ws.isAuthenticated && dispatchTo.includes(ws.user.id));
-  // TODO: Filter the clients themselves rather than return from DB?
+  const clients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
 
   if (clients.length > 0) {
     dispatchServerLeave(clients, serverId);
