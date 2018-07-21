@@ -1,7 +1,7 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { filter } = require('./Utils.js');
-const { authenticate, createUser, createServer, getOwnedServers, ownsServer, deleteServer, storeMessage } = require('./DatabaseHandler.js');
+const { authenticate, createUser, createServer, generateInvite, getOwnedServers, ownsServer, deleteServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
 const { dispatchMessage, dispatchServerCreate, dispatchServerLeave } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -47,6 +47,7 @@ api.post('/create', async (req, res) => {
 });
 
 api.post('/server/:serverId/messages', authorize, async (req, res) => {
+  // USE MIDDLEWARE
   const { serverId } = req.params;
   const { content } = req.body;
 
@@ -107,30 +108,48 @@ api.post('/server', authorize, async (req, res) => {  // this feels so inconsist
 });
 
 
-api.delete('/server/:serverId', authorize, async (req, res) => {
-  const { serverId } = req.params;
-  const sid = Number(serverId);
+api.delete('/server/:serverId', validateServer, authorize, async (req, res) => {
+  const { serverId } = req;
 
-  if (!await ownsServer(req.user.id, sid)) {
+  if (!await ownsServer(req.user.id, serverId)) {
     return res.status(403).json({ 'error': 'You can only delete servers that you own.' });
   }
 
-  const dispatchTo = await deleteServer(sid);
+  const dispatchTo = await deleteServer(serverId);
 
   res.status(200).send();
 
   const clients = filter(global.server.clients, ws => ws.isAuthenticated && dispatchTo.includes(ws.user.id));
+  // TODO: Filter the clients themselves rather than return from DB?
 
   if (clients.length > 0) {
-    dispatchServerLeave(clients, sid);
+    dispatchServerLeave(clients, serverId);
   }
 });
 
 
-//function notFound(req, res, next) {
-//    res.status(404).send('The requested URL wasn\'t found!');
-//}
+api.post('/api/server/:serverId/invites', validateServer, authorize, async (req, res) => {
+  const { serverId } = req;
 
+  if (!await ownsServer(req.user.id, serverId)) {
+    return res.status(403).json({ 'error': 'Only the server owner can generate invites.' });
+  }
+
+  const inviteCode = await generateInvite(serverId, req.user.id);
+
+  res.status(200).send({ code: inviteCode });
+
+  // TODO:
+  // Update websocket client-user servers when they join a server
+  // Method to join servers with invite codes
+  // Dispatch memberJoin to users in the server associated with the invite ID
+  // Dispatch serverJoin to the user who accepted the invite
+});
+
+
+/**
+ * Validates the 'authorization' header and populates req.user
+ */
 async function authorize (req, res, next) {
   const user = await authenticate(req.headers.authorization);
 
@@ -142,10 +161,31 @@ async function authorize (req, res, next) {
   next();
 }
 
+
+/**
+ * Ensures a server matching 'serverId' exists
+ */
+async function validateServer (req, res, next) {
+  const { serverId } = req.params;
+  const sid = Number(serverId);
+
+  if (!await serverExists(sid)) {
+    return res.status(400).json({ 'error': 'Unknown server' });
+  }
+
+  req.serverId = sid;
+  next();
+}
+
+
+/**
+ * Middleware to allow CORS
+ */
 function allowCORS (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 }
+
 
 module.exports = api;

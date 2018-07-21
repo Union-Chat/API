@@ -1,4 +1,5 @@
 const { hash, compare } = require('bcrypt');
+const shortId = require('shortid');
 const r = require('rethinkdbdash')({
   db: 'union'
 });
@@ -20,7 +21,7 @@ async function createUser (username, password) {
       id: username,
       password: await hash(password, 10),
       createdAt: Date.now(),
-      servers: await getServers(), // Throw them in every server because why not
+      servers: [],
       online: false
     });
 
@@ -182,16 +183,6 @@ function getOwnedServers (username) {
 
 
 /**
- * Retrieves the IDs of all servers in the database
- * @returns {Array<Number>} The server IDs
- */
-async function getServers () {
-  const servers = await r.table('servers');
-  return servers.map(s => s.id);
-}
-
-
-/**
  * Retrieves a server from the database by its ID
  * @param {Number} serverId The ID of the server to retrieve
  * @returns {Object|Null} The server, if it exists
@@ -235,6 +226,39 @@ function ownsServer (username, serverId) {
   return r.table('servers').get(serverId)('owner').eq(username).default(false);
 }
 
+
+/**
+ * Checks whether the server exists
+ * @param {Number} serverId The id of the server to check
+ * @returns {Boolean} Whether the server exists or not
+ */
+function serverExists (serverId) {
+  if (!serverId) {
+    return false;
+  }
+
+  return r.table('servers').filter({ id: serverId }).count().eq(1);
+}
+
+
+/**
+ * Generates an invite for the specified server
+ * @param {Number} serverId The server ID to associate the invite with
+ * @param {String} inviter The user who generated the invite
+ * @returns {String} The invite code
+ */
+async function generateInvite (serverId, inviter) {
+  const invite = shortId();
+
+  await r.table('invites').insert({
+    id: invite,
+    serverId,
+    inviter
+  });
+
+  return invite;
+}
+
 function storeMessage (id, author) {
   r.table('messages').insert({ id, author }).run();
 }
@@ -252,6 +276,7 @@ module.exports = {
   createUser,
   createServer,
   deleteServer,
+  generateInvite,
   getMember,
   getOwnedServers,
   getUser,
@@ -259,6 +284,7 @@ module.exports = {
   getServersOfUser,
   ownsServer,
   retrieveMessage,
+  serverExists,
   storeMessage,
   updatePresenceOf,
 };

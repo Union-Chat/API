@@ -52,6 +52,20 @@ function dispatchMessage (clients, message) {
 
 
 /**
+ * Dispatches a member object to the provided clients
+ * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the member to
+ * @param {Object} member The member to send to the clients
+ */
+function dispatchMember (clients, member) {
+  const payload = {
+    op: OPCODES.DispatchMemberAdd,
+    d: member
+  };
+  send(clients, payload);
+}
+
+
+/**
  * Dispatches a list of members to the given client
  * @param {WebSocket} client The client to dispatch the members to
  * @param {Array} members The list of members

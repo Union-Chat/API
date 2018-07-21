@@ -10,7 +10,7 @@ const { getUsersInServer, retrieveMessage, getUser, updatePresenceOf } = require
  * @param {String} data The data sent by the client
  * @param {Set<WebSocket>} clients The clients that payloads should be forwarded to if necessary
  */
-async function handleIncomingData (client, data, clients) {
+async function handleIncomingData (client, data) {
   data = safeParse(data);
 
   if (!data || !data.op) {
@@ -20,34 +20,6 @@ async function handleIncomingData (client, data, clients) {
   if (data.op === OPCODES.SyncMembers) { // TODO: Deprecate
     const members = await getUsersInServer(data.d);
     dispatchMembers(client, members);
-  } else if (data.op === OPCODES.DeleteMessage) {
-    /*
-    const msg = await retrieveMessage(data.d);
-
-    if (!msg) {
-      return client.send(JSON.stringify({
-        op: OPCODES.Error,
-        d: `Message ${data.d} doesn't exist`
-      }));
-    }
-
-    if (msg.author !== client.user.id) {
-      return client.send(JSON.stringify({ // all of these need moving to dispatcher
-        op: OPCODES.Error,
-        d: `Cannot delete ${data.d}: Not the author`
-      }));
-    }
-
-    const payload = JSON.stringify({
-      op: OPCODES.DispatchDeleteMessage,
-      d: data.d
-    });
-
-    clients.forEach(ws => ws.send(payload)); // move to dispatcher
-    */
-
-    // TODO: Needs to be a REST request
-
   }
 }
 

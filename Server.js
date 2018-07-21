@@ -39,7 +39,7 @@ server.on('connection', async (client, req) => {
     if (typeof data === 'string' && data.startsWith('Basic ') && !client.isAuthenticated) {
       checkLogin(client, data);
     } else if (client.isAuthenticated) { // Heck off unauth'd users
-      handleIncomingData(client, data, server.clients);
+      handleIncomingData(client, data);
     }
   });
   client.on('error', (error) => console.log(formatString('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error)));
