@@ -162,7 +162,7 @@ api.post('/invites/:inviteId', authorize, async (req, res) => {
     dispatchServerJoin(clients, server);
   }
 
-  const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(invite.serverId));
+  const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(invite.serverId) && ws.user.id !== req.user.id);
   const member  = await getMember(req.user.id);
 
   if (members.length > 0) {
