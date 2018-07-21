@@ -55,7 +55,7 @@ async function checkLogin (client, data) {
     return client.close(4001, 'Unauthorized: Invalid credentials');
   }
 
-  console.log(`Connection from ${user.id} established | Clients: ${server.clients.size}`); // eslint-disable-line
+  console.log(`Client connected\n\t${user.id}\n\t${server.clients.size} clients connected`); // eslint-disable-line
   client._un = user.id;
   client.user = user;
   client.isAlive = true;
@@ -87,7 +87,7 @@ wss.listen(config.ws.port, () => {
       }
 
       if (!ws.isAlive && ws.isAuthenticated) {
-        console.log(`WS Died\n\t${ws._un}\n\t${server.clients.size - 1} clients`); // eslint-disable-line
+        console.log(`Client disconnected\n\t${ws._un}\n\t${server.clients.size - 1} clients connected`); // eslint-disable-line
         handlePresenceUpdate(ws.user.id, server.clients);
         return ws.terminate();
       }
