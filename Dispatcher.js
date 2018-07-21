@@ -54,12 +54,16 @@ function dispatchMessage (clients, message) {
 /**
  * Dispatches a member object to the provided clients
  * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the member to
+ * @param {Number} serverId The serverId that the member was added to
  * @param {Object} member The member to send to the clients
  */
-function dispatchMember (clients, member) {
+function dispatchMember (clients, serverId, member) {
   const payload = {
     op: OPCODES.DispatchMemberAdd,
-    d: member
+    d: {
+      server: serverId,
+      member
+    }
   };
   send(clients, payload);
 }
