@@ -130,6 +130,6 @@ module.exports = {
   dispatchPresenceUpdate,
   dispatchMessage,
   dispatchMembers,
-  dispatchServerCreate,
+  dispatchServerJoin,
   dispatchServerLeave
 };
