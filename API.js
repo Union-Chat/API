@@ -1,8 +1,8 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { deduplicate, filter, getClientsById, remove } = require('./Utils.js');
-const { addMemberToServer, authenticate, createUser, createServer, generateInvite, getMember, getInvite,
-  getOwnedServers, getServer, ownsServer, deleteServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
+const { addMemberToServer, authenticate, createUser, createServer, deleteServer, generateInvite, getMember, getInvite,
+  getOwnedServers, getServer, isInServer, ownsServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
 const { dispatchMessage, dispatchMember, dispatchServerJoin, dispatchServerLeave } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -155,6 +155,10 @@ api.post('/invites/:inviteId', authorize, async (req, res) => {
 
   const { serverId } = invite;
 
+  if (await isInServer(req.user.id, serverId)) {
+    return res.status(200).send();
+  }
+
   await addMemberToServer(req.user.id, serverId);
 
   const clients = await getClientsById(global.server.clients, req.user.id);
@@ -170,6 +174,8 @@ api.post('/invites/:inviteId', authorize, async (req, res) => {
   if (members.length > 0) {
     dispatchMember(members, serverId, member);
   }
+
+  res.status(200).send();
 });
 
 

@@ -121,6 +121,17 @@ function getUsersInServer (serverId) {
 
 
 /**
+ * Checks whether a user is in a server
+ * @param {String} userId The user to check the servers of
+ * @param {Number} serverId The server to check the user's presence of
+ * @returns {Boolean} Whether the user is in the server
+ */
+function isInServer (userId, serverId) {
+  return r.table('users').get(userId)('servers').contains(serverId).default(false);
+}
+
+
+/**
  * Gets a list of servers that the given user is in
  * @param {String} username Username of the user to retrieve the servers of
  * @returns {Array<Object>} A list of servers that the user is in
@@ -291,6 +302,7 @@ module.exports = {
   getUsersInServer,
   getServer,
   getServersOfUser,
+  isInServer,
   ownsServer,
   retrieveMessage,
   serverExists,
