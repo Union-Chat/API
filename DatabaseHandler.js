@@ -231,9 +231,8 @@ async function deleteServer (serverId) {
  * @param {Number} serverId The id of the server to check
  * @returns {Boolean} Whether or not the user owns the server
  */
-async function ownsServer (username, serverId) {
-  const server = await r.table('servers').get(serverId);
-  return server && server.owner === username;
+function ownsServer (username, serverId) {
+  return r.table('servers').get(serverId)('owner').eq(username).default(false);
 }
 
 function storeMessage (id, author) {
