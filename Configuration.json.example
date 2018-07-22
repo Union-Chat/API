@@ -4,6 +4,9 @@
         "certPath": "/path/to/certificate.pem",
         "keyPath": "/path/to/key.pem"
     },
+    "voicews": {
+        "port": 2087
+    },
     "web": {
         "port": 80
     },

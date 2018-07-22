@@ -13,6 +13,7 @@ const WebSocket = require('ws');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = require('./API.js');
+const voice = require('./VoiceServer.js');
 
 /* Apps */
 const wss = https.createServer({
@@ -97,6 +98,8 @@ wss.listen(config.ws.port, () => {
     });
   }, 10e3);
 });
+
+voice.start();
 
 exports.router = app;
 
