@@ -12,10 +12,10 @@ const voiceSocket = new WebSocket.Server({ server: wss });
 global.voiceServer = voiceSocket;
 
 
-server.on('connection', async (client, req) => {
+voiceSocket.on('connection', async (client, req) => {
   console.log(`Connection from ${client._socket.remoteAddress}`);
   client.on('message', (data) => {
-    server.clients.forEach(client => {
+    voiceSocket.clients.forEach(client => {
       try {
         client.send(data, {
           binary: true
