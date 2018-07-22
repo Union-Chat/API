@@ -18,6 +18,7 @@ voiceSocket.on('connection', async (client, req) => {
 
   client.on('message', (data) => {
     voiceSocket.clients.forEach(ws => {
+      console.log(ws.clientId, client.clientId);
       if (ws.readyState === WebSocket.OPEN && ws.clientId !== client.clientId) {
         ws.send(data, {
           binary: true
