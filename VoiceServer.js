@@ -15,13 +15,11 @@ global.voiceServer = voiceSocket;
 voiceSocket.on('connection', async (client, req) => {
   console.log(`Connection from ${client._socket.remoteAddress}`);
   client.on('message', (data) => {
-    voiceSocket.clients.forEach(client => {
-      try {
+    voiceSocket.clients.forEach(ws => {
+      if (ws.readyState === WebSocket.OPEN && ws !== client) {
         client.send(data, {
           binary: true
         });
-      } catch(e) {
-        console.log(e);
       }
     });
   });
