@@ -13,10 +13,12 @@ global.voiceServer = voiceSocket;
 
 
 voiceSocket.on('connection', async (client, req) => {
-  console.log(`Connection from ${client._socket.remoteAddress}`);
+  client.clientId = generateClientId();
+  console.log(`Connection from ${client._socket.remoteAddress} (Assigned client-id ${client.clientId})`);
+
   client.on('message', (data) => {
     voiceSocket.clients.forEach(ws => {
-      if (ws.readyState === WebSocket.OPEN && ws !== client) {
+      if (ws.readyState === WebSocket.OPEN && ws.clientId !== client.clientId) {
         ws.send(data, {
           binary: true
         });
@@ -25,6 +27,17 @@ voiceSocket.on('connection', async (client, req) => {
   });
 });
 
+function generateClientId () {
+  let largestId = 1;
+
+  voiceSocket.clients.forEach(ws => {
+    if (ws.clientId && ws.clientId > largestId) {
+      largestId = ws.clientId;
+    }
+  });
+
+  return largestId + 1;
+}
 
 function start () {
   wss.listen(config.voicews.port, () => {
