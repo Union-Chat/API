@@ -24,10 +24,6 @@ voiceSocket.on('connection', async (client, req) => {
         console.log(e);
       }
     });
-
-    client.on('close', (error, code) => {
-      console.log(`${client._socket.remoteAddress} disconnected (${code}): ${error}`);
-    });
   });
 });
 
