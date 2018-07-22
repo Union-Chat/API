@@ -17,7 +17,9 @@ server.on('connection', async (client, req) => {
   client.on('message', (data) => {
     server.clients.forEach(client => {
       try {
-        client.send(data);
+        client.send(data, {
+          binary: true
+        });
       } catch(e) {
         console.log(e);
       }
