@@ -16,7 +16,7 @@ voiceSocket.on('connection', async (client, req) => {
   console.log(`Connection from ${client._socket.remoteAddress}`);
   client.on('message', (data) => {
     voiceSocket.clients.forEach(ws => {
-      if (ws.readyState === WebSocket.OPEN) {// && ws !== client) {
+      if (ws.readyState === WebSocket.OPEN && ws !== client) {
         ws.send(data, {
           binary: true
         });
