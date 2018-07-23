@@ -5,7 +5,7 @@ const fs = require('fs');
 const { authenticate } = require('./DatabaseHandler.js');
 const { dispatchHello } = require('./Dispatcher.js');
 const { handleIncomingData, handlePresenceUpdate } = require('./EventHandler.js');
-const { formatString } = require('./Utils.js');
+const logger = require('./Logger.js');
 
 /* Server */
 const https = require('https');
@@ -43,7 +43,7 @@ server.on('connection', async (client, req) => {
       handleIncomingData(client, data);
     }
   });
-  client.on('error', (error) => console.log(formatString('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error)));
+  client.on('error', (error) => logger.warn('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error));
   client.on('close', () => client.user && handlePresenceUpdate(client.user.id, server.clients));
   client.on('pong', () => client.isAlive = true);
 });
@@ -56,7 +56,7 @@ async function checkLogin (client, data) {
     return client.close(4001, 'Unauthorized: Invalid credentials');
   }
 
-  console.log(`Client connected\n\t${user.id}\n\t${server.clients.size} clients connected`); // eslint-disable-line
+  logger.info('Client connected\n\t{0}\n\t{1} clients connected', user.id, server.clients.size);
   client._un = user.id;
   client.user = user;
   client.isAlive = true;
@@ -80,7 +80,7 @@ function allowCORS (req, res, next) {
 }
 
 wss.listen(config.ws.port, () => {
-  console.log(`[WS] Server started on port ${config.ws.port}`); // eslint-disable-line
+  logger.info('[WS] Server started on port {0}', config.ws.port);
   setInterval(() => {
     server.clients.forEach(ws => {
       if (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) {
@@ -88,7 +88,7 @@ wss.listen(config.ws.port, () => {
       }
 
       if (!ws.isAlive && ws.isAuthenticated) {
-        console.log(`Client disconnected\n\t${ws._un}\n\t${server.clients.size - 1} clients connected`); // eslint-disable-line
+        logger.info('Client disconnected\n\t{0}\n\t{1} clients connected', ws._un, server.clients.size - 1);
         handlePresenceUpdate(ws.user.id, server.clients);
         return ws.terminate();
       }

@@ -1,4 +1,5 @@
 const config = require('./Configuration.json');
+const logger = require('./Logger.js');
 const fs = require('fs');
 
 const https = require('https');
@@ -14,7 +15,7 @@ global.voiceServer = voiceSocket;
 
 voiceSocket.on('connection', async (client, req) => {
   client.clientId = generateClientId();
-  console.log(`Connection from ${client._socket.remoteAddress} (Assigned client-id ${client.clientId})`);
+  logger.info('Connection from {0} (Assigned client-id {1})', client._socket.remoteAddress, client.clientId);
 
   client.on('message', (data) => {
     voiceSocket.clients.forEach(ws => {
@@ -41,7 +42,7 @@ function generateClientId () {
 
 function start () {
   wss.listen(config.voicews.port, () => {
-    console.log(`[VWS] Voice WebSocket started on port ${config.voicews.port}`);
+    logger.info('[VWS] Voice WebSocket started on port {0}', config.voicews.port);
   });
 }
 

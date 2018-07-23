@@ -1,5 +1,3 @@
-const formatterRegex = /(\{(\d+)\})+/gm;
-
 /**
  * Filters a set based on the given expression
  * @param {Set} set The set to filter the elements of
@@ -85,20 +83,6 @@ function getSessionsOf (userId, clients) {
 }
 
 
-/**
- * Formats the string with drop-in args
- * @param {String} content The string to format
- * @param {...Object} args The args to format the string with
- */
-function formatString (content, ...args) {
-  let match;
-  while ((match = formatterRegex.exec(content)) !== null) {
-    content = content.substring(0, match.index) + args[Number(match[2])].toString() + content.substring(match.index + match[0].length, content.length);
-  }
-  return content;
-}
-
-
 module.exports = {
   deduplicate,
   filter,
@@ -106,6 +90,5 @@ module.exports = {
   safeParse,
   getClientsById,
   getSessionsOf,
-  formatString,
   remove
 };

@@ -101,11 +101,6 @@ api.post('/server/:serverId/invite', validateServer, authorize, async (req, res)
   const inviteCode = await generateInvite(serverId, req.user.id);
 
   res.status(200).send({ code: inviteCode });
-
-  // TODO:
-  // Method to join servers with invite codes
-  // Dispatch memberJoin to users in the server associated with the invite ID
-  // Dispatch serverJoin to the user who accepted the invite
 });
 
 
