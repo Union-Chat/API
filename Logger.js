@@ -37,7 +37,7 @@ function log (loglevel, message, ...args) {
   const min = forceTwoDigits(date.getMinutes());
   const sec = forceTwoDigits(date.getSeconds());
 
-  console.log(`[${hour}:${min}:${sec}] [${loglevel}] ${formatString(message, ...args)}`); // eslint-disable-line
+  console.log(`[${hour}:${min}:${sec}] [${loglevel.padEnd(5)}] ${formatString(message, ...args)}`); // eslint-disable-line
 }
 
 for (const method of ['DEBUG', 'INFO', 'WARN', 'ERROR']) {
