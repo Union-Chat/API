@@ -120,8 +120,10 @@ function dispatchServerLeave (clients, serverId) {
  * @param {Object} payload The payload to send to the clients
  */
 function send (clients, payload) {
-  payload = JSON.stringify(payload);
+  const op = payload.op;
   const dispatchedTo = [];
+
+  payload = JSON.stringify(payload);
 
   clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) {
@@ -130,7 +132,7 @@ function send (clients, payload) {
     }
   });
 
-  logger.debug(`Dispatched OP ${payload.op} to:\n\t${dispatchedTo.sort().join(', ')}`);
+  logger.debug(`Dispatched OP ${op} to:\n\t${dispatchedTo.sort().join(', ')}`);
 }
 
 
