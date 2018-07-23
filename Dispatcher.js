@@ -1,5 +1,6 @@
 const OPCODES = require('./OpCodes.json');
 const { getServersOfUser } = require('./DatabaseHandler.js');
+const logger = require('./Logger.js');
 const WebSocket = require('ws');
 
 
@@ -120,12 +121,16 @@ function dispatchServerLeave (clients, serverId) {
  */
 function send (clients, payload) {
   payload = JSON.stringify(payload);
+  const dispatchedTo = [];
 
   clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) {
+      dispatchedTo.push(ws.user.id);
       ws.send(payload);
     }
   });
+
+  logger.debug(`Dispatched OP ${payload.op} to:\n\t${dispatchedTo.sort().join(', ')}`);
 }
 
 
