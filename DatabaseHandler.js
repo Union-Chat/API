@@ -227,14 +227,13 @@ function getServer (serverId) {
  */
 async function deleteServer (serverId) {
   await r.table('servers').get(serverId).delete();
+  await r.table('invites').filter(inv => inv('serverId').eq(serverId)).delete();
 
   await r.table('users')
     .filter(u => u('servers').contains(serverId))
     .update({
       servers: r.row('servers').difference([serverId])
     });
-
-  // todo clear invites associated with the server
 }
 
 
