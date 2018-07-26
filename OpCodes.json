@@ -7,5 +7,6 @@
     "DispatchServerLeave": 6,
     "DispatchMembers": 7,
     "DispatchDeleteMessage": 8,
-    "SyncMembers": 9
+    "SyncMembers": 9,
+    "DispatchMemberLeave": 10
 }

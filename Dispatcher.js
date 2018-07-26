@@ -71,6 +71,25 @@ function dispatchMember (clients, serverId, member) {
 
 
 /**
+ * Dispatches a member leave payload to the provided clients
+ * @param {Set<WebSocket>|WebSocket[]} clients The clients to dispatch the payload to
+ * @param {String} username The name of the user who left
+ * @param {Number} serverId The ID of the server the member left
+ */
+function dispatchMemberLeave (clients, username, serverId) {
+  const payload = {
+    op: OPCODES.DispatchMemberLeave,
+    d: {
+      user: username,
+      server: serverId,
+      kicked: false // soon
+    }
+  };
+  send(clients, payload);
+}
+
+
+/**
  * Dispatches a list of members to the given client
  * @param {WebSocket} client The client to dispatch the members to
  * @param {Array} members The list of members
@@ -141,6 +160,7 @@ module.exports = {
   dispatchPresenceUpdate,
   dispatchMessage,
   dispatchMember,
+  dispatchMemberLeave,
   dispatchMembers,
   dispatchServerJoin,
   dispatchServerLeave

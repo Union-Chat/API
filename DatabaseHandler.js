@@ -184,6 +184,20 @@ function getMember (username) {
 
 
 /**
+ * Removes a member from a server
+ * @param {String} username The name of the user to kick from the server
+ * @param {Number} serverId The server to remove the member from
+ */
+function removeMemberFromServer (username, serverId) {
+  return r.table('users')
+    .get(username)
+    .update({
+      servers: r.row('servers').difference([serverId])
+    });
+}
+
+
+/**
  * Returns the number of servers that the given user owns
  * @param {String} username The username to filter servers against
  * @returns {Number} The amount of servers the user owns
@@ -304,6 +318,7 @@ module.exports = {
   getServersOfUser,
   isInServer,
   ownsServer,
+  removeMemberFromServer,
   retrieveMessage,
   serverExists,
   storeMessage,

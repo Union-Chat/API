@@ -2,8 +2,8 @@ const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
 const { deduplicate, filter, getClientsById, remove } = require('./Utils.js');
 const { addMemberToServer, authenticate, createUser, createServer, deleteServer, generateInvite, getMember, getInvite,
-  getOwnedServers, getServer, isInServer, ownsServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
-const { dispatchMessage, dispatchMember, dispatchServerJoin, dispatchServerLeave } = require('./Dispatcher.js');
+  getOwnedServers, getServer, isInServer, ownsServer, removeMemberFromServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
+const { dispatchMessage, dispatchMember, dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = express.Router();
@@ -174,6 +174,29 @@ api.post('/invites/:inviteId', authorize, async (req, res) => {
   res.status(200).send();
 });
 
+
+api.delete('/self/server/:serverId', validateServer, authorize, async (req, res) => {
+  const { serverId } = req;
+
+  if (!await isInServer(req.user.id, serverId)) {
+    return res.status(400).json({ 'error': 'You are not in that server' });
+  }
+
+  await removeMemberFromServer(req.user.id, serverId);
+
+  const self = await getClientsById(global.server.clients, req.user.id);
+  const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
+
+  if (members.length > 0) {
+    dispatchMemberLeave(members, req.user.id, serverId);
+  }
+
+  if (self.length > 0) {
+    self.forEach(ws => remove(ws.user.servers, serverId));
+  }
+
+  res.status(200).send();
+});
 
 /**
  * Validates the 'authorization' header and populates req.user
