@@ -164,6 +164,14 @@ function updatePresenceOf (username, online) {
 
 
 /**
+ * Resets the online status of all members. Useful when the server is shutting down
+ */
+function resetPresenceStates () {
+  return r.table('users').update({ online: false });
+}
+
+
+/**
  * Updates the online status of the given user
  * @param {String} username Username of the user to update the presence of
  * @param {Boolean} online Whether the user is online or not
@@ -318,6 +326,7 @@ module.exports = {
   isInServer,
   ownsServer,
   removeMemberFromServer,
+  resetPresenceStates,
   retrieveMessage,
   serverExists,
   storeMessage,

@@ -2,9 +2,9 @@ const config = require('./Configuration.json');
 const fs = require('fs');
 
 /* Server middleware */
-const { authenticate } = require('./DatabaseHandler.js');
+const { authenticate, resetPresenceStates } = require('./DatabaseHandler.js');
 const { dispatchHello } = require('./Dispatcher.js');
-const { handleIncomingData, handlePresenceUpdate } = require('./EventHandler.js');
+const { handlePresenceUpdate } = require('./EventHandler.js');
 const logger = require('./Logger.js');
 
 /* Server */
@@ -13,7 +13,6 @@ const WebSocket = require('ws');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = require('./API.js');
-const voice = require('./VoiceServer.js');
 
 /* Apps */
 const wss = https.createServer({
@@ -39,8 +38,6 @@ server.on('connection', async (client, req) => {
   client.on('message', (data) => {
     if (typeof data === 'string' && data.startsWith('Basic ') && !client.isAuthenticated) {
       checkLogin(client, data);
-    } else if (client.isAuthenticated) { // Heck off unauth'd users
-      handleIncomingData(client, data);
     }
   });
   client.on('error', (error) => logger.warn('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error));
@@ -79,6 +76,7 @@ function allowCORS (req, res, next) {
   next();
 }
 
+
 wss.listen(config.ws.port, () => {
   logger.info('[WS] Server started on port {0}', config.ws.port);
   setInterval(() => {
@@ -99,14 +97,11 @@ wss.listen(config.ws.port, () => {
   }, 10e3);
 });
 
-voice.start();
-
-exports.router = app;
-
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   server.clients.forEach(ws => ws.close(1000));
+  await resetPresenceStates();
+
   process.exit();
 });
 
-// TODO
-// Perhaps remove 'online' from user objects to prevent invalid cache state
+exports.router = app;

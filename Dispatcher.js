@@ -21,11 +21,11 @@ async function dispatchHello (client) {
 
 /**
  * Dispatch a presence update to all connected clients
+ * @param {Set<WebSocket>} clients The clients to dispatch the payload to
  * @param {String} userId The user whose presence was updated
  * @param {Boolean} status The status of the user
- * @param {Set<WebSocket>} clients The clients to dispatch the payload to
  */
-function dispatchPresenceUpdate (userId, status, clients) {
+function dispatchPresenceUpdate (clients, userId, status) {
   const payload = {
     op: OPCODES.DispatchPresence,
     d: {
@@ -139,19 +139,14 @@ function dispatchServerLeave (clients, serverId) {
  * @param {Object} payload The payload to send to the clients
  */
 function send (clients, payload) {
-  const op = payload.op;
-  const dispatchedTo = [];
-
+  logger.debug('Dispatching OP {0} to {1} clients', payload.op, clients.size || clients.length);
   payload = JSON.stringify(payload);
 
   clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) {
-      dispatchedTo.push(ws.user.id);
       ws.send(payload);
     }
   });
-
-  logger.debug(`Dispatched OP ${op} to:\n\t${dispatchedTo.sort().join(', ')}`);
 }
 
 
