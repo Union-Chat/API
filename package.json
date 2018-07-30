@@ -11,11 +11,11 @@
   "author": "Kromatic",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^3.0.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "rethinkdbdash": "^2.3.31",
     "shortid": "^2.2.12",
-    "ws": "^5.2.2"
+    "ws": "^6.0.0"
   }
 }
