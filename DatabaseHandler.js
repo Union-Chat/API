@@ -14,7 +14,7 @@ const r = require('rethinkdbdash')({
 async function createUser (username, password) {
   const account = await r.table('users').get(username);
 
-  if (account !== null) {
+  if (null !== account) {
     return false;
   } else {
     await r.table('users').insert({
@@ -84,7 +84,7 @@ async function authenticate (auth) {
 
   const [type, creds] = auth.split(' ');
 
-  if (type !== 'Basic' || !creds) {
+  if ('Basic' !== type || !creds) {
     return null;
   }
 

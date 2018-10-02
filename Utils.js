@@ -67,7 +67,7 @@ function deduplicate (array, ...append) {
 function remove (array, item) {
   const ind = array.indexOf(item);
 
-  if (ind > -1) {
+  if (-1 < ind) {
     array.splice(ind, 1);
   }
 }

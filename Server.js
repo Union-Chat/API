@@ -36,7 +36,7 @@ server.on('connection', async (client, req) => {
   }
 
   client.on('message', (data) => {
-    if (typeof data === 'string' && data.startsWith('Basic ') && !client.isAuthenticated) {
+    if ('string' === typeof data && data.startsWith('Basic ') && !client.isAuthenticated) {
       checkLogin(client, data);
     }
   });

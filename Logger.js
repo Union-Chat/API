@@ -18,8 +18,8 @@ function forceTwoDigits (number) {
  */
 function formatString (content, ...args) {
   let match;
-  while ((match = formatterRegex.exec(content)) !== null) {
-    content = content.substring(0, match.index) + args[Number(match[2])].toString() + content.substring(match.index + match[0].length, content.length);
+  while (null !== (match = formatterRegex.exec(content))) {
+    content = content.replace(match[0], args[Number(match[2])]);
   }
   return content;
 }

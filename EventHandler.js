@@ -7,7 +7,7 @@ async function handlePresenceUpdate (userId, clients) {
   const { online } = await getUser(userId);
   const sessions = getSessionsOf(userId, clients);
 
-  const newState = sessions > 0;
+  const newState = 0 < sessions;
   const shouldUpdate = newState !== online;
 
   if (shouldUpdate) {

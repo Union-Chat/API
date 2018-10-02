@@ -26,7 +26,7 @@ api.patch('/self', (req, res) => {
 api.post('/create', async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || username.trim().length === 0) {
+  if (!username || 0 === username.trim().length) {
     return res.status(400).json({ 'error': 'Username cannot be empty.' });
   }
 
@@ -34,7 +34,7 @@ api.post('/create', async (req, res) => {
     return res.status(400).json({ 'error': `Username cannot exceed ${config.rules.usernameCharacterLimit} characters.` });
   }
 
-  if (!password || password.length < 5) {
+  if (!password || 5 > password.length) {
     return res.status(400).json({ 'error': 'Password cannot be empty and must be 5 characters long or more.' });
   }
 
@@ -50,7 +50,7 @@ api.post('/create', async (req, res) => {
 api.post('/server', authorize, async (req, res) => {  // this feels so inconsistent lul
   const { name, iconUrl } = req.body;
 
-  if (!name || name.trim().length === 0) {
+  if (!name || 0 === name.trim().length) {
     return res.status(400).json({ 'error': 'Server name cannot be empty.' });
   }
 
@@ -64,7 +64,7 @@ api.post('/server', authorize, async (req, res) => {  // this feels so inconsist
 
   const clients = getClientsById(global.server.clients, req.user.id);
 
-  if (clients.length > 0) {
+  if (0 < clients.length) {
     clients.forEach(ws => ws.user.servers = deduplicate(ws.user.servers, server.id));
     dispatchServerJoin(clients, server);
   }
@@ -84,7 +84,7 @@ api.delete('/server/:serverId', validateServer, authorize, async (req, res) => {
 
   const clients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
 
-  if (clients.length > 0) {
+  if (0 < clients.length) {
     clients.forEach(ws => remove(ws.user.servers, serverId));
     dispatchServerLeave(clients, serverId);
   }
@@ -112,7 +112,7 @@ api.post('/server/:serverId/messages', validateServer, authorize, async (req, re
     return res.status(400).json({ 'error': 'You cannot send messages to this server' });
   }
 
-  if (!content || content.trim().length === 0) {
+  if (!content || 0 === content.trim().length) {
     return res.status(400).json({ 'error': 'Content must be a string and not empty' });
   }
 
@@ -159,7 +159,7 @@ api.post('/invites/:inviteId', authorize, async (req, res) => {
   const clients = await getClientsById(global.server.clients, req.user.id);
   const server = await getServer(serverId);
 
-  if (clients.length > 0) {
+  if (0 < clients.length) {
     clients.forEach(ws => ws.user.servers = deduplicate(ws.user.servers, serverId));
     dispatchServerJoin(clients, server);
   }
@@ -167,7 +167,7 @@ api.post('/invites/:inviteId', authorize, async (req, res) => {
   const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId) && ws.user.id !== req.user.id);
   const member  = await getMember(req.user.id);
 
-  if (members.length > 0) {
+  if (0 < members.length) {
     dispatchMember(members, serverId, member);
   }
 
@@ -187,11 +187,11 @@ api.delete('/self/server/:serverId', validateServer, authorize, async (req, res)
   const self = await getClientsById(global.server.clients, req.user.id);
   const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId));
 
-  if (members.length > 0) {
+  if (0 < members.length) {
     dispatchMemberLeave(members, req.user.id, serverId);
   }
 
-  if (self.length > 0) {
+  if (0 < self.length) {
     self.forEach(ws => remove(ws.user.servers, serverId));
   }
 
