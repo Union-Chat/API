@@ -18,6 +18,19 @@ api.get('/', (req, res) => {
   // TODO: Serve docs or something
 });
 
+api.get('/info', (req, res) => {
+  res.send({
+    api_version: 1,
+    websocket: config.ws.port,
+    voice: config.voicews.port,
+    app_settings: {
+      max_servers: config.rules.messageCharacterLimit,
+      max_message_characters: config.rules.messageCharacterLimit,
+      max_username_characters: config.rules.usernameCharacterLimit
+    }
+  });
+});
+
 api.patch('/self', (req, res) => {
   res.send('Not done.');
   // TODO
