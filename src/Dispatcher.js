@@ -1,23 +1,21 @@
-const OPCODES = require('./OpCodes.json');
-const { getServersOfUser } = require('./DatabaseHandler.js');
-const logger = require('./Logger.js');
-const WebSocket = require('ws');
-
+const OPCODES = require('../OpCodes.json')
+const { getServersOfUser } = require('./DatabaseHandler.js')
+const logger = require('./Logger.js')
+const WebSocket = require('ws')
 
 /**
  * Dispatch a HELLO payload to a client
  * @param {WebSocket} client The client to dispatch to
  */
 async function dispatchHello (client) {
-  const servers = await getServersOfUser(client.user.id);
+  const servers = await getServersOfUser(client.user.id)
   const payload = {
     op: OPCODES.Hello,
     d: servers
-  };
+  }
 
-  send([client], payload);
+  send([client], payload)
 }
-
 
 /**
  * Dispatch a presence update to all connected clients
@@ -32,11 +30,10 @@ function dispatchPresenceUpdate (clients, userId, status) {
       id: userId,
       status
     }
-  };
+  }
 
-  send(clients, payload);
+  send(clients, payload)
 }
-
 
 /**
  * Dispatches a user message to the provided clients
@@ -47,10 +44,9 @@ function dispatchMessage (clients, message) {
   const payload = {
     op: OPCODES.DispatchMessage,
     d: message
-  };
-  send(clients, payload);
+  }
+  send(clients, payload)
 }
-
 
 /**
  * Dispatches a member object to the provided clients
@@ -65,10 +61,9 @@ function dispatchMember (clients, serverId, member) {
       server: serverId,
       member
     }
-  };
-  send(clients, payload);
+  }
+  send(clients, payload)
 }
-
 
 /**
  * Dispatches a member leave payload to the provided clients
@@ -84,10 +79,9 @@ function dispatchMemberLeave (clients, username, serverId) {
       server: serverId,
       kicked: false // soon
     }
-  };
-  send(clients, payload);
+  }
+  send(clients, payload)
 }
-
 
 /**
  * Dispatches a list of members to the given client
@@ -98,10 +92,9 @@ function dispatchMembers (client, members) {
   const payload = {
     op: OPCODES.DispatchMembers,
     d: members
-  };
-  send([client], payload);
+  }
+  send([client], payload)
 }
-
 
 /**
  * Dispatches a guildJoin op to the given clients
@@ -112,11 +105,10 @@ function dispatchServerJoin (clients, server) {
   const payload = {
     op: OPCODES.DispatchServerJoin,
     d: server
-  };
+  }
 
-  send(clients, payload);
+  send(clients, payload)
 }
-
 
 /**
  * Dispatches a guildLeave op to the given clients
@@ -127,11 +119,10 @@ function dispatchServerLeave (clients, serverId) {
   const payload = {
     op: OPCODES.DispatchServerLeave,
     d: serverId
-  };
+  }
 
-  send(clients, payload);
+  send(clients, payload)
 }
-
 
 /**
  * Dispatch a payload to the provided clients
@@ -139,16 +130,15 @@ function dispatchServerLeave (clients, serverId) {
  * @param {Object} payload The payload to send to the clients
  */
 function send (clients, payload) {
-  logger.debug('Dispatching OP {0} to {1} clients', payload.op, clients.size || clients.length);
-  payload = JSON.stringify(payload);
+  logger.debug('Dispatching OP {0} to {1} clients', payload.op, clients.size || clients.length)
+  payload = JSON.stringify(payload)
 
   clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(payload);
+      ws.send(payload)
     }
-  });
+  })
 }
-
 
 module.exports = {
   dispatchHello,
@@ -159,4 +149,4 @@ module.exports = {
   dispatchMembers,
   dispatchServerJoin,
   dispatchServerLeave
-};
+}

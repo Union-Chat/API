@@ -5,22 +5,20 @@
  * @returns {Array} The filtered elements
  */
 function filter (set, expression) {
-  const results = [];
-  set.forEach(item => expression(item) && results.push(item));
-  return results;
+  const results = []
+  set.forEach(item => expression(item) && results.push(item))
+  return results
 }
-
 
 /**
  * Filters the given set by the given predicate and returns the first match, if any.
  * @param {Set} set The set to filter the elements of
  * @param {Function} expression The predicate to match elements against
- * @returns {Any|Null} The first match, if any
+ * @returns {any|Null} The first match, if any
  */
 function findFirst (set, expression) {
-  return filter(set, expression)[0];
+  return filter(set, expression)[0]
 }
-
 
 /**
  * Gets the first websocket client with the given user ID
@@ -29,9 +27,8 @@ function findFirst (set, expression) {
  * @returns {Array<WebSocket>} The matching clients
  */
 function getClientsById (clients, userId) {
-  return filter(clients, (ws) => ws.isAuthenticated && ws.user.id === userId);
+  return filter(clients, (ws) => ws.isAuthenticated && ws.user.id === userId)
 }
-
 
 /**
  * Parses a string into an object and suppresses any errors thrown
@@ -39,12 +36,11 @@ function getClientsById (clients, userId) {
  */
 function safeParse (data) {
   try {
-    return JSON.parse(data);
+    return JSON.parse(data)
   } catch (exception) {
-    return null;
+    return null
   }
 }
-
 
 /**
  * De-duplicates an array by converting it to a set and back
@@ -53,11 +49,10 @@ function safeParse (data) {
  * @returns {Array<*>} The deduplicated array
  */
 function deduplicate (array, ...append) {
-  array.push(...append);
-  const arraySet = new Set(array);
-  return [...arraySet.values()];
+  array.push(...append)
+  const arraySet = new Set(array)
+  return [...arraySet.values()]
 }
-
 
 /**
  * Removes an element from an array
@@ -65,13 +60,12 @@ function deduplicate (array, ...append) {
  * @param {*} item The item to remove
  */
 function remove (array, item) {
-  const ind = array.indexOf(item);
+  const ind = array.indexOf(item)
 
-  if (-1 < ind) {
-    array.splice(ind, 1);
+  if (ind > -1) {
+    array.splice(ind, 1)
   }
 }
-
 
 /**
  * Gets the number of sessions of the given user ID
@@ -79,9 +73,8 @@ function remove (array, item) {
  * @param {Set<WebSocket>} clients The clients to filter
  */
 function getSessionsOf (userId, clients) {
-  return filter(clients, ws => ws.user && ws.user.id === userId).length;
+  return filter(clients, ws => ws.user && ws.user.id === userId).length
 }
-
 
 module.exports = {
   deduplicate,
@@ -91,4 +84,4 @@ module.exports = {
   getClientsById,
   getSessionsOf,
   remove
-};
+}
