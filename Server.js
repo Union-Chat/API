@@ -103,9 +103,8 @@ wss.listen(config.ws.port, () => {
 
 process.on('SIGINT', async () => {
   server.clients.forEach(ws => ws.close(1000));
-  await resetPresenceStates();
-
-  process.exit();
+  resetPresenceStates()
+    .finally(process.exit);
 });
 
 app.listen(config.web.port);
