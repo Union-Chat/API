@@ -1,10 +1,10 @@
 import {
   addMemberToServer, generateInvite, getInvite, getMember, getServer, isInServer,
   ownsServer
-} from '../DatabaseHandler'
-import { dispatchMember, dispatchServerJoin } from '../Dispatcher'
-import { deduplicate, filter, getClientsById } from '../Utils'
-import serverExists from '../middlewares/serverExists'
+} from '../../DatabaseHandler'
+import { dispatchMember, dispatchServerJoin } from '../../Dispatcher'
+import { deduplicate, filter, getClientsById } from '../../Utils'
+import serverExists from '../../middlewares/serverExists'
 
 export async function create (req, res) {
   const { serverId } = req;

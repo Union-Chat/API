@@ -5,10 +5,7 @@ import corsMiddleware from '../src/middlewares/cors'
 
 describe('CORS Middleware', () => {
   it('should append CORS headers to the request', (done) => {
-    let request = mock.createRequest({
-      method: 'GET',
-      url: '/'
-    })
+    let request = mock.createRequest({ method: 'GET', url: '/' })
     let response = mock.createResponse()
 
     corsMiddleware(request, response, () => {

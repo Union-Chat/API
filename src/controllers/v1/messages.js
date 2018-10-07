@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto'
-import { storeMessage } from '../DatabaseHandler'
-import { dispatchMessage } from '../Dispatcher'
-import { filter } from '../Utils'
+import { storeMessage } from '../../DatabaseHandler'
+import { dispatchMessage } from '../../Dispatcher'
+import { filter } from '../../Utils'
 
 export async function post (req, res) {
   const { serverId } = req

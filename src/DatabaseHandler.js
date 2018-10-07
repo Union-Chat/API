@@ -1,7 +1,7 @@
 const { hash, compare } = require('bcrypt')
 const shortId = require('shortid')
 const r = require('rethinkdbdash')({
-  db: 'union'
+  db: 'union' + (process.env.NODE_ENV !== 'production' ? '_' + process.env.NODE_ENV : '')
 })
 
 /**
@@ -10,7 +10,7 @@ const r = require('rethinkdbdash')({
  * @param {String} password The password of the account to create
  * @returns {Boolean} Whether the account was created or not
  */
-async function createUser (username, password) {
+export async function createUser (username, password) {
   const account = await r.table('users').get(username)
 
   if (account !== null) {
@@ -34,9 +34,12 @@ async function createUser (username, password) {
  * @param {String} iconUrl A URL leading to an image to be used as the server's icon
  * @returns {Object} The created server
  */
-async function createServer (name, iconUrl, owner) {
-  const largestId = await r.table('servers').max('id')
-  const id = largestId.id + 1
+export async function createServer (name, iconUrl, owner) {
+  let largestId = 0
+  try {
+    largestId = (await r.table('servers').max('id')).id
+  } catch (e) {}
+  const id = largestId + 1
 
   const server = {
     name,
@@ -55,7 +58,7 @@ async function createServer (name, iconUrl, owner) {
  * @param {String} username The member to add to the server
  * @param {Number} id The server to add the member to
  */
-async function addMemberToServer (username, id) {
+export async function addMemberToServer (username, id) {
   const user = await r.table('users').get(username)
   const server = await r.table('servers').get(id)
 
@@ -73,7 +76,7 @@ async function addMemberToServer (username, id) {
  * @param {String} auth The authentication type + base64-encoded credentials
  * @returns {(Null|Object)} The user object if authentication was successful, otherwise null
  */
-async function authenticate (auth) {
+export async function authenticate (auth) {
   if (!auth) {
     return null
   }
@@ -110,7 +113,7 @@ async function authenticate (auth) {
  * @param {Number} serverId The user to get the servers of
  * @returns {Array<Object>} A list of users in the server
  */
-function getUsersInServer (serverId) {
+export function getUsersInServer (serverId) {
   return r.table('users').filter(u => u('servers').contains(serverId)).without(['servers', 'password'])
 }
 
@@ -120,7 +123,7 @@ function getUsersInServer (serverId) {
  * @param {Number} serverId The server to check the user's presence of
  * @returns {Boolean} Whether the user is in the server
  */
-function isInServer (userId, serverId) {
+export function isInServer (userId, serverId) {
   return r.table('users').get(userId)('servers').contains(serverId).default(false)
 }
 
@@ -129,7 +132,7 @@ function isInServer (userId, serverId) {
  * @param {String} username Username of the user to retrieve the servers of
  * @returns {Promise<Array<Object>>} A list of servers that the user is in
  */
-async function getServersOfUser (username) {
+export async function getServersOfUser (username) {
   const user = await r.table('users').get(username)
 
   if (!user) {
@@ -148,14 +151,14 @@ async function getServersOfUser (username) {
  * @param {String} username Username of the user to update the presence of
  * @param {Boolean} online Whether the user is online or not
  */
-function updatePresenceOf (username, online) {
+export function updatePresenceOf (username, online) {
   r.table('users').get(username).update({ online }).run()
 }
 
 /**
  * Resets the online status of all members. Useful when the server is shutting down
  */
-function resetPresenceStates () {
+export function resetPresenceStates () {
   return r.table('users').update({ online: false })
 }
 
@@ -164,7 +167,7 @@ function resetPresenceStates () {
  * @param {String} username Username of the user to update the presence of
  * @param {Boolean} online Whether the user is online or not
  */
-function getUser (username) {
+export function getUser (username) {
   return r.table('users').get(username)
 }
 
@@ -173,7 +176,7 @@ function getUser (username) {
  * @param {String} username The name of the user to retrieve
  * @returns {Object|Null} The user, if they exist
  */
-function getMember (username) {
+export function getMember (username) {
   return r.table('users').get(username).without(['password', 'servers'])
 }
 
@@ -182,7 +185,7 @@ function getMember (username) {
  * @param {String} username The name of the user to kick from the server
  * @param {Number} serverId The server to remove the member from
  */
-function removeMemberFromServer (username, serverId) {
+export function removeMemberFromServer (username, serverId) {
   return r.table('users')
     .get(username)
     .update({
@@ -195,7 +198,7 @@ function removeMemberFromServer (username, serverId) {
  * @param {String} username The username to filter servers against
  * @returns {Number} The amount of servers the user owns
  */
-function getOwnedServers (username) {
+export function getOwnedServers (username) {
   return r.table('servers').filter(s => s('owner').eq(username)).count()
 }
 
@@ -204,7 +207,7 @@ function getOwnedServers (username) {
  * @param {Number} serverId The ID of the server to retrieve
  * @returns {Object|Null} The server, if it exists
  */
-function getServer (serverId) {
+export function getServer (serverId) {
   return r.table('servers')
     .get(serverId)
     .merge(server => ({
@@ -216,7 +219,7 @@ function getServer (serverId) {
  * Deletes a server by its ID
  * @param {Number} serverId The ID of the server to delete
  */
-async function deleteServer (serverId) {
+export async function deleteServer (serverId) {
   await r.table('servers').get(serverId).delete()
   await r.table('invites').filter(inv => inv('serverId').eq(serverId)).delete()
 
@@ -233,7 +236,7 @@ async function deleteServer (serverId) {
  * @param {Number} serverId The id of the server to check
  * @returns {Boolean} Whether or not the user owns the server
  */
-function ownsServer (username, serverId) {
+export function ownsServer (username, serverId) {
   return r.table('servers').get(serverId)('owner').eq(username).default(false)
 }
 
@@ -242,7 +245,7 @@ function ownsServer (username, serverId) {
  * @param {Number} serverId The id of the server to check
  * @returns {Boolean} Whether the server exists or not
  */
-function serverExists (serverId) {
+export function serverExists (serverId) {
   if (!serverId) {
     return false
   }
@@ -256,7 +259,7 @@ function serverExists (serverId) {
  * @param {String} inviter The user who generated the invite
  * @returns {String} The invite code
  */
-async function generateInvite (serverId, inviter) {
+export async function generateInvite (serverId, inviter) {
   const invite = shortId()
 
   await r.table('invites').insert({
@@ -285,26 +288,6 @@ function retrieveMessage (id) {
   return r.table('messages').get(id)
 }
 
-module.exports = {
-  addMemberToServer,
-  authenticate,
-  createUser,
-  createServer,
-  deleteServer,
-  generateInvite,
-  getInvite,
-  getMember,
-  getOwnedServers,
-  getUser,
-  getUsersInServer,
-  getServer,
-  getServersOfUser,
-  isInServer,
-  ownsServer,
-  removeMemberFromServer,
-  resetPresenceStates,
-  retrieveMessage,
-  serverExists,
-  storeMessage,
-  updatePresenceOf
+export function drain () {
+  r.getPoolMaster().drain()
 }

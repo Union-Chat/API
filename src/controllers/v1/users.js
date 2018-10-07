@@ -1,7 +1,10 @@
+import config from '../../../Configuration'
+import { createUser } from '../../DatabaseHandler'
+
 export async function create (req, res) {
   const { username, password } = req.body
 
-  if (!username || 0 === username.trim().length) {
+  if (!username || username.trim().length === 0) {
     return res.status(400).json({ 'error': 'Username cannot be empty.' })
   }
 
@@ -9,7 +12,7 @@ export async function create (req, res) {
     return res.status(400).json({ 'error': `Username cannot exceed ${config.rules.usernameCharacterLimit} characters.` })
   }
 
-  if (!password || 5 > password.length) {
+  if (!password || password.length < 5) {
     return res.status(400).json({ 'error': 'Password cannot be empty and must be 5 characters long or more.' })
   }
 

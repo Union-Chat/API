@@ -1,5 +1,5 @@
 const { execSync } = require('child_process')
-const { migrator } = require('./migrations/_migrator')
+const { migrator, drain } = require('./migrations/_migrator')
 
 console.log('Union installer v1.0.0')
 console.log('Migrating database...')
@@ -18,6 +18,5 @@ migrator().then(() => {
   execSync('rm -rf union-react', { stdio: [null, null, null] })
 
   console.log('Success! Union is ready to work. Just do `yarn run start`')
-  // Manually exit because rethink is annoying
-  process.exit(0)
+  drain()
 })

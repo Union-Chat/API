@@ -20,12 +20,18 @@ const migrator = async function () {
   if (databases.indexOf(dbName) === -1) await r.dbCreate(dbName).run()
 
   // Run migrations!
-  files.forEach(async file => {
-    const meta = file.split('.')
-    lastMigration = parseInt(meta[0])
-    console.log('Running migration ' + meta[1])
-    await require('./' + file)(r, dbName)
+  const promises = []
+  files.forEach(file => {
+    promises.push(new Promise(async resolve => {
+      const meta = file.split('.')
+      lastMigration = parseInt(meta[0])
+      console.log('Running migration ' + meta[1])
+      await require('./' + file)(r, dbName)
+      console.log('Successfully ran migration ' + meta[1])
+      resolve()
+    }))
   })
+  await Promise.all(promises)
 
   fs.writeFileSync(path.resolve(__dirname, '_migration'), lastMigration)
 }
@@ -35,5 +41,6 @@ module.exports = {
   drop: async function () {
     await r.dbDrop(dbName).run()
     fs.unlinkSync(path.resolve(__dirname, path.resolve(__dirname, '_migration')))
-  }
+  },
+  drain: () => r.getPoolMaster().drain()
 }

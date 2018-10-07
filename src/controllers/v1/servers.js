@@ -1,10 +1,10 @@
-import config from '../../Configuration'
+import config from '../../../Configuration'
 import {
   createServer, deleteServer, getOwnedServers, isInServer, ownsServer,
   removeMemberFromServer
-} from '../DatabaseHandler'
-import { deduplicate, filter, getClientsById, remove as utilRemove } from '../Utils'
-import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../Dispatcher'
+} from '../../DatabaseHandler'
+import { deduplicate, filter, getClientsById, remove as utilRemove } from '../../Utils'
+import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../../Dispatcher'
 
 export async function create (req, res) {  // this feels so inconsistent lul
   const { name, iconUrl } = req.body
