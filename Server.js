@@ -24,7 +24,7 @@ const wss = process.argv.includes('--use-insecure-ws')
   });
 
 const server = new WebSocket.Server({ server: wss });
-const app = express.Router();
+const app = express();
 global.server = server;
 
 
@@ -108,4 +108,4 @@ process.on('SIGINT', async () => {
   process.exit();
 });
 
-exports.router = app;
+app.listen(config.web.port);

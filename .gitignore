@@ -38,3 +38,7 @@ jspm_packages
 
 Configuration.json
 .vs/
+
+
+# Debug environment
+views/
