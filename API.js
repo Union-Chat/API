@@ -1,12 +1,18 @@
 const config = require('./Configuration.json');
 const { randomBytes } = require('crypto');
+const flakeId = require('flakeid');
 const { deduplicate, filter, getClientsById, remove } = require('./Utils.js');
 const { addMemberToServer, authenticate, createUser, createServer, deleteServer, generateInvite, getMember, getInvite,
   getOwnedServers, getServer, isInServer, ownsServer, removeMemberFromServer, serverExists, storeMessage } = require('./DatabaseHandler.js');
 const { dispatchMessage, dispatchMember, dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } = require('./Dispatcher.js');
 const express = require('express');
 const bodyParser = require('body-parser');
+
 const api = express.Router();
+
+const idGenerator = new flakeId({
+  timeOffset: (2018 - 1970) * 31536000 * 1000
+});
 
 api.use(bodyParser.json());
 api.use(bodyParser.urlencoded({ extended: true }));
@@ -20,14 +26,10 @@ api.get('/', (req, res) => {
 
 api.get('/info', (req, res) => {
   res.json({
-    api_version: 1,
+    apiVersion: 1,
     websocket: config.ws.port,
     voice: config.voicews.port,
-    app_settings: {
-      max_servers: config.rules.maxServersPerUser,
-      max_message_characters: config.rules.messageCharacterLimit,
-      max_username_characters: config.rules.usernameCharacterLimit
-    }
+    appSettings: config.rules
   });
 });
 
@@ -51,13 +53,8 @@ api.post('/create', async (req, res) => {
     return res.status(400).json({ 'error': 'Password cannot be empty and must be 5 characters long or more.' });
   }
 
-  const created = await createUser(username.trim(), password);
-
-  if (created) {
-    return res.status(200).send('Account created! You may now login.'); // todo: json
-  } else {
-    return res.status(200).send('Unable to create account (it may already exist!)'); // also json here
-  }
+  await createUser(username.trim(), password);
+  return res.status(200).send(`Welcome to Union, ${username}!`); // todo: json
 });
 
 api.post('/server', authorize, async (req, res) => {  // this feels so inconsistent lul
@@ -133,7 +130,7 @@ api.post('/server/:serverId/messages', validateServer, authorize, async (req, re
     return res.status(400).json({ 'error': `Content cannot exceed ${config.rules.messageCharacterLimit} characters` });
   }
 
-  const id = randomBytes(15).toString('hex');
+  const id = idGenerator.gen();
   storeMessage(id, req.user.id);
 
   const message = {

@@ -1,7 +1,13 @@
 const { hash, compare } = require('bcrypt');
 const shortId = require('shortid');
+const flakeId = require('flakeid');
+
 const r = require('rethinkdbdash')({
   db: 'union'
+});
+
+const idGenerator = new flakeId({
+  timeOffset: (2018 - 1970) * 31536000 * 1000
 });
 
 
@@ -9,24 +15,16 @@ const r = require('rethinkdbdash')({
  * Creates a user object with the provided username and password, and stores it in the DB
  * @param {String} username The username of the account to create
  * @param {String} password The password of the account to create
- * @returns {Boolean} Whether the account was created or not
  */
 async function createUser (username, password) {
-  const account = await r.table('users').get(username);
-
-  if (null !== account) {
-    return false;
-  } else {
-    await r.table('users').insert({
-      id: username,
-      password: await hash(password, 10),
-      createdAt: Date.now(),
-      servers: [],
-      online: false
-    });
-
-    return true;
-  }
+  await r.table('users').insert({
+    id: idGenerator.gen(),
+    username,
+    password: await hash(password, 10),
+    createdAt: Date.now(),
+    servers: [],
+    online: false
+  });
 }
 
 
@@ -37,14 +35,11 @@ async function createUser (username, password) {
  * @returns {Object} The created server
  */
 async function createServer (name, iconUrl, owner) {
-  const largestId = await r.table('servers').max('id');
-  const id = largestId.id + 1;
-
   const server = {
+    id: idGenerator.gen(),
     name,
     iconUrl,
-    owner,
-    id
+    owner
   };
 
   await r.table('servers').insert(server);
