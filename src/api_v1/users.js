@@ -12,15 +12,15 @@ export async function create (req, res) {
     return res.status(400).json({ 'error': `Username cannot exceed ${config.rules.usernameCharacterLimit} characters.` })
   }
 
+  if ([':', '#'].some(char => username.includes(char))) {
+    return res.status(400).json({ 'error': 'Your username contains prohibited characters.' })
+  }
+
   if (!password || password.length < 5) {
     return res.status(400).json({ 'error': 'Password cannot be empty and must be 5 characters long or more.' })
   }
 
-  const created = await createUser(username.trim(), password)
-
-  if (created) {
-    return res.status(200).send('Account created! You may now login.') // todo: json
-  } else {
-    return res.status(200).send('Unable to create account (it may already exist!)') // also json here
-  }
+  createUser(username.trim(), password)
+    .then(id => res.status(200).send(id))
+    .catch(err => res.status(400).json({ 'error': err.message }))
 }

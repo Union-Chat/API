@@ -36,8 +36,8 @@ describe('Authorize Middleware', () => {
   })
 
   it('should allow the request if valid token', async () => {
-    await createUser('root', 'a_secure_password')
-    const token = Buffer.from('root:a_secure_password').toString('base64')
+    const id = await createUser('root', 'a_secure_password')
+    const token = Buffer.from(id + ':a_secure_password').toString('base64')
 
     let request = mock.createRequest({ method: 'GET', url: '/', headers: { Authorization: 'Basic ' + token } })
     let response = mock.createResponse()

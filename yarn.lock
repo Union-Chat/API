@@ -1845,6 +1845,10 @@ find-up@^3.0.0:
   dependencies:
     locate-path "^3.0.0"
 
+"flakeid@git+https://github.com/Devoxin/FlakeId.git":
+  version "1.0.0"
+  resolved "git+https://github.com/Devoxin/FlakeId.git#c1cf95fc9ad958b8700872853a72353f3c1b112b"
+
 flat-cache@^1.2.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/flat-cache/-/flat-cache-1.3.0.tgz#d3030b32b38154f4e3b7e9c709f490f7ef97c481"

@@ -26,13 +26,21 @@ describe('User Controller', function () {
   describe('Create', function () {
     it('should create an user', async function () {
       const req = await request(server).post('/users/create').send({ username: 'root', password: 'a_secure_password' })
-      assert.strictEqual(req.res.statusCode, 204)
+      assert.strictEqual(req.res.statusCode, 200)
       assert.strictEqual(await r.table('users').count().run(), 1)
     })
 
     it('should reject empty username', async function () {
       const req = await request(server).post('/users/create').send({ username: '', password: 'a_secure_password' })
       assert.strictEqual(req.res.statusCode, 400)
+      assert.strictEqual(await r.table('users').count().run(), 0)
+    })
+
+    it('should reject invalid username', async function () {
+      const req1 = await request(server).post('/users/create').send({ username: 'ro:ot', password: 'a_secure_password' })
+      const req2 = await request(server).post('/users/create').send({ username: 'ro#ot', password: 'a_secure_password' })
+      assert.strictEqual(req1.res.statusCode, 400)
+      assert.strictEqual(req2.res.statusCode, 400)
       assert.strictEqual(await r.table('users').count().run(), 0)
     })
 
@@ -63,7 +71,7 @@ describe('User Controller', function () {
       const r = require('rethinkdbdash')({ db: 'union_test' })
       const req1 = await request(server).post('/users/create').send({ username: 'root', password: 'a_secure_password' })
       const req2 = await request(server).post('/users/create').send({ username: 'root', password: 'a_secure_password' })
-      assert.strictEqual(req1.res.statusCode, 204)
+      assert.strictEqual(req1.res.statusCode, 200)
       assert.strictEqual(req2.res.statusCode, 400)
       assert.strictEqual(await r.table('users').count().run(), 1)
       r.getPoolMaster().drain()

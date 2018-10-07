@@ -1,6 +1,6 @@
 import config from '../Configuration'
 import fs from 'fs'
-// import http from 'http'
+import http from 'http'
 import https from 'https'
 import WebSocket from 'ws'
 
@@ -11,10 +11,12 @@ import { handlePresenceUpdate } from './EventHandler.js'
 import logger from './Logger.js'
 
 /* Apps */
-let server = https.createServer({
-  cert: fs.readFileSync(config.ws.certPath),
-  key: fs.readFileSync(config.ws.keyPath)
-})
+let server = process.argv.includes('--use-insecure-ws')
+  ? http.createServer()
+  : https.createServer({
+    cert: fs.readFileSync(config.ws.certPath),
+    key: fs.readFileSync(config.ws.keyPath)
+  })
 const socket = new WebSocket.Server({ server })
 
 socket.on('connection', async (client, req) => {
@@ -57,9 +59,7 @@ async function checkLogin (client, data) {
 
 process.on('SIGINT', async () => {
   socket.clients.forEach(ws => ws.close(1000))
-  await resetPresenceStates()
-
-  process.exit()
+  resetPresenceStates().finally(process.exit)
 })
 
 global.server = socket

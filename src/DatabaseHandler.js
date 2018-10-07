@@ -1,7 +1,13 @@
-const { hash, compare } = require('bcrypt')
-const shortId = require('shortid')
+import { hash, compare } from 'bcrypt'
+import shortId from 'shortid'
+import FlakeId from 'flakeid'
+
 const r = require('rethinkdbdash')({
   db: 'union' + (process.env.NODE_ENV !== 'production' ? '_' + process.env.NODE_ENV : '')
+})
+
+const idGenerator = new FlakeId({
+  timeOffset: (2018 - 1970) * 31536000 * 1000
 })
 
 /**
@@ -11,20 +17,34 @@ const r = require('rethinkdbdash')({
  * @returns {Boolean} Whether the account was created or not
  */
 export async function createUser (username, password) {
-  const account = await r.table('users').get(username)
+  const id = idGenerator.gen()
+  const discriminator = await rollDiscriminator(username, id)
 
-  if (account !== null) {
-    return false
+  if (!discriminator) {
+    throw new Error('Cannot generate unique discrim. Try a different username.')
+  }
+
+  await r.table('users').insert({
+    id,
+    username,
+    discriminator,
+    password: await hash(password, 10),
+    createdAt: Date.now(),
+    servers: [],
+    online: false
+  })
+
+  return `${username}#${discriminator}`
+}
+
+async function rollDiscriminator (username, id) {
+  const discriminator = id.substring(id.length - 4) // hahayes lazy discrim generating method
+  const isDiscrimTaken = await r.table('users').filter({ username, discriminator }).count().gt(0)
+
+  if (!isDiscrimTaken) {
+    return discriminator
   } else {
-    await r.table('users').insert({
-      id: username,
-      password: await hash(password, 10),
-      createdAt: Date.now(),
-      servers: [],
-      online: false
-    })
-
-    return true
+    return null
   }
 }
 
@@ -88,12 +108,13 @@ export async function authenticate (auth) {
   }
 
   const [username, password] = Buffer.from(creds, 'base64').toString().split(':')
+  const [name, discriminator] = username ? username.split('#') : []
 
-  if (!username || !password) {
+  if (!username || !password || !name || !discriminator) {
     return null
   }
 
-  const user = await r.table('users').get(username)
+  const user = await r.table('users').filter({ username: name, discriminator }).nth(0).default(null)
 
   if (!user) {
     return null
@@ -276,15 +297,15 @@ export async function generateInvite (serverId, inviter) {
  * @param {String} code The code to lookup
  * @returns {Object|Null} The invite, if it exists
  */
-function getInvite (code) {
+export function getInvite (code) {
   return r.table('invites').get(code)
 }
 
-function storeMessage (id, author) {
+export function storeMessage (id, author) {
   r.table('messages').insert({ id, author }).run()
 }
 
-function retrieveMessage (id) {
+export function retrieveMessage (id) {
   return r.table('messages').get(id)
 }
 
