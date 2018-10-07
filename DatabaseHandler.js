@@ -25,7 +25,7 @@ async function createUser (username, password) {
   }
 
   await r.table('users').insert({
-    id: idGenerator.gen(),
+    id,
     username,
     discriminator,
     password: await hash(password, 10),
