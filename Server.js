@@ -8,6 +8,7 @@ const { handlePresenceUpdate } = require('./EventHandler.js');
 const logger = require('./Logger.js');
 
 /* Server */
+const http = require('http');
 const https = require('https');
 const WebSocket = require('ws');
 const express = require('express');
@@ -15,12 +16,15 @@ const bodyParser = require('body-parser');
 const api = require('./API.js');
 
 /* Apps */
-const wss = https.createServer({
-  cert: fs.readFileSync(config.ws.certPath),
-  key: fs.readFileSync(config.ws.keyPath),
-});
-const app = express.Router();
+const wss = process.argv.includes('--use-insecure-ws')
+  ? http.createServer()
+  : https.createServer({
+      cert: fs.readFileSync(config.ws.certPath),
+      key: fs.readFileSync(config.ws.keyPath),
+    });
+
 const server = new WebSocket.Server({ server: wss });
+const app = express.Router();
 global.server = server;
 
 
@@ -46,7 +50,7 @@ server.on('connection', async (client, req) => {
 });
 
 
-async function checkLogin (client, data) {
+async function checkLogin(client, data) {
   const user = await authenticate(data);
 
   if (!user) {
@@ -70,7 +74,7 @@ app.use(express.static(`${__dirname}/views`));
 app.use('/api', api);
 app.use(allowCORS);
 
-function allowCORS (req, res, next) {
+function allowCORS(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
