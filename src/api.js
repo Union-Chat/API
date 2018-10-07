@@ -1,6 +1,6 @@
 import express from 'express'
-import v1 from './controllers/v1'
-import v2 from './controllers/v2'
+import v1 from './api_v1'
+import v2 from './api_v2'
 
 const api = express.Router()
 

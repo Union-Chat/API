@@ -1,9 +1,9 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 
-import authorize from '../../middlewares/authorize'
-import allowCORS from '../../middlewares/cors'
-import validateServer from '../../middlewares/serverExists'
+import authorize from '../middlewares/authorize'
+import allowCORS from '../middlewares/cors'
+import validateServer from '../middlewares/serverExists'
 
 import { home, info } from './core'
 import { create as userCreate } from './users'
@@ -37,3 +37,5 @@ api.post('/server/:serverId/messages', validateServer, authorize, messagePost)
 
 // Invites
 api.post('/invites/:inviteId', authorize, inviteAccept)
+
+export default api

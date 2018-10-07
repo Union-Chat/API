@@ -1,4 +1,4 @@
-import config from '../../../Configuration'
+import config from '../../Configuration'
 
 export function home (req, res) {
   res.send('Welcome to the Union API!')

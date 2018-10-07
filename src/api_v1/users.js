@@ -1,5 +1,5 @@
-import config from '../../../Configuration'
-import { createUser } from '../../DatabaseHandler'
+import config from '../../Configuration'
+import { createUser } from '../DatabaseHandler'
 
 export async function create (req, res) {
   const { username, password } = req.body

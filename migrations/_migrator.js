@@ -32,7 +32,6 @@ const migrator = async function () {
     }))
   })
   await Promise.all(promises)
-
   fs.writeFileSync(path.resolve(__dirname, '_migration'), lastMigration)
 }
 
@@ -40,7 +39,7 @@ module.exports = {
   migrator,
   drop: async function () {
     await r.dbDrop(dbName).run()
-    fs.unlinkSync(path.resolve(__dirname, path.resolve(__dirname, '_migration')))
+    fs.unlinkSync(path.resolve(__dirname, '_migration'))
   },
   drain: () => r.getPoolMaster().drain()
 }
