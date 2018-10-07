@@ -12,6 +12,7 @@ logs
 build
 dist
 /index.html
+migrations/_migration
 
 # Config & certs
 Configuration.json
