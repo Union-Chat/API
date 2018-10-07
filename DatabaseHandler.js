@@ -17,14 +17,35 @@ const idGenerator = new flakeId({
  * @param {String} password The password of the account to create
  */
 async function createUser (username, password) {
+  const id = idGenerator.gen();
+  const discriminator = await rollDiscriminator(username, id);
+
+  if (!discriminator) {
+    throw new Error('Cannot generate unique discrim. Try a different username.');
+  }
+
   await r.table('users').insert({
     id: idGenerator.gen(),
     username,
+    discriminator,
     password: await hash(password, 10),
     createdAt: Date.now(),
     servers: [],
     online: false
   });
+
+  return `${username}#${discriminator}`;
+}
+
+async function rollDiscriminator (username, id) {
+  const discriminator = id.substring(id.length - 4); // hahayes lazy discrim generating method
+  const isDiscrimTaken = await r.table('users').filter({ username, discriminator }).count().gt(0);
+
+  if (!isDiscrimTaken) {
+    return discriminator;
+  } else {
+    return null;
+  }
 }
 
 
@@ -84,12 +105,13 @@ async function authenticate (auth) {
   }
 
   const [username, password] = Buffer.from(creds, 'base64').toString().split(':');
+  const [name, discriminator] = username ? username.split('#') : [];
 
-  if (!username || !password) {
+  if (!username || !password || !name || !discriminator) {
     return null;
   }
 
-  const user = await r.table('users').get(username);
+  const user = await r.table('users').filter({ username: name, discriminator }).nth(0).default(null);
 
   if (!user) {
     return null;

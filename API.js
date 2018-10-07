@@ -1,5 +1,4 @@
 const config = require('./Configuration.json');
-const { randomBytes } = require('crypto');
 const flakeId = require('flakeid');
 const { deduplicate, filter, getClientsById, remove } = require('./Utils.js');
 const { addMemberToServer, authenticate, createUser, createServer, deleteServer, generateInvite, getMember, getInvite,
@@ -49,12 +48,18 @@ api.post('/create', async (req, res) => {
     return res.status(400).json({ 'error': `Username cannot exceed ${config.rules.usernameCharacterLimit} characters.` });
   }
 
+  if ([':', '#'].some(char => username.includes(char))) {
+    return res.status(400).json({ 'error': 'Your username contains prohibited characters.' });
+  }
+
   if (!password || 5 > password.length) {
     return res.status(400).json({ 'error': 'Password cannot be empty and must be 5 characters long or more.' });
   }
 
-  await createUser(username.trim(), password);
-  return res.status(200).send(`Welcome to Union, ${username}!`); // todo: json
+
+  createUser(username.trim(), password)
+    .then(id => res.status(200).send(id))
+    .catch(err => res.status(400).json({ 'error': err.message }));
 });
 
 api.post('/server', authorize, async (req, res) => {  // this feels so inconsistent lul
