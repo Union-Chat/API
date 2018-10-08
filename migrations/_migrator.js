@@ -1,6 +1,6 @@
 const dbName = 'union' + (process.env.NODE_ENV !== 'production' ? '_' + process.env.NODE_ENV : '')
 
-const r = require('rethinkdbdash')({ db: dbName })
+const r = require('rethinkdbdash')({ silent: true, db: dbName })
 const path = require('path')
 const fs = require('fs')
 
@@ -25,9 +25,7 @@ const migrator = async function () {
     promises.push(new Promise(async resolve => {
       const meta = file.split('.')
       lastMigration = parseInt(meta[0])
-      console.log('Running migration ' + meta[1])
       await require('./' + file)(r, dbName)
-      console.log('Successfully ran migration ' + meta[1])
       resolve()
     }))
   })

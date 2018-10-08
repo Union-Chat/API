@@ -1,4 +1,6 @@
 /* eslint-env node, mocha */
+import './_hooks'
+
 import sinon from 'sinon'
 import assert from 'assert'
 import mock from 'node-mocks-http'

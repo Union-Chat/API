@@ -3,7 +3,11 @@ import shortId from 'shortid'
 import FlakeId from 'flakeid'
 
 const r = require('rethinkdbdash')({
-  db: 'union' + (process.env.NODE_ENV !== 'production' ? '_' + process.env.NODE_ENV : '')
+  db: 'union' + (process.env.NODE_ENV !== 'production' ? '_' + process.env.NODE_ENV : ''),
+  silent: process.env.NODE_ENV === 'test',
+  log: function (message) {
+    if (process.env.NODE_ENV !== 'test') console.log(message)
+  }
 })
 
 const idGenerator = new FlakeId({

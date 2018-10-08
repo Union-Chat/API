@@ -1,4 +1,6 @@
 /* eslint-env node, mocha */
+import './_hooks'
+
 import assert from 'assert'
 import express from 'express'
 import request from 'supertest'

@@ -1,4 +1,6 @@
 /* eslint-env node, mocha */
+import './_hooks'
+
 import assert from 'assert'
 import express from 'express'
 import request from 'supertest'
@@ -7,9 +9,9 @@ import v2 from '../src/api_v2'
 import { migrator, drop } from '../migrations/_migrator'
 
 let server
-describe('User Controller', function () {
+describe('Users Controller', function () {
   let r
-  before(() => { r = require('rethinkdbdash')({ db: 'union_test' }) })
+  before(() => { r = require('rethinkdbdash')({ silent: true, db: 'union_test' }) })
   after(() => r.getPoolMaster().drain())
   beforeEach(async function () {
     await migrator()
@@ -60,21 +62,17 @@ describe('User Controller', function () {
     })
 
     it('should reject short passwords', async function () {
-      const r = require('rethinkdbdash')({ db: 'union_test' })
       const req = await request(server).post('/users/create').send({ username: 'root', password: 'lol' })
       assert.strictEqual(req.res.statusCode, 400)
       assert.strictEqual(await r.table('users').count().run(), 0)
-      r.getPoolMaster().drain()
     })
 
-    it('should reject already used accounts', async function () {
-      const r = require('rethinkdbdash')({ db: 'union_test' })
+    it('should allow duplicate usernames', async function () {
       const req1 = await request(server).post('/users/create').send({ username: 'root', password: 'a_secure_password' })
       const req2 = await request(server).post('/users/create').send({ username: 'root', password: 'a_secure_password' })
       assert.strictEqual(req1.res.statusCode, 200)
-      assert.strictEqual(req2.res.statusCode, 400)
-      assert.strictEqual(await r.table('users').count().run(), 1)
-      r.getPoolMaster().drain()
+      assert.strictEqual(req2.res.statusCode, 200)
+      assert.strictEqual(await r.table('users').count().run(), 2)
     })
   })
 })
