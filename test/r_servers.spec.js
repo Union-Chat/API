@@ -95,11 +95,6 @@ describe('Servers Controller', function () {
       await addMemberToServer(lambdaId, serverId)
     })
 
-    afterEach(async function () {
-      await r.db('union_test').tableDrop('servers').run()
-      await r.db('union_test').tableCreate('servers').run()
-    })
-
     it('should require authentication', async function () {
       const req = await request(server).delete('/servers/' + serverId + '/leave')
       assert.strictEqual(req.res.statusCode, 401)
@@ -139,11 +134,6 @@ describe('Servers Controller', function () {
 
       serverId = (await createServer('A server', 'lol.png', userId)).id
       await addMemberToServer(lambdaId, serverId)
-    })
-
-    afterEach(async function () {
-      await r.db('union_test').tableDrop('servers').run()
-      await r.db('union_test').tableCreate('servers').run()
     })
 
     it('should require authentication', async function () {

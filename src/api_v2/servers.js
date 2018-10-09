@@ -9,11 +9,11 @@ import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '..
 export async function create (req, res) {
   const { name, iconUrl } = req.body
   if (!name || name.trim().length === 0) {
-    return res.status(400).json({ error: 'Server name cannot be empty.' })
+    return res.status(400).json({ error: 'Server name cannot be empty' })
   }
 
   if (name.trim().length > config.rules.serverCharacterLimit) {
-    return res.status(400).json({ error: `Username cannot exceed ${config.rules.serverCharacterLimit} characters.` })
+    return res.status(400).json({ error: `Username cannot exceed ${config.rules.serverCharacterLimit} characters` })
   }
 
   if (await getOwnedServers(req.user.id) >= config.rules.maxServersPerUser) {
@@ -66,7 +66,7 @@ export async function remove (req, res) {
   const { serverId } = req
 
   if (!await ownsServer(req.user.id, serverId)) {
-    return res.status(403).json({ error: 'You can only delete servers that you own.' })
+    return res.status(403).json({ error: 'You can only delete servers that you own' })
   }
 
   await deleteServer(serverId)
