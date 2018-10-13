@@ -12,6 +12,7 @@ import { create as serverCreate, leave as serverLeave, remove as serverDelete } 
 import { create as inviteCreate, accept as inviteAccept } from './invites'
 
 const api = express.Router()
+const notImplemented = (req, res) => res.status(501).json({ error: 'This feature is not implemented yet. Contribute to help us bring this feature faster! https://github.com/Union-Chat/Union-Server' })
 
 // Middlewares
 api.use(bodyParser.json())
@@ -23,16 +24,28 @@ api.get('/', home)
 api.get('/info', info)
 
 // User
-api.post('/users/create', userCreate)
+api.post('/users', userCreate)
 
 // Server
-api.post('/servers/create', authorize, serverCreate)
+api.post('/servers', authorize, serverCreate)
 api.post('/servers/:serverId/messages', serverExists, authorize, messagePost)
 api.delete('/servers/:serverId([0-9]+)/leave', authorize, serverExists, serverLeave)
 api.delete('/servers/:serverId([0-9]+)', authorize, serverExists, serverDelete)
 
 // Invites
-api.post('/servers/:serverId([0-9]+)/invites/create', authorize, serverExists, inviteCreate)
+api.post('/servers/:serverId([0-9]+)/invites', authorize, serverExists, inviteCreate)
 api.post('/invites/:inviteId([a-zA-Z0-9-_]+)', authorize, inviteAccept)
+
+// Developers
+api.post('/developers/applications', notImplemented)
+
+api.get('/developers/applications/:applicationId', notImplemented)
+api.put('/developers/applications/:applicationId', notImplemented)
+api.patch('/developers/applications/:applicationId', notImplemented)
+api.delete('/developers/applications/:applicationId', notImplemented)
+
+api.get('/oauth2/authorize', notImplemented)
+api.post('/oauth2/token', notImplemented)
+api.post('/oauth2/revoke', notImplemented)
 
 export default api
