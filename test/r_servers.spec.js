@@ -36,12 +36,12 @@ describe('Servers Controller', function () {
 
   describe('Create', function () {
     it('should require authentication', async function () {
-      const req = await request(server).post('/servers/create')
+      const req = await request(server).post('/servers')
       assert.strictEqual(req.res.statusCode, 401)
     })
 
     it('should create a server with correct owner id', async function () {
-      const req = await request(server).post('/servers/create').send({
+      const req = await request(server).post('/servers').send({
         name: 'A server',
         iconUrl: 'lol.png'
       }).set('Authorization', 'Basic ' + token)
@@ -52,7 +52,7 @@ describe('Servers Controller', function () {
     })
 
     it('should reject empty name', async function () {
-      const req = await request(server).post('/servers/create').send({
+      const req = await request(server).post('/servers').send({
         name: '',
         iconUrl: 'lol.png'
       }).set('Authorization', 'Basic ' + token)
@@ -61,7 +61,7 @@ describe('Servers Controller', function () {
     })
 
     it('should reject too long names', async function () {
-      const req = await request(server).post('/servers/create').send({
+      const req = await request(server).post('/servers').send({
         name: 'A serverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr',
         iconUrl: 'lol.png'
       }).set('Authorization', 'Basic ' + token)
@@ -71,12 +71,12 @@ describe('Servers Controller', function () {
 
     it('should prevent user from creating ton of servers', async function () {
       const serverData = { name: 'A server', iconUrl: 'lol.png' }
-      await request(server).post('/servers/create').send(serverData).set('Authorization', 'Basic ' + token)
-      await request(server).post('/servers/create').send(serverData).set('Authorization', 'Basic ' + token)
-      await request(server).post('/servers/create').send(serverData).set('Authorization', 'Basic ' + token)
-      await request(server).post('/servers/create').send(serverData).set('Authorization', 'Basic ' + token)
-      await request(server).post('/servers/create').send(serverData).set('Authorization', 'Basic ' + token)
-      const req = await request(server).post('/servers/create').send(serverData).set('Authorization', 'Basic ' + token)
+      await request(server).post('/servers').send(serverData).set('Authorization', 'Basic ' + token)
+      await request(server).post('/servers').send(serverData).set('Authorization', 'Basic ' + token)
+      await request(server).post('/servers').send(serverData).set('Authorization', 'Basic ' + token)
+      await request(server).post('/servers').send(serverData).set('Authorization', 'Basic ' + token)
+      await request(server).post('/servers').send(serverData).set('Authorization', 'Basic ' + token)
+      const req = await request(server).post('/servers').send(serverData).set('Authorization', 'Basic ' + token)
 
       assert.strictEqual(req.res.statusCode, 400)
       assert.strictEqual(await r.table('servers').count().run(), 5)

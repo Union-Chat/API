@@ -6,7 +6,7 @@ import authorize from '../middlewares/authorize'
 import serverExists from '../middlewares/serverExists'
 
 import { home, info } from './core'
-import { create as userCreate } from './users'
+import { create as userCreate, getSelf as userGetSelf, patch as userPatch, remove as userDelete } from './users'
 import { post as messagePost } from './messages'
 import { create as serverCreate, leave as serverLeave, remove as serverDelete } from './servers'
 import { create as inviteCreate, accept as inviteAccept } from './invites'
@@ -25,6 +25,10 @@ api.get('/info', info)
 
 // User
 api.post('/users', userCreate)
+api.get('/users/self', authorize, userGetSelf)
+api.put('/users/self', authorize, userPatch)
+api.patch('/users/self', authorize, userPatch)
+api.delete('/users/self', authorize, userDelete)
 
 // Server
 api.post('/servers', authorize, serverCreate)
@@ -37,6 +41,7 @@ api.post('/servers/:serverId([0-9]+)/invites', authorize, serverExists, inviteCr
 api.post('/invites/:inviteId([a-zA-Z0-9-_]+)', authorize, inviteAccept)
 
 // Developers
+api.get('/developers/applications', notImplemented)
 api.post('/developers/applications', notImplemented)
 
 api.get('/developers/applications/:applicationId', notImplemented)

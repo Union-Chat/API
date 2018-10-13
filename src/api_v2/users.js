@@ -1,7 +1,8 @@
 import config from '../../Configuration'
 
 import fetch from 'node-fetch'
-import { createUser } from '../DatabaseHandler'
+import { createUser, deleteUser, updateUser } from '../DatabaseHandler'
+import { compare } from 'bcrypt'
 
 export async function create (req, res) {
   const { username, password } = req.body
@@ -51,4 +52,46 @@ export async function create (req, res) {
   createUser(username.trim(), password)
     .then(id => res.status(200).json({ id }))
     .catch(err => res.status(400).json({ error: err.message }))
+}
+
+export async function getSelf (req, res) {
+  res.json(Object.assign({}, req.user, { password: undefined }))
+}
+
+export async function patch (req, res) {
+  const { password, username, newPassword } = req.body
+  if (!password || !await compare(password, req.user.password)) {
+    return res.sendStatus(401)
+  }
+
+  if (username !== undefined) {
+    if (username.trim().length === 0) {
+      return res.status(400).json({ error: 'Username cannot be empty' })
+    }
+
+    if (username.trim().length > config.rules.usernameCharacterLimit) {
+      return res.status(400).json({ error: `Username cannot exceed ${config.rules.usernameCharacterLimit} characters` })
+    }
+
+    if ([':', '#'].some(char => username.includes(char))) {
+      return res.status(400).json({ error: 'Your username contains prohibited characters' })
+    }
+  }
+
+  if (newPassword !== undefined && newPassword.length < 5) {
+    return res.status(400).json({ error: 'Password cannot be empty and must be 5 characters long or more' })
+  }
+
+  const newUser = await updateUser(req.user.id, username || req.user.username, newPassword)
+  res.status(200).send(newUser)
+}
+
+export async function remove (req, res) {
+  const { password } = req.body
+  if (!password || !await compare(password, req.user.password)) {
+    return res.sendStatus(401)
+  }
+
+  await deleteUser(req.user.id)
+  res.sendStatus(204)
 }

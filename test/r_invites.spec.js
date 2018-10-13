@@ -43,23 +43,23 @@ describe('Invites Controller', function () {
 
   describe('Create', function () {
     it('should require authentication', async function () {
-      const req = await request(server).post('/servers/' + serverId + '/invites/create')
+      const req = await request(server).post('/servers/' + serverId + '/invites')
       assert.strictEqual(req.res.statusCode, 401)
     })
 
     it('should create an invite', async function () {
-      const req = await request(server).post('/servers/' + serverId + '/invites/create').set('Authorization', 'Basic ' + userToken)
+      const req = await request(server).post('/servers/' + serverId + '/invites').set('Authorization', 'Basic ' + userToken)
       assert.strictEqual(req.res.statusCode, 200)
       assert.strictEqual(await r.table('invites').count().run(), 1)
     })
 
     it('should reject if the server does not exists', async function () {
-      const req = await request(server).post('/servers/666/invites/create').set('Authorization', 'Basic ' + userToken)
+      const req = await request(server).post('/servers/666/invites').set('Authorization', 'Basic ' + userToken)
       assert.strictEqual(req.res.statusCode, 404)
     })
 
     it('should reject if the user is not the server owner', async function () {
-      const req = await request(server).post('/servers/' + serverId + '/invites/create').set('Authorization', 'Basic ' + lambdaToken)
+      const req = await request(server).post('/servers/' + serverId + '/invites').set('Authorization', 'Basic ' + lambdaToken)
       assert.strictEqual(req.res.statusCode, 403)
       assert.strictEqual(await r.table('invites').count().run(), 0)
     })

@@ -41,15 +41,21 @@ export async function createUser (username, password) {
   return `${username}#${discriminator}`
 }
 
-async function rollDiscriminator (username, id) {
-  const discriminator = id.substring(id.length - 4) // hahayes lazy discrim generating method
-  const isDiscrimTaken = await r.table('users').filter({ username, discriminator }).count().gt(0)
+export async function updateUser (id, username, password) {
+  const discriminator = await rollDiscriminator(username)
+  const update = { username, discriminator }
+  if (password) Object.assign(update, { password: await hash(password, 10) })
+  await r.table('users').get(id).update(update)
+  return `${username}#${discriminator}`
+}
 
-  if (!isDiscrimTaken) {
-    return discriminator
-  } else {
-    return null
+async function rollDiscriminator (username) {
+  let discriminator
+  while (true) {
+    discriminator = Math.floor(Math.random() * 9999 + 1).toString().padStart(4, '0')
+    if (!await r.table('users').filter({ username, discriminator }).count().gt(0)) break
   }
+  return discriminator
 }
 
 /**
@@ -255,6 +261,10 @@ export async function deleteServer (serverId) {
     })
 }
 
+export async function deleteUser (userId) {
+  await r.table('users').get(userId).delete()
+}
+
 /**
  * Checks if the given user is the owner of the given server
  * @param {String} username The name of the user to check
@@ -305,8 +315,8 @@ export function getInvite (code) {
   return r.table('invites').get(code)
 }
 
-export function storeMessage (id, author) {
-  r.table('messages').insert({ id, author }).run()
+export async function storeMessage (id, author) {
+  await r.table('messages').insert({ id, author }).run()
 }
 
 export function retrieveMessage (id) {

@@ -3,12 +3,14 @@ A light chat service
 
 ## Installation
 
-To build and install everything that Union needs to work, just do `yarn run setup`
-and `yarn run start` to start the whole thing
+ - `git clone https://github.com/Union-Chat/Union-Server` - Download Union-Server
+ - `yarn run setup` - Build the server & the UI, setup the database
+ - Create a Configuration.json with your custom settings
+ - `yarn run start` - Start the app!
 
-`yarn run setup` will create the database or migrate it if it exists, build the app,
-download web interface from https://github.com/Union-Chat/union-react and generate
-a default `Confuguration.json`
+## Updating
 
-`yarn run setup` can also be used to update your installation of Union (But it'll
-not download the latest version of Union-Server)
+ - `git pull` - Download the latest Union-Server
+ - `yarn run setup` - Re-build everything (**Will keep your database safe** and update it)
+ - Check if there is no new fields in Configuration.json
+ - `yarn run start` - Start the app!
