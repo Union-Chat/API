@@ -1,7 +1,6 @@
 import config from '../../Configuration'
 import {
-  createServer, deleteServer, getOwnedServers, getServer, isInServer, ownsServer,
-  removeMemberFromServer
+  createServer, deleteServer, getOwnedServers, isInServer, ownsServer, removeMemberFromServer
 } from '../DatabaseHandler'
 import { deduplicate, filter, getClientsById, remove as utilRemove } from '../Utils'
 import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../Dispatcher'

@@ -53,5 +53,4 @@ export async function accept (req, res) {
       dispatchMember(members, serverId, member)
     }
   }
-
 }

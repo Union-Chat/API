@@ -1,3 +1,5 @@
+import config from '../../Configuration'
+
 import { randomBytes } from 'crypto'
 import { storeMessage } from '../DatabaseHandler'
 import { dispatchMessage } from '../Dispatcher'
@@ -11,7 +13,7 @@ export async function post (req, res) {
     return res.status(400).json({ 'error': 'You cannot send messages to this server' })
   }
 
-  if (!content || 0 === content.trim().length) {
+  if (!content || content.trim().length === 0) {
     return res.status(400).json({ 'error': 'Content must be a string and not empty' })
   }
 

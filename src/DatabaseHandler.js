@@ -18,7 +18,7 @@ const idGenerator = new FlakeId({
  * Creates a user object with the provided username and password, and stores it in the DB
  * @param {String} username The username of the account to create
  * @param {String} password The password of the account to create
- * @returns {Boolean} Whether the account was created or not
+ * @returns {String} Whether the account was created or not
  */
 export async function createUser (username, password) {
   const id = idGenerator.gen()

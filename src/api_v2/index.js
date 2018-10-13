@@ -7,6 +7,7 @@ import serverExists from '../middlewares/serverExists'
 
 import { home, info } from './core'
 import { create as userCreate } from './users'
+import { post as messagePost } from './messages'
 import { create as serverCreate, leave as serverLeave, remove as serverDelete } from './servers'
 import { create as inviteCreate, accept as inviteAccept } from './invites'
 
@@ -26,6 +27,7 @@ api.post('/users/create', userCreate)
 
 // Server
 api.post('/servers/create', authorize, serverCreate)
+api.post('/servers/:serverId/messages', serverExists, authorize, messagePost)
 api.delete('/servers/:serverId([0-9]+)/leave', authorize, serverExists, serverLeave)
 api.delete('/servers/:serverId([0-9]+)', authorize, serverExists, serverDelete)
 

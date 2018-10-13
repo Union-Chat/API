@@ -6,10 +6,10 @@ import {
 import { deduplicate, filter, getClientsById, remove as utilRemove } from '../Utils'
 import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../Dispatcher'
 
-export async function create (req, res) {  // this feels so inconsistent lul
+export async function create (req, res) { // this feels so inconsistent lul
   const { name, iconUrl } = req.body
 
-  if (!name || 0 === name.trim().length) {
+  if (!name || name.trim().length === 0) {
     return res.status(400).json({ 'error': 'Server name cannot be empty.' })
   }
 
@@ -23,8 +23,8 @@ export async function create (req, res) {  // this feels so inconsistent lul
 
   const clients = getClientsById(global.server.clients, req.user.id)
 
-  if (0 < clients.length) {
-    clients.forEach(ws => ws.user.servers = deduplicate(ws.user.servers, server.id))
+  if (clients.length > 0) {
+    clients.forEach(ws => { ws.user.servers = deduplicate(ws.user.servers, server.id) })
     dispatchServerJoin(clients, server)
   }
 }
@@ -42,11 +42,11 @@ export async function leave (req, res) {
   const self = await getClientsById(global.server.clients, req.user.id)
   const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId))
 
-  if (0 < members.length) {
+  if (members.length > 0) {
     dispatchMemberLeave(members, req.user.id, serverId)
   }
 
-  if (0 < self.length) {
+  if (self.length > 0) {
     self.forEach(ws => remove(ws.user.servers, serverId))
   }
 
@@ -66,7 +66,7 @@ export async function remove (req, res) {
 
   const clients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId))
 
-  if (0 < clients.length) {
+  if (clients.length > 0) {
     clients.forEach(ws => utilRemove(ws.user.servers, serverId))
     dispatchServerLeave(clients, serverId)
   }
