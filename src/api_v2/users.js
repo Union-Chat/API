@@ -1,8 +1,34 @@
 import config from '../../Configuration'
+
+import fetch from 'node-fetch'
 import { createUser } from '../DatabaseHandler'
 
 export async function create (req, res) {
   const { username, password } = req.body
+
+  if (config.recaptcha && process.env.NODE_ENV !== 'test') {
+    console.log(config.recaptcha)
+    const gRecaptchaResponse = req.body['g-recaptcha-response']
+    if (!gRecaptchaResponse) {
+      return res.status(400).json({ error: 'reCAPTCHA is missing' })
+    }
+
+    const response = await (await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        secret: config.recaptcha.secret,
+        response: gRecaptchaResponse,
+        remoteip: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      })
+    })).json()
+
+    if (!response.success) {
+      return res.status(400).json({ error: 'reCAPTCHA check failed' })
+    }
+  }
 
   // Validate data
   if (!username || username.trim().length === 0) {

@@ -19,6 +19,7 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "flakeid": "git+https://github.com/Devoxin/FlakeId.git",
+    "node-fetch": "^2.2.0",
     "rethinkdbdash": "^2.3.31",
     "shortid": "^2.2.12",
     "ws": "^6.0.0"

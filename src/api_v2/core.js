@@ -9,6 +9,10 @@ export function info (req, res) {
     apiVersion: 2,
     websocket: config.ws.port,
     voice: config.voicews.port,
-    appSettings: config.rules
+    appSettings: config.rules,
+    recaptcha: {
+      enabled: !!config.recaptcha,
+      key: config.recaptcha ? config.recaptcha.key : null
+    }
   })
 }
