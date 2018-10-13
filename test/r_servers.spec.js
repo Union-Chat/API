@@ -83,6 +83,55 @@ describe('Servers Controller', function () {
     })
   })
 
+  describe('Update', function () {
+    let serverId, lambdaToken
+    beforeEach(async function () {
+      const username = await createUser('sudo', 'sudo')
+      const usermeta = username.split('#')
+      lambdaToken = Buffer.from(username + ':sudo').toString('base64')
+      const lambdaId = (await r.table('users').filter({ username: usermeta[0], discriminator: usermeta[1] }).nth(0)).id
+      serverId = (await createServer('A server', 'lol.png', userId)).id
+      await addMemberToServer(lambdaId, serverId)
+    })
+
+    it('should require authentication', async function () {
+      const req = await request(server).patch('/servers/' + serverId)
+      assert.strictEqual(req.res.statusCode, 401)
+    })
+
+    it('should reject if the server does not exists', async function () {
+      const req = await request(server).patch('/servers/666').set('Authorization', 'Basic ' + token)
+      assert.strictEqual(req.res.statusCode, 404)
+    })
+
+    it('should reject if the user is the server owner', async function () {
+      const req = await request(server).patch('/servers/' + serverId).set('Authorization', 'Basic ' + lambdaToken)
+      assert.strictEqual(req.res.statusCode, 403)
+    })
+
+    it('should update the server', async function () {
+      const req = await request(server).patch('/servers/' + serverId).send({
+        name: 'A new name',
+        iconUrl: 'a_new_icon.png'
+      }).set('Authorization', 'Basic ' + token)
+      assert.strictEqual(req.res.statusCode, 204)
+    })
+
+    it('should reject empty name', async function () {
+      const req = await request(server).patch('/servers/' + serverId).send({
+        name: ''
+      }).set('Authorization', 'Basic ' + token)
+      assert.strictEqual(req.res.statusCode, 400)
+    })
+
+    it('should reject too long names', async function () {
+      const req = await request(server).patch('/servers/' + serverId).send({
+        name: 'A serverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'
+      }).set('Authorization', 'Basic ' + token)
+      assert.strictEqual(req.res.statusCode, 400)
+    })
+  })
+
   describe('Leave', function () {
     let serverId, lambdaId, lambdaToken
     beforeEach(async function () {

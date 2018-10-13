@@ -1,6 +1,6 @@
 import config from '../../Configuration'
 import {
-  createServer, deleteServer, getOwnedServers, isInServer, ownsServer, removeMemberFromServer
+  createServer, deleteServer, getOwnedServers, isInServer, ownsServer, removeMemberFromServer, updateServer
 } from '../DatabaseHandler'
 import { deduplicate, filter, getClientsById, remove as utilRemove } from '../Utils'
 import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../Dispatcher'
@@ -29,6 +29,27 @@ export async function create (req, res) {
       dispatchServerJoin(clients, server)
     }
   }
+}
+
+export async function patch (req, res) {
+  const { name, iconUrl } = req.body
+
+  if (!await ownsServer(req.user.id, req.serverId)) {
+    return res.status(403).json({ error: 'You don\'t own this server' })
+  }
+
+  if (name !== undefined) {
+    if (name.trim().length === 0) {
+      return res.status(400).json({ error: 'Server name cannot be empty' })
+    }
+
+    if (name.trim().length > config.rules.serverCharacterLimit) {
+      return res.status(400).json({ error: `Username cannot exceed ${config.rules.serverCharacterLimit} characters` })
+    }
+  }
+
+  await updateServer(req.serverId, name, iconUrl)
+  res.sendStatus(204)
 }
 
 export async function leave (req, res) {

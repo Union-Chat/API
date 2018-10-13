@@ -41,10 +41,11 @@ export async function createUser (username, password) {
   return `${username}#${discriminator}`
 }
 
-export async function updateUser (id, username, password) {
+export async function updateUser (id, username, password, avatarUrl) {
   const discriminator = await rollDiscriminator(username)
   const update = { username, discriminator }
   if (password) Object.assign(update, { password: await hash(password, 10) })
+  if (avatarUrl) Object.assign(update, avatarUrl)
   await r.table('users').get(id).update(update)
   return `${username}#${discriminator}`
 }
@@ -81,6 +82,13 @@ export async function createServer (name, iconUrl, owner) {
   await r.table('servers').insert(server)
   await addMemberToServer(owner, id)
   return getServer(id)
+}
+
+export async function updateServer (id, name, iconUrl) {
+  const update = {}
+  if (name) Object.assign(update, name)
+  if (iconUrl) Object.assign(update, iconUrl)
+  await r.table('servers').get(id).update(update)
 }
 
 /**

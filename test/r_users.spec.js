@@ -8,7 +8,6 @@ import v2 from '../src/api_v2'
 
 import { migrator, drop } from '../migrations/_migrator'
 import { createUser } from '../src/DatabaseHandler'
-import { hash } from 'bcrypt'
 
 let server
 describe('Users Controller', function () {

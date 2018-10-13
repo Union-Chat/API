@@ -59,7 +59,7 @@ export async function getSelf (req, res) {
 }
 
 export async function patch (req, res) {
-  const { password, username, newPassword } = req.body
+  const { password, username, newPassword, avatarUrl } = req.body
   if (!password || !await compare(password, req.user.password)) {
     return res.sendStatus(401)
   }
@@ -82,7 +82,7 @@ export async function patch (req, res) {
     return res.status(400).json({ error: 'Password cannot be empty and must be 5 characters long or more' })
   }
 
-  const newUser = await updateUser(req.user.id, username || req.user.username, newPassword)
+  const newUser = await updateUser(req.user.id, username || req.user.username, newPassword, avatarUrl)
   res.status(200).send(newUser)
 }
 

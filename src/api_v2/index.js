@@ -8,7 +8,7 @@ import serverExists from '../middlewares/serverExists'
 import { home, info } from './core'
 import { create as userCreate, getSelf as userGetSelf, patch as userPatch, remove as userDelete } from './users'
 import { post as messagePost } from './messages'
-import { create as serverCreate, leave as serverLeave, remove as serverDelete } from './servers'
+import { create as serverCreate, leave as serverLeave, remove as serverDelete, patch as serverPatch } from './servers'
 import { create as inviteCreate, accept as inviteAccept } from './invites'
 
 const api = express.Router()
@@ -32,9 +32,11 @@ api.delete('/users/self', authorize, userDelete)
 
 // Server
 api.post('/servers', authorize, serverCreate)
-api.post('/servers/:serverId/messages', serverExists, authorize, messagePost)
+api.put('/servers/:serverId([0-9]+)', authorize, serverExists, serverPatch)
+api.patch('/servers/:serverId([0-9]+)', authorize, serverExists, serverPatch)
 api.delete('/servers/:serverId([0-9]+)/leave', authorize, serverExists, serverLeave)
 api.delete('/servers/:serverId([0-9]+)', authorize, serverExists, serverDelete)
+api.post('/servers/:serverId/messages', serverExists, authorize, messagePost)
 
 // Invites
 api.post('/servers/:serverId([0-9]+)/invites', authorize, serverExists, inviteCreate)
