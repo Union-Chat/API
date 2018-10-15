@@ -4,7 +4,7 @@ import './_hooks'
 import assert from 'assert'
 import express from 'express'
 import request from 'supertest'
-import v2 from '../src/api_v2'
+import v2 from '../src/api'
 
 let server
 describe('Core Controller', function () {

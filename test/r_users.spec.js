@@ -4,7 +4,7 @@ import './_hooks'
 import assert from 'assert'
 import express from 'express'
 import request from 'supertest'
-import v2 from '../src/api_v2'
+import v2 from '../src/api'
 
 import { migrator, drop } from '../migrations/_migrator'
 import { createUser } from '../src/DatabaseHandler'
