@@ -1,0 +1,7 @@
+name: Union API Docs
+title: Union API Docs
+include: ['_pages']
+exclude: ['modesta']
+baseurl: ""
+url: ""
+markdown: kramdown

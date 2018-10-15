@@ -1,0 +1,79 @@
+<html>
+<head>
+  <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no'/>
+
+  <!-- Meta data -->
+  <meta content='{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}' property='og:title'/>
+  {% if page.description %}
+  <meta content='{{ page.description }}' property='og:description'/>
+  <meta content='{{ page.description }}' name='description'/>
+  {% endif %}
+
+  <!-- CSS -->
+  <link href='/css/style.css' type='text/css' rel='stylesheet'>
+  <link href='/css/modesta.min.css' type='text/css' rel='stylesheet'>
+  <link href='/css/blobcat.min.css' type='text/css' rel='stylesheet'>
+</head>
+<body>
+<div id='navbar' class='nav-container default'>
+  <span id='menu-icon'></span>
+  <img src='/img/union.svg' alt='Union logo'/>
+  <h3 class='nav-title'>
+    {{ page.title }}
+  </h3>
+  <div id='navside' class='sidenav'>
+    {% for pagedocs in site.pages %}
+    {% if page.title == pagedocs.title %}
+    <a href='{{ pagedocs.url }}' class='current'>{{ pagedocs.title }}</a>
+    {% else %}
+    <a href='{{ pagedocs.url }}'>{{ pagedocs.title }}</a>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<div class='markdown-container'>
+  {{ content }}
+</div>
+
+<script>
+  function checkSizeNavbar (navbar, navside) {
+    if (window.innerWidth < 650) {
+      navside.style.transform = 'translateX(-250px)'
+      navbar.classList.remove('default')
+    } else {
+      navside.style.transform = 'translateX(0)'
+      navbar.classList.add('default')
+    }
+  }
+
+  const navbar = document.getElementById('navbar')
+  const navside = document.getElementById('navside')
+  const menuicon = document.getElementById('menu-icon')
+
+  document.getElementById('menu-icon').onclick = function () {
+    navside.style.transform = 'translateX(0)'
+  }
+
+  document.addEventListener('click', function (event) {
+    if (window.getComputedStyle(menuicon).display === 'block') {
+      if (event.target.closest('.nav-container')) return
+      navside.style.transform = 'translateX(-250px)'
+    }
+  })
+
+  if (navbar) {
+    checkSizeNavbar(navbar, navside)
+
+    window.addEventListener('resize', function () {
+      checkSizeNavbar(navbar, navside)
+    })
+  }
+
+  // Replace first link
+  document.getElementsByTagName('a')[0].innerHTML = 'Home'
+</script>
+</body>
+</html>
