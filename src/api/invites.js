@@ -2,7 +2,7 @@ import {
   addMemberToServer, generateInvite, getInvite, getMember, getServer, isInServer,
   ownsServer, serverExists
 } from '../DatabaseHandler'
-import { dispatchMember, dispatchServerJoin } from '../Dispatcher'
+import { dispatchMember, dispatchServerJoin } from '../socket/dispatcher'
 import { deduplicate, filter, getClientsById } from '../Utils'
 
 export async function create (req, res) {

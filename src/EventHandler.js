@@ -1,5 +1,5 @@
 const { getSessionsOf } = require('./Utils.js')
-const { dispatchPresenceUpdate } = require('./Dispatcher.js')
+const { dispatchPresenceUpdate } = require('./socket/dispatcher.js')
 const { getUser, updatePresenceOf } = require('./DatabaseHandler.js')
 
 async function handlePresenceUpdate (userId, clients) {

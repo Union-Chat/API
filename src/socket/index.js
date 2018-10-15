@@ -1,14 +1,13 @@
-import config from '../Configuration'
+import config from '../../Configuration'
 import fs from 'fs'
 import http from 'http'
 import https from 'https'
 import WebSocket from 'ws'
 
-/* Server middleware */
-import { authenticate, resetPresenceStates } from './DatabaseHandler.js'
-import { dispatchHello } from './Dispatcher.js'
-import { handlePresenceUpdate } from './EventHandler.js'
-import logger from './Logger.js'
+import { authenticate, resetPresenceStates } from '../DatabaseHandler.js'
+import { dispatchHello } from './dispatcher.js'
+import { handlePresenceUpdate } from '../EventHandler.js'
+import logger from '../logger.js'
 
 /* Apps */
 let server = process.argv.includes('--use-insecure-ws')
@@ -18,6 +17,7 @@ let server = process.argv.includes('--use-insecure-ws')
     key: fs.readFileSync(config.ws.keyPath)
   })
 const socket = new WebSocket.Server({ server })
+global.server = socket
 
 socket.on('connection', async (client, req) => {
   if (!req.headers.authorization) {
@@ -62,7 +62,6 @@ process.on('SIGINT', async () => {
   resetPresenceStates().finally(process.exit)
 })
 
-global.server = socket
 export default server
 
 export function socketInit () {

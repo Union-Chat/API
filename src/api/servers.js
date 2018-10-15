@@ -3,7 +3,7 @@ import {
   createServer, deleteServer, getOwnedServers, isInServer, ownsServer, removeMemberFromServer, updateServer
 } from '../DatabaseHandler'
 import { deduplicate, filter, getClientsById, remove as utilRemove } from '../Utils'
-import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../Dispatcher'
+import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../socket/dispatcher'
 
 export async function create (req, res) {
   const { name, iconUrl } = req.body

@@ -1,6 +1,6 @@
-const OPCODES = require('../OpCodes.json')
-const { getServersOfUser } = require('./DatabaseHandler.js')
-const logger = require('./Logger.js')
+const OPCODES = require('../../opcodes.json')
+const { getServersOfUser } = require('../DatabaseHandler.js')
+const logger = require('../logger.js')
 const WebSocket = require('ws')
 
 /**
