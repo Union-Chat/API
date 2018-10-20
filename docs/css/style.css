@@ -40,23 +40,32 @@ code {
 }
 
 table {
-    background-color: #383838;
+    background-color: #242424;
 }
 
 table thead {
-    background-color: #303030;
+    background-color: #202020;
 }
 
-table tr {
-    border: none;
+table tr, table td, table th {
+    border: 1px #363636 solid!important;
 }
 
-table th, table td {
-    border-top: 1px #454545 solid;
-    border-left: 1px #454545 solid;
+.markdown-container h1 {
+    font-size: 38px!important;
 }
-
-table tr {
-    border-top: 1px #454545 solid;
-    border-left: 1px #454545 solid;
+.markdown-container h2 {
+    font-size: 32px!important;
+}
+.markdown-container h3 {
+    font-size: 24px!important;
+}
+.markdown-container h4 {
+    font-size: 20px!important;
+}
+.markdown-container h5 {
+    font-size: 16px!important;
+}
+.markdown-container h6 {
+    font-size: 14px!important;
 }
