@@ -13,3 +13,50 @@
 #navbar h3, #navbar div {
     margin-top: 2px;
 }
+
+#modesta-credit {
+    color: #f49898;
+    text-decoration: none;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 10px 15px;
+}
+
+code {
+    background-color: #282828;
+    border: 1px #121212 solid;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+.table-container {
+    margin-top: 10px;
+}
+
+.table-container, table {
+    width: 100%!important;
+    max-width: 100%!important;
+}
+
+table {
+    background-color: #383838;
+}
+
+table thead {
+    background-color: #303030;
+}
+
+table tr {
+    border: none;
+}
+
+table th, table td {
+    border-top: 1px #454545 solid;
+    border-left: 1px #454545 solid;
+}
+
+table tr {
+    border-top: 1px #454545 solid;
+    border-left: 1px #454545 solid;
+}

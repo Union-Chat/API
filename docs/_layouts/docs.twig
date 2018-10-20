@@ -1,36 +1,35 @@
+<!DOCTYPE html>
 <html>
 <head>
-  <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
   <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no'/>
 
   <!-- Meta data -->
   <meta content='{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}' property='og:title'/>
   {% if page.description %}
-  <meta content='{{ page.description }}' property='og:description'/>
-  <meta content='{{ page.description }}' name='description'/>
+  <meta content='{{ site.description }}' property='og:description'/>
+  <meta content='{{ site.description }}' name='description'/>
   {% endif %}
 
   <!-- CSS -->
   <link href='/css/style.css' type='text/css' rel='stylesheet'>
-  <link href='/css/modesta.min.css' type='text/css' rel='stylesheet'>
-  <link href='/css/blobcat.min.css' type='text/css' rel='stylesheet'>
+  <link href='/modesta/css/modesta.min.css' type='text/css' rel='stylesheet'>
+  <link href='/modesta/css/blobcat.min.css' type='text/css' rel='stylesheet'>
 </head>
 <body>
 <div id='navbar' class='nav-container default'>
   <span id='menu-icon'></span>
   <img src='/img/union.svg' alt='Union logo'/>
   <h3 class='nav-title'>
-    {{ page.title }}
+    {% if page.title %}{{ page.title }}{% else %}Union API Documentation{% endif %}
   </h3>
   <div id='navside' class='sidenav'>
-    {% for pagedocs in site.pages %}
-    {% if page.title == pagedocs.title %}
-    <a href='{{ pagedocs.url }}' class='current'>{{ pagedocs.title }}</a>
-    {% else %}
-    <a href='{{ pagedocs.url }}'>{{ pagedocs.title }}</a>
-    {% endif %}
-    {% endfor %}
+    <a href='/' {% if page.title == null %}class='current'{% endif %}>Home</a>
+    <a href='/api' {% if page.title contains "API - " %}class='current'{% endif %}>API</a>
+    <a href='/socket' {% if page.title contains "Socket" %}class='current'{% endif %}>Socket</a>
+    <a href='/apps' {% if page.title contains "Applications" %}class='current'{% endif %}>Applications</a>
+    <a href='/themes' {% if page.title contains "Themes" %}class='current'{% endif %}>Themes</a>
   </div>
 </div>
 
@@ -71,9 +70,6 @@
       checkSizeNavbar(navbar, navside)
     })
   }
-
-  // Replace first link
-  document.getElementsByTagName('a')[0].innerHTML = 'Home'
 </script>
 </body>
 </html>

@@ -1,7 +1,8 @@
-name: Union API Docs
-title: Union API Docs
+name: Union API Documentation
+title: Union API Documentation
+description: Welcome to the official documentation for Union API!
 include: ['_pages']
-exclude: ['modesta']
+exclude: ['modesta/_pages']
 baseurl: ""
 url: ""
 markdown: kramdown
