@@ -1,5 +1,5 @@
 {
-  "name": "Union",
+  "name": "union",
   "version": "1.0.0",
   "description": "Lightweight chat service built with C# and NodeJS",
   "main": "build/index.js",
