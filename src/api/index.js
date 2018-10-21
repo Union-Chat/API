@@ -42,6 +42,17 @@ api.post('/servers/:serverId/messages', serverExists, authorize, messagePost)
 api.post('/servers/:serverId([0-9]+)/invites', authorize, serverExists, inviteCreate)
 api.post('/invites/:inviteId([a-zA-Z0-9-_]+)', authorize, inviteAccept)
 
+// Themes
+api.get('/themes/all', notImplemented)
+api.get('/themes/search', notImplemented)
+api.post('/themes/:themeId/vote', notImplemented)
+api.delete('/themes/:themeId/vote', notImplemented)
+
+api.post('/themes', notImplemented)
+api.put('/themes/:themeId', notImplemented)
+api.patch('/themes/:themeId', notImplemented)
+api.delete('/themes/:themeId', notImplemented)
+
 // Developers
 api.get('/developers/applications', notImplemented)
 api.post('/developers/applications', notImplemented)
