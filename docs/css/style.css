@@ -35,8 +35,8 @@ code {
 }
 
 .table-container, table {
-    width: 100%!important;
-    max-width: 100%!important;
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 table {
@@ -48,24 +48,37 @@ table thead {
 }
 
 table tr, table td, table th {
-    border: 1px #363636 solid!important;
+    border: 1px #363636 solid !important;
 }
 
 .markdown-container h1 {
-    font-size: 38px!important;
+    font-size: 38px !important;
 }
+
 .markdown-container h2 {
-    font-size: 32px!important;
+    font-size: 32px !important;
 }
+
 .markdown-container h3 {
-    font-size: 24px!important;
+    font-size: 24px !important;
 }
+
 .markdown-container h4 {
-    font-size: 20px!important;
+    font-size: 20px !important;
 }
+
 .markdown-container h5 {
-    font-size: 16px!important;
+    font-size: 16px !important;
 }
+
 .markdown-container h6 {
-    font-size: 14px!important;
+    font-size: 14px !important;
+}
+
+.api-endpoint {
+    font-family: 'Roboto Mono', monospace;
+    color: #aaa;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 25px;
 }

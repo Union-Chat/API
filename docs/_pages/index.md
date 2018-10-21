@@ -17,3 +17,7 @@ we would love your help to improve this! <3
 ## Applications and bots 
 
 Currently, bots and applications are not available, but we're working on it!
+
+## Is Union salable?
+
+In theory, yes. In practice, not yet

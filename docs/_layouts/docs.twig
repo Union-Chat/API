@@ -13,6 +13,7 @@
   {% endif %}
 
   <!-- CSS -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:700" rel="stylesheet">
   <link href='/css/style.css' type='text/css' rel='stylesheet'>
   <link href='/modesta/css/modesta.min.css' type='text/css' rel='stylesheet'>
   <link href='/modesta/css/blobcat.min.css' type='text/css' rel='stylesheet'>
@@ -26,7 +27,7 @@
   </h3>
   <div id='navside' class='sidenav'>
     <a href='/' {% if page.title == null %}class='current'{% endif %}>Home</a>
-    <a href='/api' {% if page.title contains "API - " %}class='current'{% endif %}>API</a>
+    <a href='/api' {% if page.title contains "API" %}class='current'{% endif %}>API</a>
     <a href='/socket' {% if page.title contains "Socket" %}class='current'{% endif %}>Socket</a>
     <a href='/apps' {% if page.title contains "Applications" %}class='current'{% endif %}>Applications</a>
     <a href='/themes' {% if page.title contains "Themes" %}class='current'{% endif %}>Themes</a>

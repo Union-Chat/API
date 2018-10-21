@@ -1,7 +1,7 @@
 {
-  "name": "union",
+  "name": "union-server",
   "version": "1.0.0",
-  "description": "Lightweight chat service built with C# and NodeJS",
+  "description": "Lightweight chat service built with NodeJS",
   "main": "build/index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --require @babel/register",
