@@ -194,7 +194,6 @@ Move along, nothing to see citizen
 
 <span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/:serverId</span>
 
-<br>
  - Response
 
 204 on success

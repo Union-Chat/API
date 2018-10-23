@@ -1,5 +1,5 @@
 import express from 'express'
-import v2 from './api'
+import v2 from './api/index'
 
 const api = express.Router()
 

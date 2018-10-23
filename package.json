@@ -4,7 +4,7 @@
   "description": "Lightweight chat service built with NodeJS",
   "main": "build/index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha --require @babel/register",
+    "test": "cross-env NODE_ENV=test mocha --require @babel/register --timeout 10000",
     "lint": "eslint **/*.js --ignore-pattern build/* --ignore-pattern dist/*",
     "setup": "yarn run build && node installer.js",
     "start": "cross-env NODE_ENV=production node build/index.js",
