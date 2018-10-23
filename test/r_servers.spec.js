@@ -45,7 +45,7 @@ describe('Servers Controller', function () {
         name: 'A server',
         iconUrl: 'lol.png'
       }).set('Authorization', 'Basic ' + token)
-      assert.strictEqual(req.res.statusCode, 200)
+      assert.strictEqual(req.res.statusCode, 204)
       assert.strictEqual(await r.table('servers').count().run(), 1)
       const serv = await getServer(1)
       assert.strictEqual(serv.owner, userId)

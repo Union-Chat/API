@@ -33,7 +33,6 @@ export async function createUser (username, password) {
     username,
     discriminator,
     password: await hash(password, 10),
-    createdAt: Date.now(),
     servers: [],
     online: false
   })

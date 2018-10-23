@@ -12,7 +12,7 @@ export async function create (req, res) {
   }
 
   if (name.trim().length > config.rules.serverCharacterLimit) {
-    return res.status(400).json({ error: `Username cannot exceed ${config.rules.serverCharacterLimit} characters` })
+    return res.status(400).json({ error: `Server name cannot exceed ${config.rules.serverCharacterLimit} characters` })
   }
 
   if (await getOwnedServers(req.user.id) >= config.rules.maxServersPerUser) {
@@ -20,7 +20,7 @@ export async function create (req, res) {
   }
 
   const server = await createServer(name, iconUrl, req.user.id)
-  res.status(200).send()
+  res.sendStatus(204)
 
   if (global.server) { // May not be declared in unit tests
     const clients = getClientsById(global.server.clients, req.user.id)
@@ -44,7 +44,7 @@ export async function patch (req, res) {
     }
 
     if (name.trim().length > config.rules.serverCharacterLimit) {
-      return res.status(400).json({ error: `Username cannot exceed ${config.rules.serverCharacterLimit} characters` })
+      return res.status(400).json({ error: `Server name cannot exceed ${config.rules.serverCharacterLimit} characters` })
     }
   }
 

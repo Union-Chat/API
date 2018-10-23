@@ -12,7 +12,7 @@ export function info (req, res) {
     appSettings: config.rules,
     recaptcha: {
       enabled: !!config.recaptcha,
-      key: config.recaptcha ? config.recaptcha.key : null
+      key: config.recaptcha ? config.recaptcha.key : undefined
     }
   })
 }

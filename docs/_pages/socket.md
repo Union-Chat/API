@@ -53,13 +53,14 @@ If you send 4 events and one of them is invalid, you'll not be (un)subscribed to
 
 ## Close codes
 
-| Code | Description            | Troubleshooting                                          |
-|------|------------------------|----------------------------------------------------------|
-| 4001 | Authentication failure | You passed an invalid token (or nothing)                 |
-| 4002 | Malformed Payload      | wtf is `{op": 4", "d": {"["client1", client2"]}}`???     |
-| 4003 | Unknown op code        | You sent something that you shouldn't                    |
-| 4004 | Session invalidated    | User password or MFA settings updated / Bot token reset  |
-| 4005 | Session timed out      | Not responding to ping requests                          |
+| Code | Description            | Troubleshooting                                                  |
+|------|------------------------|------------------------------------------------------------------|
+| 4001 | Authentication failure | You passed an invalid token (or nothing)                         |
+| 4002 | Malformed Payload      | wtf is `{op": 4", "d": {"["client1", client2"]}}`???             |
+| 4003 | Unknown op code        | You sent something that you shouldn't                            |
+| 4004 | Session invalidated    | User password or MFA settings updated / Bot token reset          |
+| 4005 | Session timed out      | Not responding to ping requests                                  |
+| 4006 | No active subscription | You can't be not subscribed to anything for more than 30 seconds |
 
 ## Events
 

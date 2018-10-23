@@ -22,8 +22,7 @@ export async function post (req, res) {
   }
 
   const id = randomBytes(15).toString('hex')
-  storeMessage(id, req.user.id)
-
+  await storeMessage(id, req.user.id)
   res.sendStatus(204)
 
   if (global.server) {

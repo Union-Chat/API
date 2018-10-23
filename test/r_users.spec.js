@@ -98,7 +98,7 @@ describe('Users Controller', function () {
         const req = await request(server).get('/users/self').set('Authorization', 'Basic ' + token)
         const json = JSON.parse(req.res.text)
         assert.strictEqual(req.res.statusCode, 200)
-        assert.deepStrictEqual(Object.keys(json).sort(), ['id', 'username', 'discriminator', 'createdAt', 'servers', 'online'].sort())
+        assert.deepStrictEqual(Object.keys(json).sort(), ['id', 'username', 'discriminator', 'servers', 'online'].sort())
       })
     })
 
