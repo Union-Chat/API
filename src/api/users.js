@@ -1,8 +1,10 @@
 import config from '../../Configuration'
 
 import fetch from 'node-fetch'
-import { createUser, deleteUser, updateUser } from '../database'
 import { compare } from 'bcrypt'
+import { filter, getClientsById } from '../utils'
+import { dispatchEvent } from '../socket/dispatcher'
+import { createUser, deleteUser, getUser, updateUser } from '../database'
 
 export async function create (req, res) {
   const { username, password } = req.body
@@ -84,6 +86,16 @@ export async function patch (req, res) {
 
   const newUser = await updateUser(req.user.id, username || req.user.username, newPassword, avatarUrl)
   res.status(200).send(newUser)
+
+  if (global.server) {
+    if (newPassword !== password) {
+      getClientsById(global.server.clients, req.user.id).forEach(ws => ws.close(4004, 'Password changed'))
+    }
+
+    const serverIds = req.user.servers.map(s => s.id)
+    const clients = filter(global.server.clients, c => c.user.servers.filter(s => serverIds.indexOf(s.id) !== -1).length !== 0)
+    dispatchEvent(clients, 'USER_UPDATE', await getUser(newUser))
+  }
 }
 
 export async function remove (req, res) {

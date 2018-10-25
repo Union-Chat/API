@@ -1,9 +1,9 @@
 import config from '../../Configuration'
 import {
-  createServer, deleteServer, getOwnedServers, isInServer, ownsServer, removeMemberFromServer, updateServer
+  createServer, deleteServer, getOwnedServers, getServer, isInServer, ownsServer, removeMemberFromServer, updateServer
 } from '../database'
 import { deduplicate, filter, getClientsById, remove as utilRemove } from '../utils'
-import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../socket/_old/dispatcher'
+import { dispatchEvent } from '../socket/dispatcher'
 
 export async function create (req, res) {
   const { name, iconUrl } = req.body
@@ -26,7 +26,7 @@ export async function create (req, res) {
     const clients = getClientsById(global.server.clients, req.user.id)
     if (clients.length > 0) {
       clients.forEach(ws => { ws.user.servers = deduplicate(ws.user.servers, server.id) })
-      dispatchServerJoin(clients, server)
+      dispatchEvent(clients, server)
     }
   }
 }
@@ -50,6 +50,15 @@ export async function patch (req, res) {
 
   await updateServer(req.serverId, name, iconUrl)
   res.sendStatus(204)
+
+  if (global.server) {
+    const clients = getClientsById(global.server.clients, req.user.id)
+    if (clients.length > 0) {
+      const server = await getServer(req.serverId)
+      clients.forEach(ws => { ws.user.servers = deduplicate(ws.user.servers, server.id) })
+      dispatchEvent(clients, 'SERVER_UPDATE', server)
+    }
+  }
 }
 
 export async function leave (req, res) {
@@ -67,13 +76,14 @@ export async function leave (req, res) {
   res.sendStatus(204)
 
   if (global.server) {
-    dispatchServerLeave(getClientsById(global.server.clients, req.user.id), serverId)
+    dispatchEvent(getClientsById(global.server.clients, req.user.id), 'SERVER_DELETE', serverId)
 
     const self = await getClientsById(global.server.clients, req.user.id)
     const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId))
 
     if (members.length > 0) {
-      dispatchMemberLeave(members, req.user.id, serverId)
+      // reason: SELF, KICKED:reason why this kid was kicked, BANNED:this user is still a kid (soon)
+      dispatchEvent(members, 'SERVER_MEMBER_LEAVE', { user: req.user.id, server: serverId, reason: 'SELF' })
     }
 
     if (self.length > 0) {
@@ -97,7 +107,7 @@ export async function remove (req, res) {
 
     if (clients.length > 0) {
       clients.forEach(ws => utilRemove(ws.user.servers, serverId))
-      dispatchServerLeave(clients, serverId)
+      dispatchEvent(clients, 'SERVER_DELETE', serverId)
     }
   }
 }

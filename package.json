@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --require @babel/register --timeout 10000",
-    "lint": "eslint **/*.js --ignore-pattern build/* --ignore-pattern dist/*",
+    "lint": "eslint **/*.js --ignore-pattern build/* --ignore-pattern dist/* --ignore-pattern docs/*",
     "setup": "yarn run build && node installer.js",
     "start": "cross-env NODE_ENV=production node build/index.js",
     "build": "babel src -d build --copy-files",

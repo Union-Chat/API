@@ -58,13 +58,13 @@ async function handleAuthenticate (client, data) {
   client.user = user
   client.isAlive = true
   client.isAuthenticated = true
-  // client.subscriptions = []
-  // if (!user.bot) {
   client.subscriptions = events
+  // if (user.bot) {
+  //   client.subscriptions = []
   // }
 
   await dispatchHello(client)
-  await handlePresenceUpdate(client.user.id, global.server.clients)
+  await handlePresenceUpdate(client.user.id)
 }
 
 function handleSubscribe (client, data) {

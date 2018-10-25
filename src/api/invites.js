@@ -2,7 +2,7 @@ import {
   addMemberToServer, generateInvite, getInvite, getMember, getServer, isInServer,
   ownsServer, serverExists
 } from '../database'
-import { dispatchMember, dispatchServerJoin } from '../socket/_old/dispatcher'
+import { dispatchEvent } from '../socket/dispatcher'
 import { deduplicate, filter, getClientsById } from '../utils'
 
 export async function create (req, res) {
@@ -43,14 +43,14 @@ export async function accept (req, res) {
 
     if (clients.length > 0) {
       clients.forEach(ws => { ws.user.servers = deduplicate(ws.user.servers, serverId) })
-      dispatchServerJoin(clients, server)
+      dispatchEvent(clients, 'SERVER_CREATE', server)
     }
 
     const members = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId) && ws.user.id !== req.user.id)
     const member = await getMember(req.user.id)
 
     if (members.length > 0) {
-      dispatchMember(members, serverId, member)
+      dispatchEvent(members, 'SERVER_MEMBER_JOIN', { server: serverId, member })
     }
   }
 }

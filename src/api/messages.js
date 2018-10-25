@@ -2,7 +2,7 @@ import config from '../../Configuration'
 
 import { randomBytes } from 'crypto'
 import { storeMessage } from '../database'
-import { dispatchMessage } from '../socket/_old/dispatcher'
+import { dispatchEvent } from '../socket/dispatcher'
 import { filter } from '../utils'
 
 export async function post (req, res) {
@@ -27,7 +27,7 @@ export async function post (req, res) {
 
   if (global.server) {
     const recipients = filter(global.server.clients, ws => ws.isAuthenticated && ws.user.servers.includes(serverId))
-    dispatchMessage(recipients, {
+    dispatchEvent(recipients, 'MESSAGE_CREATE', {
       id,
       server: serverId,
       content: content.trim(),
