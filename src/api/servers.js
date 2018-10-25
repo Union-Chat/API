@@ -16,7 +16,7 @@ export async function create (req, res) {
   }
 
   if (await getOwnedServers(req.user.id) >= config.rules.maxServersPerUser) {
-    return res.status(400).json({ 'error': `You cannot create more than ${config.rules.maxServersPerUser} servers` })
+    return res.status(400).json({ error: `You cannot create more than ${config.rules.maxServersPerUser} servers` })
   }
 
   const server = await createServer(name, iconUrl, req.user.id)

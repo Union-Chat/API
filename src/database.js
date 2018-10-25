@@ -320,8 +320,16 @@ export function getInvite (code) {
   return r.table('invites').get(code)
 }
 
-export async function storeMessage (id, author) {
-  await r.table('messages').insert({ id, author }).run()
+export async function storeMessage (id, author, server, contents) {
+  await r.table('messages').insert({ id, author, server, contents, createdAt: Date.now() }).run()
+}
+
+export async function updateMessage (id, contents) {
+  await r.table('messages').get(id).update({ contents })
+}
+
+export async function deleteMessage (id) {
+  await r.table('messages').get(id).delete()
 }
 
 export function retrieveMessage (id) {
