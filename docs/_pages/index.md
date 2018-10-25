@@ -18,6 +18,6 @@ we would love your help to improve this! <3
 
 Currently, bots and applications are not available, but we're working on it!
 
-## Is Union salable?
+## Is Union scalable?
 
 In theory, yes. In practice, not yet

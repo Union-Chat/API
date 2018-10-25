@@ -102,6 +102,7 @@ Move along, nothing to see citizen
 ### Get current user
 
 <span class='api-endpoint'><span class='sun-flower-text'>GET</span> /users/self</span>
+<span class='api-auth'>Requires authentication</span>
 
  - Response data
 
@@ -117,6 +118,7 @@ Move along, nothing to see citizen
 ### Update the current user
 
 <span class='api-endpoint'><span class='sun-flower-text'>PUT/PATCH</span> /users/self</span>
+<span class='api-auth'>Requires authentication</span>
 
  - Request data (All fields are optional)
 
@@ -134,6 +136,7 @@ Move along, nothing to see citizen
 ### Delete the current user
 
 <span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /users/self</span>
+<span class='api-auth'>Requires authentication</span>
 
  - Request data
 
@@ -151,6 +154,7 @@ Move along, nothing to see citizen
 ### Create a server
 
 <span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers</span>
+<span class='api-auth'>Requires authentication</span>
 
 **Note:** You can't create more server than specified in `maxServersPerUser`
 
@@ -169,6 +173,7 @@ Move along, nothing to see citizen
 ### Update a server
 
 <span class='api-endpoint'><span class='sun-flower-text'>PUT/PATCH</span> /servers/:serverId</span>
+<span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission</span>
 
  - Request data (All fields are optional)
 
@@ -185,6 +190,7 @@ Move along, nothing to see citizen
 ### Leave a server
 
 <span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/:serverId/leave</span>
+<span class='api-auth'>Requires authentication</span>
 
  - Response
 
@@ -193,6 +199,7 @@ Move along, nothing to see citizen
 ### Delete a server
 
 <span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/:serverId</span>
+<span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission</span>
 
  - Response
 
@@ -201,6 +208,7 @@ Move along, nothing to see citizen
 ### Post a message
 
 <span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers/:serverId/messages</span>
+<span class='api-auth'>Requires authentication</span>
 
  - Request data
 
@@ -216,6 +224,7 @@ Move along, nothing to see citizen
 ### Edit a message
 
 <span class='api-endpoint'><span class='sun-flower-text'>PUT/PATCH</span> /servers/:serverId/messages/:messageId</span>
+<span class='api-auth'>Requires authentication and must be the <span class='sun-flower-text'>author of the message</span></span>
 
  - Request data
 
@@ -231,6 +240,7 @@ Move along, nothing to see citizen
 ### Delete a message
 
 <span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/:serverId/messages/:messageId</span>
+<span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission, or to be the <span class='sun-flower-text'>author of the message</span></span>
 
  - Response
 
@@ -241,6 +251,7 @@ Move along, nothing to see citizen
 ### Create an invite
 
 <span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers/:serverId/invites</span>
+<span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission</span>
 
  - Response
 
@@ -251,6 +262,7 @@ Move along, nothing to see citizen
 ### Accept an invite
 
 <span class='api-endpoint'><span class='sun-flower-text'>POST</span> /invites/:invite</span>
+<span class='api-auth'>Requires authentication</span>
 
  - Response
 
