@@ -87,7 +87,6 @@ describe('Core Socket', function () {
 
   describe('Subscription flow', function () {
     beforeEach(function (done) {
-      console.log('merde')
       ws.on('message', m => {
         const data = JSON.parse(m)
         if (data.op === opcodes.Welcome) {
