@@ -1,5 +1,5 @@
 const { getSessionsOf } = require('./Utils.js')
-const { dispatchPresenceUpdate } = require('./socket/dispatcher.js')
+const { dispatchPresenceUpdate } = require('./socket/_old/dispatcher.js')
 const { getUser, updatePresenceOf } = require('./DatabaseHandler.js')
 
 async function handlePresenceUpdate (userId, clients) {
@@ -10,7 +10,7 @@ async function handlePresenceUpdate (userId, clients) {
   const shouldUpdate = newState !== online
 
   if (shouldUpdate) {
-    updatePresenceOf(userId, newState)
+    await updatePresenceOf(userId, newState)
     dispatchPresenceUpdate(clients, userId, newState)
   }
 }

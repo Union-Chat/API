@@ -9,7 +9,7 @@
     "setup": "yarn run build && node installer.js",
     "start": "cross-env NODE_ENV=production node build/index.js",
     "build": "babel src -d build --copy-files",
-    "dev": "cross-env NODE_ENV=development concurrently -k -n \"Babel,Node\" -p \"[{name}]\" -c \"yellow,green\" \"babel src -w -d build --copy-files\" \"nodemon build/index.js\""
+    "dev": "cross-env NODE_ENV=development concurrently -k -n \"Babel,Node\" -p \"[{name}]\" -c \"yellow,green\" \"babel src -w -d build --copy-files\" \"nodemon build/index.js --use-insecure-ws\""
   },
   "keywords": [],
   "author": "Kromatic",

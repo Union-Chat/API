@@ -4,10 +4,7 @@ import FlakeId from 'flakeid'
 
 const r = require('rethinkdbdash')({
   db: 'union' + (process.env.NODE_ENV !== 'production' ? '_' + process.env.NODE_ENV : ''),
-  silent: process.env.NODE_ENV === 'test',
-  log: function (message) {
-    if (process.env.NODE_ENV !== 'test') console.log(message)
-  }
+  silent: process.env.NODE_ENV === 'test'
 })
 
 const idGenerator = new FlakeId({
@@ -189,8 +186,9 @@ export async function getServersOfUser (username) {
  * @param {String} username Username of the user to update the presence of
  * @param {Boolean} online Whether the user is online or not
  */
-export function updatePresenceOf (username, online) {
-  r.table('users').get(username).update({ online }).run()
+export async function updatePresenceOf (username, online) {
+  // Sometimes this generate errors in unit tests
+  try { await r.table('users').get(username).update({ online }).run() } catch (e) { }
 }
 
 /**

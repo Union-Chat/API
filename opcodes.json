@@ -1,12 +1,10 @@
 {
-    "Hello": 1,
-    "DispatchMemberAdd": 2,
-    "DispatchMessage": 3,
-    "DispatchPresence": 4,
-    "DispatchServerJoin": 5,
-    "DispatchServerLeave": 6,
-    "DispatchMembers": 7,
-    "DispatchDeleteMessage": 8,
-    "SyncMembers": 9,
-    "DispatchMemberLeave": 10
+    "OK": -1,
+    "DispatchEvent": 0,
+    "Welcome": 1,
+    "Authenticate": 2,
+    "Hello": 3,
+    "Subscribe": 4,
+    "Unsubscribe": 5,
+    "RequestMembers": 6
 }

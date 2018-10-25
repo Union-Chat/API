@@ -2,7 +2,7 @@ import config from '../../Configuration'
 
 import { randomBytes } from 'crypto'
 import { storeMessage } from '../DatabaseHandler'
-import { dispatchMessage } from '../socket/dispatcher'
+import { dispatchMessage } from '../socket/_old/dispatcher'
 import { filter } from '../Utils'
 
 export async function post (req, res) {
