@@ -7,7 +7,7 @@ import request from 'supertest'
 import v2 from '../src/api'
 
 import { migrator, drop } from '../migrations/_migrator'
-import { createUser } from '../src/DatabaseHandler'
+import { createUser } from '../src/database'
 
 let server
 describe('Users Controller', function () {

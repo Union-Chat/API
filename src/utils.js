@@ -4,7 +4,7 @@
  * @param {Function} expression The predicate to match against
  * @returns {Array} The filtered elements
  */
-function filter (set, expression) {
+export function filter (set, expression) {
   const results = []
   set.forEach(item => expression(item) && results.push(item))
   return results
@@ -16,7 +16,7 @@ function filter (set, expression) {
  * @param {Function} expression The predicate to match elements against
  * @returns {any|Null} The first match, if any
  */
-function findFirst (set, expression) {
+export function findFirst (set, expression) {
   return filter(set, expression)[0]
 }
 
@@ -26,20 +26,8 @@ function findFirst (set, expression) {
  * @param {String} userId The userId to find
  * @returns {Array<WebSocket>} The matching clients
  */
-function getClientsById (clients, userId) {
-  return filter(clients, (ws) => ws.isAuthenticated && ws.user.id === userId)
-}
-
-/**
- * Parses a string into an object and suppresses any errors thrown
- * @param {String} data The string to convert to an object
- */
-function safeParse (data) {
-  try {
-    return JSON.parse(data)
-  } catch (exception) {
-    return null
-  }
+export function getClientsById (clients, userId) {
+  return filter(clients, ws => ws.isAuthenticated && ws.user.id === userId)
 }
 
 /**
@@ -48,7 +36,7 @@ function safeParse (data) {
  * @param {*} append Elements to append to the array before deduplicating
  * @returns {Array<*>} The deduplicated array
  */
-function deduplicate (array, ...append) {
+export function deduplicate (array, ...append) {
   array.push(...append)
   const arraySet = new Set(array)
   return [...arraySet.values()]
@@ -59,7 +47,7 @@ function deduplicate (array, ...append) {
  * @param {Array<*>} array The array to remove the item from
  * @param {*} item The item to remove
  */
-function remove (array, item) {
+export function remove (array, item) {
   const ind = array.indexOf(item)
 
   if (ind > -1) {
@@ -72,16 +60,6 @@ function remove (array, item) {
  * @param {String} userId The user ID to get the sessions of
  * @param {Set<WebSocket>} clients The clients to filter
  */
-function getSessionsOf (userId, clients) {
+export function getSessionsOf (userId, clients) {
   return filter(clients, ws => ws.user && ws.user.id === userId).length
-}
-
-module.exports = {
-  deduplicate,
-  filter,
-  findFirst,
-  safeParse,
-  getClientsById,
-  getSessionsOf,
-  remove
 }

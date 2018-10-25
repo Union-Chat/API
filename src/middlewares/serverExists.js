@@ -1,4 +1,4 @@
-import { serverExists } from '../DatabaseHandler'
+import { serverExists } from '../database'
 
 /**
  * Ensures a server matching 'serverId' exists

@@ -1,8 +1,8 @@
 import config from '../../Configuration'
 import {
   createServer, deleteServer, getOwnedServers, isInServer, ownsServer, removeMemberFromServer, updateServer
-} from '../DatabaseHandler'
-import { deduplicate, filter, getClientsById, remove as utilRemove } from '../Utils'
+} from '../database'
+import { deduplicate, filter, getClientsById, remove as utilRemove } from '../utils'
 import { dispatchMemberLeave, dispatchServerJoin, dispatchServerLeave } from '../socket/_old/dispatcher'
 
 export async function create (req, res) {

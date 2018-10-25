@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import assert from 'assert'
 import mock from 'node-mocks-http'
 import { migrator, drop } from '../migrations/_migrator'
-import { createServer } from '../src/DatabaseHandler'
+import { createServer } from '../src/database'
 import serverExistsMiddleware from '../src/middlewares/serverExists'
 
 describe('Server Exists Middleware', function () {

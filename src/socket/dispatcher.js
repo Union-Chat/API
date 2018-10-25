@@ -1,8 +1,8 @@
 import WebSocket from 'ws'
 import logger from '../logger'
 import opcodes from '../../opcodes'
-import { filter } from '../Utils'
-import { getServersOfUser } from '../DatabaseHandler'
+import { filter } from '../utils'
+import { getServersOfUser } from '../database'
 
 export function dispatchWelcome (client) {
   send([client], { op: opcodes.Welcome, d: 'Welcome, your papers please' })

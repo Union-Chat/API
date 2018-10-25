@@ -1,4 +1,4 @@
-import { authenticate } from '../DatabaseHandler'
+import { authenticate } from '../database'
 
 /**
  * Validates the 'authorization' header and populates req.user

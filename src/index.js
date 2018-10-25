@@ -4,7 +4,7 @@ import path from 'path'
 import express from 'express'
 import api from './api'
 import socket, { socketDestroy, socketInit } from './socket'
-import { resetPresenceStates } from './DatabaseHandler'
+import { resetPresenceStates } from './database'
 // import voice from './voice'
 
 const app = express()

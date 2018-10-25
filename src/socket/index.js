@@ -5,7 +5,7 @@ import http from 'http'
 import https from 'https'
 import WebSocket from 'ws'
 import logger from '../logger'
-import { handlePresenceUpdate } from '../EventHandler'
+import { handlePresenceUpdate } from '../events'
 import receiver from './receiver'
 import { dispatchWelcome } from './dispatcher'
 

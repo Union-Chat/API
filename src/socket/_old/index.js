@@ -4,9 +4,9 @@ import http from 'http'
 import https from 'https'
 import WebSocket from 'ws'
 
-import { authenticate, resetPresenceStates } from '../../DatabaseHandler.js'
+import { authenticate, resetPresenceStates } from '../../database.js'
 import { dispatchHello } from './dispatcher.js'
-import { handlePresenceUpdate } from '../../EventHandler.js'
+import { handlePresenceUpdate } from '../../events.js'
 import logger from '../../logger.js'
 
 /* Apps */

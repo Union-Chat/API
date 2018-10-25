@@ -10,7 +10,7 @@ import { migrator, drop } from '../migrations/_migrator'
 import {
   addMemberToServer, createServer, createUser, getServer, isInServer,
   removeMemberFromServer
-} from '../src/DatabaseHandler'
+} from '../src/database'
 
 let server, r, userId, token
 describe('Servers Controller', function () {

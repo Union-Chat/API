@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import assert from 'assert'
 import mock from 'node-mocks-http'
 import { migrator, drop } from '../migrations/_migrator'
-import { createUser } from '../src/DatabaseHandler'
+import { createUser } from '../src/database'
 import authorizeMiddleware from '../src/middlewares/authorize'
 
 describe('Authorize Middleware', () => {

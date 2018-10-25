@@ -1,8 +1,8 @@
 import logger from '../logger'
 import opcodes from '../../opcodes'
-import { deduplicate } from '../Utils'
-import { authenticate } from '../DatabaseHandler'
-import { handlePresenceUpdate } from '../EventHandler'
+import { deduplicate } from '../utils'
+import { authenticate } from '../database'
+import { handlePresenceUpdate } from '../events'
 import { dispatchOk, dispatchHello } from './dispatcher'
 
 const events = ['USER_UPDATE', 'PRESENCE_UPDATE', 'SERVER_CREATE', 'SERVER_UPDATE', 'SERVER_DELETE', 'SERVER_MEMBER_JOIN', 'SERVER_MEMBER_LEAVE', 'SERVER_MEMBERS_CHUNK', 'MESSAGE_CREATE', 'MESSAGE_UPDATE', 'MESSAGE_DELETE']

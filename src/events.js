@@ -1,8 +1,8 @@
-const { getSessionsOf } = require('./Utils.js')
-const { dispatchPresenceUpdate } = require('./socket/_old/dispatcher.js')
-const { getUser, updatePresenceOf } = require('./DatabaseHandler.js')
+import { getSessionsOf } from './utils.js'
+import { dispatchPresenceUpdate } from './socket/_old/dispatcher.js'
+import { getUser, updatePresenceOf } from './database.js'
 
-async function handlePresenceUpdate (userId, clients) {
+export async function handlePresenceUpdate (userId, clients) {
   const { online } = await getUser(userId)
   const sessions = getSessionsOf(userId, clients)
 
@@ -13,8 +13,4 @@ async function handlePresenceUpdate (userId, clients) {
     await updatePresenceOf(userId, newState)
     dispatchPresenceUpdate(clients, userId, newState)
   }
-}
-
-module.exports = {
-  handlePresenceUpdate
 }

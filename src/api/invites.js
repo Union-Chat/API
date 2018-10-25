@@ -1,9 +1,9 @@
 import {
   addMemberToServer, generateInvite, getInvite, getMember, getServer, isInServer,
   ownsServer, serverExists
-} from '../DatabaseHandler'
+} from '../database'
 import { dispatchMember, dispatchServerJoin } from '../socket/_old/dispatcher'
-import { deduplicate, filter, getClientsById } from '../Utils'
+import { deduplicate, filter, getClientsById } from '../utils'
 
 export async function create (req, res) {
   const { serverId } = req

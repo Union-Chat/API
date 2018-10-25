@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import assert from 'assert'
 import WebSocket from 'ws'
 import opcodes from '../opcodes'
-import { createUser } from '../src/DatabaseHandler'
+import { createUser } from '../src/database'
 import { dispatchEvent } from '../src/socket/dispatcher'
 import socket, { socketDestroy, socketInit } from '../src/socket'
 
@@ -153,7 +153,6 @@ describe('Core Socket', function () {
               assert.strictEqual(data.e, 'SERVER_CREATE')
               dispatchEvent(global.server.clients, 'PRESENCE_UPDATE', 'owo')
             } else {
-              console.log(data)
               assert.strictEqual(data.e, 'PRESENCE_UPDATE')
               resolve()
             }

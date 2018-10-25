@@ -9,7 +9,7 @@ import v2 from '../src/api'
 import { migrator, drop } from '../migrations/_migrator'
 import {
   addMemberToServer, createServer, createUser, generateInvite, isInServer
-} from '../src/DatabaseHandler'
+} from '../src/database'
 
 let server, r, userId, userToken, lambdaId, lambdaToken, serverId
 describe('Invites Controller', function () {

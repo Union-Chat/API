@@ -1,9 +1,9 @@
 import config from '../../Configuration'
 
 import { randomBytes } from 'crypto'
-import { storeMessage } from '../DatabaseHandler'
+import { storeMessage } from '../database'
 import { dispatchMessage } from '../socket/_old/dispatcher'
-import { filter } from '../Utils'
+import { filter } from '../utils'
 
 export async function post (req, res) {
   const { serverId } = req

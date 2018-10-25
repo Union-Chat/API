@@ -1,7 +1,7 @@
 import config from '../../Configuration'
 
 import fetch from 'node-fetch'
-import { createUser, deleteUser, updateUser } from '../DatabaseHandler'
+import { createUser, deleteUser, updateUser } from '../database'
 import { compare } from 'bcrypt'
 
 export async function create (req, res) {

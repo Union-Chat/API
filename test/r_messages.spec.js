@@ -9,7 +9,7 @@ import v2 from '../src/api'
 import { migrator, drop } from '../migrations/_migrator'
 import {
   addMemberToServer, createServer, createUser
-} from '../src/DatabaseHandler'
+} from '../src/database'
 
 let server, r, userId, userToken, serverId
 describe('Messages Controller', function () {
