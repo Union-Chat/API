@@ -9,7 +9,7 @@ migrator().then(() => {
   execSync('git clone https://github.com/Union-Chat/union-react', { stdio: [null, null, null] })
 
   console.log('Building web interface...')
-  execSync('cd union-react && yarn && yarn run prod && cd ..', { stdio: [null, null, null] })
+  execSync('cd union-react && yarn --prod false && yarn run prod && cd ..', { stdio: [null, null, null] })
 
   console.log('Cleaning up...')
   execSync('rm -rf dist', { stdio: [null, null, null] })
