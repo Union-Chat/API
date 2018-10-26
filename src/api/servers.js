@@ -26,7 +26,7 @@ export async function create (req, res) {
     const clients = getClientsById(global.server.clients, req.user.id)
     if (clients.length > 0) {
       clients.forEach(ws => { ws.user.servers = deduplicate(ws.user.servers, server.id) })
-      dispatchEvent(clients, server)
+      dispatchEvent(clients, 'SERVER_CREATE', server)
     }
   }
 }
