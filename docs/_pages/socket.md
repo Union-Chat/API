@@ -16,7 +16,7 @@ title: Socket
 
 When you'll try to connect to Union socket, the server will immediately respond with an opcode 1.<br>
 After this op, you must authenticate using Basic auth token or your Bot token (*coming soon*):
-`{op:2, d: "Your token goes here"}`
+`{ "op": 2, "d": "Your token goes here" }`
 
 If your authentication token is valid, you'll receive a Hello payload with all servers the user
 is in. See `data objects` to see how your payload will look like<br>
@@ -32,7 +32,7 @@ By default, you're subscribed to all events if you're using a **user** account, 
 if you're using a **bot** account. This is because a user will most likely be used in the
 Union GUI app and bots in CLI
 
-To subscribe (or unsubscribe), just send this payload to the server: `{op:4, d: ["events", "here"]}`
+To subscribe (or unsubscribe), just send this payload to the server: `{ "op": 4, "d": ["events", "here"]}`
 (An empty array will be interpreted as (un)subscribe to all)<br>
 You'll immediately receive an OK payload and start/stop receiving events
 

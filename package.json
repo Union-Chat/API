@@ -6,7 +6,7 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --require @babel/register --timeout 10000",
     "lint": "eslint **/*.js --ignore-pattern build/* --ignore-pattern dist/* --ignore-pattern docs/*",
-    "setup": "yarn run build && node installer.js",
+    "setup": "yarn run build && cross-env NODE_ENV=production node installer.js",
     "start": "cross-env NODE_ENV=production node build/index.js",
     "build": "babel src -d build --copy-files",
     "dev": "cross-env NODE_ENV=development concurrently -k -n \"Babel,Node\" -p \"[{name}]\" -c \"yellow,green\" \"babel src -w -d build --copy-files\" \"nodemon build/index.js --use-insecure-ws\""
