@@ -10,7 +10,6 @@ export async function create (req, res) {
   const { username, password } = req.body
 
   if (config.recaptcha && process.env.NODE_ENV !== 'test') {
-    console.log(config.recaptcha)
     const gRecaptchaResponse = req.body['g-recaptcha-response']
     if (!gRecaptchaResponse) {
       return res.status(400).json({ error: 'reCAPTCHA is missing' })
