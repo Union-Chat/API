@@ -23,47 +23,6 @@
     padding: 10px 15px;
 }
 
-code {
-    background-color: #282828;
-    border: 1px #121212 solid;
-    border-radius: 5px;
-    padding: 3px;
-}
-
-table {
-    width: 100% !important;
-    max-width: 100% !important;
-    background-color: #242424;
-}
-
-table thead {
-    background-color: #202020;
-}
-
-table tr, table td, table th {
-    border: 1px #363636 solid !important;
-}
-
-.markdown-container h1 {
-    font-size: 38px !important;
-}
-
-.markdown-container h2 {
-    font-size: 32px !important;
-}
-
-.markdown-container h3 {
-    font-size: 24px !important;
-}
-
-.markdown-container h4 {
-    font-size: 20px !important;
-}
-
-.markdown-container h5 {
-    font-size: 16px !important;
-}
-
 .markdown-container h6 {
     font-size: 14px !important;
 }
@@ -94,11 +53,3 @@ table tr, table td, table th {
     height: 8px;
     transform: rotate(45deg);
 }
-
-:root {
-    --transparent-highlight: rgba(0, 0, 0, .6);
-    --transparent-primary: rgba(0, 0, 0, .4);
-    --transparent-secondary: rgba(0, 0, 0, .2);
-}
-
-

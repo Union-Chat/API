@@ -93,7 +93,6 @@ Move along, nothing to see citizen
 | password             | string | Password, must be 5 characters long or more                    | yes            |
 | g-recaptcha-response | string | Response returned by Google reCaptcha                          | yes if enabled |
 
-<br>
  - Response
 
 400 on failure with the error message `{ "error": "no u" }`<br>
@@ -128,7 +127,6 @@ Move along, nothing to see citizen
 | password  | string | Password, must be 5 characters long or more                    |
 | avatarUrl | string | Url of the user's avatar                                       |
 
-<br>
  - Response
 
 204 on success, 400 on failure
@@ -144,7 +142,6 @@ Move along, nothing to see citizen
 |----------|--------|------------------------------|
 | password | string | Current password of the user |
 
-<br>
  - Response
 
 204 on success, 401 if invalid password
@@ -165,7 +162,6 @@ Move along, nothing to see citizen
 | name    | string | Name of the server |
 | iconUrl | string | Icon of the server |
 
-<br>
  - Response
 
 204 on success, 400 on failure
@@ -182,7 +178,6 @@ Move along, nothing to see citizen
 | name    | string | Name of the server |
 | iconUrl | string | Icon of the server |
 
-<br>
  - Response
 
 204 on success, 400 on failure
@@ -216,7 +211,6 @@ Move along, nothing to see citizen
 |---------|--------|---------------------------------------|
 | content | string | Content of the message (raw markdown) |
 
-<br>
  - Response
 
 204 on success, 400 on failure
@@ -232,7 +226,6 @@ Move along, nothing to see citizen
 |---------|--------|---------------------------------------|
 | content | string | Content of the message (raw markdown) |
 
-<br>
  - Response
 
 204 on success, 400 on failure
