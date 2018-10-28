@@ -4,6 +4,6 @@
 
 // Your migration have to export an async function that accepts the connection in its params
 module.exports = async (r, dbName) => {
-  r.db(dbName).tableCreate('test')
+  r.db(dbName).tableCreate('test');
   // ...
-}
+};

@@ -1,9 +1,9 @@
-import express from 'express'
-import v2 from './api/index'
+import express from 'express';
+import v2 from './api/index';
 
-const api = express.Router()
+const api = express.Router();
 
-api.use('/', v2)
-api.use('/v2', v2)
+api.use('/', v2);
+api.use('/v2', v2);
 
-export default api
+export default api;

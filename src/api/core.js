@@ -1,7 +1,7 @@
-import config from '../../Configuration'
+import config from '../../Configuration';
 
 export function home (req, res) {
-  res.send('Welcome to the Union API!')
+  res.send('Welcome to the Union API!');
 }
 
 export function info (req, res) {
@@ -14,5 +14,5 @@ export function info (req, res) {
       enabled: !!config.recaptcha,
       key: config.recaptcha ? config.recaptcha.key : undefined
     }
-  })
+  });
 }
