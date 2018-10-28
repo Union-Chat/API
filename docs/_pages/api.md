@@ -109,10 +109,10 @@ Move along, nothing to see citizen
 |---------------|-----------|---------------------------------------|
 | id            | snowflake | User internal ID                      |
 | username      | string    | Username                              |
-| discriminator | int       | Discriminator fo the user             |
+| discriminator | int       | Discriminator for the user            |
 | avatarUrl     | string?   | Url of the user's avatar              |
 | servers       | int[]     | List of the server IDs the user is in |
-| online        | boolean   | Whenever or not the user is online    |
+| online        | boolean   | Whether or not the user is online     |
 
 ### Update the current user
 
@@ -153,7 +153,7 @@ Move along, nothing to see citizen
 <span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers</span>
 <span class='api-auth'>Requires authentication</span>
 
-**Note:** You can't create more server than specified in `maxServersPerUser`
+**Note:** You can't exceed the `maxServersPerUser` limit
 
  - Request data
 

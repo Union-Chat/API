@@ -17,7 +17,8 @@
         "maxServersPerUser": 5,
         "maxAppsPerUser": 5
     },
-    "recaptcha (Remove this entirely if you don't want to setup it)": {
+    "recaptcha": {
+        "_note": "Remove this entirely if you don't want to setup it",
         "key": "...",
         "secret": "..."
     }

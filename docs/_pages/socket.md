@@ -100,7 +100,7 @@ It's better when you know what the socket will send without just trying, right?
 | Field         | Type         | Description                                                        |
 |---------------|--------------|--------------------------------------------------------------------|
 | id            | snowflake    | User ID                                                            |
-| username      | string       |                                                                    |
+| username      | string       | Username                                                           |
 | discriminator | int          | User discriminator, used to create the user tag (username#discrim) |
 | online        | boolean      | If the user is online or not                                       |
 
