@@ -3,7 +3,7 @@ import { authenticate } from '../database';
 /**
  * Validates the 'authorization' header and populates req.user
  */
-export default async function authorize (req, res, next) {
+export default async function (req, res, next) {
   const user = await authenticate(req.headers.authorization);
 
   if (!user) {

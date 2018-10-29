@@ -24,6 +24,10 @@ const socket = new WebSocket.Server({ server });
 global.server = socket;
 
 socket.on('connection', async (client) => {
+  if (global.bannedIps.includes(client.headers['cf-connecting-ip'] || client.headers['x-forwarded-for'] || client.connection.remoteAddress)) {
+    return client.close(4007, 'Banned due to API abuse');
+  }
+
   dispatchWelcome(client);
   timeout = setTimeout(() => {
     if (!client.user && client.readyState !== WebSocket.CLOSED) {
@@ -40,6 +44,7 @@ socket.on('connection', async (client) => {
 });
 
 export default server;
+
 export function socketInit () {
   logger.info('[WS] Server started on port {0}', config.ws.port);
   interval = setInterval(() => {

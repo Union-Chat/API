@@ -61,6 +61,7 @@ If you send 4 events and one of them is invalid, you'll not be (un)subscribed to
 | 4004 | Session invalidated    | User password or MFA settings updated / Bot token reset          |
 | 4005 | Session timed out      | Not responding to ping requests                                  |
 | 4006 | No active subscription | You can't be not subscribed to anything for more than 30 seconds |
+| 4007 | Banned                 | You've been API banned due to abuse                              |
 
 ## Events
 
