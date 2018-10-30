@@ -15,6 +15,9 @@ api.use(new RateLimit({
     const ip = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     if (!global.bannedIps.includes(ip)) { // We should not need to check but never too prudent
       global.bannedIps.push(ip);
+      setTimeout(() => {
+        global.bannedIps = global.bannedIps.filter(bip => bip !== ip);
+      }, 300e3);
     }
     res.sendStatus(429).send('You\'ve been banned from the API for 5 minutes due to abuse');
   }
