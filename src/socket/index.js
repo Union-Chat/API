@@ -24,9 +24,10 @@ const socket = new WebSocket.Server({ server });
 global.server = socket;
 
 socket.on('connection', async (client) => {
-  if (global.bannedIps.includes(client.headers['cf-connecting-ip'] || client.headers['x-forwarded-for'] || client.connection.remoteAddress)) {
-    return client.close(4007, 'Banned due to API abuse');
-  }
+  // @todo: Fix this (headers are not here)
+  // if (global.bannedIps.includes(client.headers['cf-connecting-ip'] || client.headers['x-forwarded-for'] || client.connection.remoteAddress)) {
+    // return client.close(4007, 'Banned due to API abuse');
+  // }
 
   dispatchWelcome(client);
   timeout = setTimeout(() => {
