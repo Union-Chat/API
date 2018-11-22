@@ -18,13 +18,9 @@ export async function create (req, res) {
     const response = await (await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: JSON.stringify({
-        secret: config.recaptcha.secret,
-        response: gRecaptchaResponse,
-        remoteip: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress
-      })
+      body: encodeURI('secret=' + _Configuration.default.recaptcha.secret + '&response=' + gRecaptchaResponse + '&remoteip=' + req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress)
     })).json();
 
     if (!response.success) {
