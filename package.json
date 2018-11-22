@@ -1,11 +1,15 @@
 {
-  "name": "Union",
+  "name": "union-server",
   "version": "1.0.0",
-  "description": "Lightweight chat service built with C# and NodeJS",
-  "main": "Server.js",
+  "description": "Lightweight chat service built with NodeJS",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node Server.js"
+    "test": "cross-env NODE_ENV=test mocha --require @babel/register --timeout 10000",
+    "lint": "eslint **/*.js --ignore-pattern build/* --ignore-pattern dist/* --ignore-pattern docs/*",
+    "setup": "yarn run build && cross-env NODE_ENV=production node installer.js",
+    "start": "cross-env NODE_ENV=production node build/index.js",
+    "build": "babel src -d build --copy-files",
+    "dev": "cross-env NODE_ENV=development concurrently -k -n \"Babel,Node\" -p \"[{name}]\" -c \"yellow,green\" \"babel src -w -d build --copy-files\" \"nodemon build/index.js --use-insecure-ws\""
   },
   "keywords": [],
   "author": "Kromatic",
@@ -14,9 +18,27 @@
     "bcrypt": "^3.0.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
+    "express-rate-limit": "^3.2.1",
     "flakeid": "git+https://github.com/Devoxin/FlakeId.git",
+    "node-fetch": "^2.2.0",
     "rethinkdbdash": "^2.3.31",
     "shortid": "^2.2.12",
     "ws": "^6.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/register": "^7.0.0",
+    "concurrently": "^4.0.1",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.6.1",
+    "mocha": "^5.2.0",
+    "node-mocks-http": "^1.7.2",
+    "nodemon": "^1.18.4",
+    "sinon": "^6.3.5",
+    "supertest": "^3.3.0"
   }
 }

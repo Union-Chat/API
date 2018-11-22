@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no'/>
+
+  <!-- Meta data -->
+  <meta content='{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}' property='og:title'/>
+  {% if page.description %}
+  <meta content='{{ site.description }}' property='og:description'/>
+  <meta content='{{ site.description }}' name='description'/>
+  {% endif %}
+
+  <!-- CSS -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:700" rel="stylesheet">
+  <link href='/css/style.css' type='text/css' rel='stylesheet'>
+  <link href='/modesta/css/modesta.min.css' type='text/css' rel='stylesheet'>
+</head>
+<body>
+<div id='navbar' class='nav-container default'>
+  <span id='menu-icon'></span>
+  <img src='/img/union.svg' alt='Union logo'/>
+  <h3 class='nav-title'>
+    {% if page.title %}{{ page.title }}{% else %}Union API Documentation{% endif %}
+  </h3>
+  <div id='navside' class='sidenav'>
+    <a href='/' {% if page.title == null %}class='current'{% endif %}>Home</a>
+    <a href='/api' {% if page.title contains "API" %}class='current'{% endif %}>API</a>
+    <a href='/socket' {% if page.title contains "Socket" %}class='current'{% endif %}>Socket</a>
+    <a href='/apps' {% if page.title contains "Applications" %}class='current'{% endif %}>Applications</a>
+    <a href='/themes' {% if page.title contains "Themes" %}class='current'{% endif %}>Themes</a>
+  </div>
+</div>
+<div class='markdown-container'>
+  {{ content }}
+</div>
+<a href='https://github.com/AlexFlipnote/ModestaCSS' target='_blank' id='modesta-credit'>Design by AlexFlipnote ♥</a>
+<script>
+  function checkSizeNavbar (navbar, navside) {
+    if (window.innerWidth < 650) {
+      navside.style.transform = 'translateX(-250px)'
+      navbar.classList.remove('default')
+    } else {
+      navside.style.transform = 'translateX(0)'
+      navbar.classList.add('default')
+    }
+  }
+
+  const navbar = document.getElementById('navbar')
+  const navside = document.getElementById('navside')
+  const menuicon = document.getElementById('menu-icon')
+
+  document.getElementById('menu-icon').onclick = function () {
+    navside.style.transform = 'translateX(0)'
+  }
+
+  document.addEventListener('click', function (event) {
+    if (window.getComputedStyle(menuicon).display === 'block') {
+      if (event.target.closest('.nav-container')) return
+      navside.style.transform = 'translateX(-250px)'
+    }
+  })
+
+  if (navbar) {
+    checkSizeNavbar(navbar, navside)
+
+    window.addEventListener('resize', function () {
+      checkSizeNavbar(navbar, navside)
+    })
+  }
+</script>
+</body>
+</html>

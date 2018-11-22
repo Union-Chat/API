@@ -1,0 +1,3 @@
+[submodule "docs/modesta"]
+	path = docs/modesta
+	url = https://github.com/AlexFlipnote/ModestaCSS

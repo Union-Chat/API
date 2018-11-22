@@ -1,4 +1,4 @@
-const config = require('./Configuration.json');
+const config = require('../Configuration.json');
 const logger = require('./Logger.js');
 const fs = require('fs');
 
@@ -7,11 +7,10 @@ const WebSocket = require('ws');
 
 const wss = https.createServer({
   cert: fs.readFileSync(config.ws.certPath),
-  key: fs.readFileSync(config.ws.keyPath),
+  key: fs.readFileSync(config.ws.keyPath)
 });
 const voiceSocket = new WebSocket.Server({ server: wss });
 global.voiceServer = voiceSocket;
-
 
 voiceSocket.on('connection', async (client, req) => {
   client.clientId = generateClientId();

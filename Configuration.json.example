@@ -13,6 +13,13 @@
     "rules": {
         "messageCharacterLimit": 1000,
         "usernameCharacterLimit": 15,
-        "maxServersPerUser": 5
+        "serverCharacterLimit": 15,
+        "maxServersPerUser": 5,
+        "maxAppsPerUser": 5
+    },
+    "recaptcha": {
+        "_note": "Remove this entirely if you don't want to setup it",
+        "key": "...",
+        "secret": "..."
     }
 }

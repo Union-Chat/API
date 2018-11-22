@@ -1,5 +1,4 @@
-const formatterRegex = /(\{(\d+)\})+/gm;
-
+const formatterRegex = /({(\d+)})+/gm;
 
 /**
  * Enforces two-digits on a number by prepending '0' where needed
@@ -9,7 +8,6 @@ const formatterRegex = /(\{(\d+)\})+/gm;
 function forceTwoDigits (number) {
   return number.toString().padStart(2, '0');
 }
-
 
 /**
  * Formats the string with drop-in args
@@ -24,7 +22,6 @@ function formatString (content, ...args) {
   return content;
 }
 
-
 /**
  * Logs a message to console
  * @param {String} loglevel The severity of the message
@@ -37,7 +34,7 @@ function log (loglevel, message, ...args) {
   const min = forceTwoDigits(date.getMinutes());
   const sec = forceTwoDigits(date.getSeconds());
 
-  console.log(`[${hour}:${min}:${sec}] [${loglevel.padEnd(5)}] ${formatString(message, ...args)}`); // eslint-disable-line
+  console.log(`[${hour}:${min}:${sec}] [${loglevel.padEnd(5)}] ${formatString(message, ...args)}`) // eslint-disable-line
 }
 
 for (const method of ['DEBUG', 'INFO', 'WARN', 'ERROR']) {
