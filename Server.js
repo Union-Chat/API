@@ -107,4 +107,4 @@ process.on('SIGINT', async () => {
     .finally(process.exit);
 });
 
-app.listen(config.web.port);
+app.listen(config.web.port, config.web.host);
