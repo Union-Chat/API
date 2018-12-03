@@ -285,7 +285,7 @@ function serverExists (serverId) {
     return false;
   }
 
-  return r.table('servers').filter({ id: serverId }).count().eq(1);
+  return r.table('servers').get(serverId).coerceTo('bool').default(false);
 }
 
 
