@@ -56,8 +56,10 @@ async function rollDiscriminator (username, id) {
  * @returns {Object} The created server
  */
 async function createServer (name, iconUrl, owner) {
+  const id = idGenerator.gen();
+
   const server = {
-    id: idGenerator.gen(),
+    id,
     name,
     iconUrl,
     owner
@@ -99,7 +101,6 @@ async function authenticate (auth) {
   }
 
   const [type, creds] = auth.split(' ');
-  console.log(type, creds);
 
   if ('Basic' !== type || !creds) {
     return null;
@@ -107,7 +108,6 @@ async function authenticate (auth) {
 
   const [username, password] = Buffer.from(creds, 'base64').toString().split(':');
   const [name, discriminator] = username ? username.split('#') : [];
-  console.log(username, password, name, discriminator)
 
   if (!username || !password || !name || !discriminator) {
     return null;
