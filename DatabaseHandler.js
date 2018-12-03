@@ -11,13 +11,17 @@ const idGenerator = new flakeId({
 });
 
 
+function generateSnowflake () {
+  return idGenerator.gen().toString();
+}
+
 /**
  * Creates a user object with the provided username and password, and stores it in the DB
  * @param {String} username The username of the account to create
  * @param {String} password The password of the account to create
  */
 async function createUser (username, password) {
-  const id = idGenerator.gen();
+  const id = generateSnowflake();
   const discriminator = await rollDiscriminator(username, id);
 
   if (!discriminator) {
@@ -56,7 +60,7 @@ async function rollDiscriminator (username, id) {
  * @returns {Object} The created server
  */
 async function createServer (name, iconUrl, owner) {
-  const id = idGenerator.gen();
+  const id = generateSnowflake();
 
   const server = {
     id,
@@ -281,8 +285,6 @@ function ownsServer (username, serverId) {
  * @returns {Boolean} Whether the server exists or not
  */
 function serverExists (serverId) {
-  console.log(serverId);
-
   if (!serverId) {
     return false;
   }
