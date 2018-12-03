@@ -232,8 +232,10 @@ async function authorize (req, res, next) {
  * Ensures a server matching 'serverId' exists
  */
 async function validateServer (req, res, next) {
+  console.log(req.params);
   const { serverId } = req.params;
   const sid = Number(serverId);
+  console.log(sid);
 
   if (!await serverExists(sid)) {
     return res.status(400).json({ 'error': 'Unknown server' });

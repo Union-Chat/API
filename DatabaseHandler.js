@@ -281,6 +281,8 @@ function ownsServer (username, serverId) {
  * @returns {Boolean} Whether the server exists or not
  */
 function serverExists (serverId) {
+  console.log(serverId);
+
   if (!serverId) {
     return false;
   }
