@@ -213,6 +213,12 @@ api.delete('/self/server/:serverId', validateServer, authorize, async (req, res)
   res.status(200).send();
 });
 
+
+api.get('/users/me', authorize, (req, res) => {
+  delete req.user.password; // :eyes:
+  res.json(req.user);
+});
+
 /**
  * Validates the 'authorization' header and populates req.user
  */
