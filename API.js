@@ -233,13 +233,12 @@ async function authorize (req, res, next) {
  */
 async function validateServer (req, res, next) {
   const { serverId } = req.params;
-  const sid = Number(serverId);
 
-  if (!await serverExists(sid)) {
+  if (!await serverExists(serverId)) {
     return res.status(400).json({ 'error': 'Unknown server' });
   }
 
-  req.serverId = sid;
+  req.serverId = serverId;
   next();
 }
 
