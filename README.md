@@ -8,6 +8,10 @@ A light chat service
  - Create a Configuration.json with your custom settings
  - `yarn run start` - Start the app!
 
+By default a root user with admin perms will be created
+<br/>Username: `root#0001`
+<br/>Password: `root` (you should change it as soon as possible)
+
 ## Updating
 
  - `git pull` - Download the latest Union-Server

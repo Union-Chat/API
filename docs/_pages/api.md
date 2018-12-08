@@ -46,10 +46,10 @@ Retry-After: xxxxxx
 
 ### Rates
 
-| Scope       | Rate                            |
-|-------------|---------------------------------|
-| Per-route   | 10 req/s                        |
-| Global      | 500 req/s, 5min ban if reached* |
+| Scope       | Rate                              |
+|-------------|-----------------------------------|
+| Per-route   | 5 req/s                           |
+| Global      | 500 req/50s, 5min ban if reached* |
 
 *\*Will ban from the API **AND** the socket*
 
@@ -168,7 +168,7 @@ Move along, nothing to see citizen
 
 ### Update a server
 
-<span class='api-endpoint'><span class='sun-flower-text'>PUT/PATCH</span> /servers/:serverId</span>
+<span class='api-endpoint'><span class='sun-flower-text'>PUT/PATCH</span> /servers/<span class='emerald-text'>:serverId</span></span>
 <span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission</span>
 
  - Request data (All fields are optional)
@@ -184,7 +184,7 @@ Move along, nothing to see citizen
 
 ### Leave a server
 
-<span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/:serverId/leave</span>
+<span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/<span class='emerald-text'>:serverId</span>/leave</span>
 <span class='api-auth'>Requires authentication</span>
 
  - Response
@@ -193,7 +193,7 @@ Move along, nothing to see citizen
 
 ### Delete a server
 
-<span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/:serverId</span>
+<span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/<span class='emerald-text'>:serverId</span></span>
 <span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission</span>
 
  - Response
@@ -202,7 +202,7 @@ Move along, nothing to see citizen
 
 ### Post a message
 
-<span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers/:serverId/messages</span>
+<span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers/<span class='emerald-text'>:serverId</span>/messages</span>
 <span class='api-auth'>Requires authentication</span>
 
  - Request data
@@ -217,7 +217,7 @@ Move along, nothing to see citizen
 
 ### Edit a message
 
-<span class='api-endpoint'><span class='sun-flower-text'>PUT/PATCH</span> /servers/:serverId/messages/:messageId</span>
+<span class='api-endpoint'><span class='sun-flower-text'>PUT/PATCH</span> /servers/<span class='emerald-text'>:serverId</span>/messages/<span class='emerald-text'>:messageId</span></span>
 <span class='api-auth'>Requires authentication and must be the <span class='sun-flower-text'>author of the message</span></span>
 
  - Request data
@@ -232,7 +232,7 @@ Move along, nothing to see citizen
 
 ### Delete a message
 
-<span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/:serverId/messages/:messageId</span>
+<span class='api-endpoint'><span class='sun-flower-text'>DELETE</span> /servers/<span class='emerald-text'>:serverId</span>/messages/<span class='emerald-text'>:messageId</span></span>
 <span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission, or to be the <span class='sun-flower-text'>author of the message</span></span>
 
  - Response
@@ -243,7 +243,7 @@ Move along, nothing to see citizen
 
 ### Create an invite
 
-<span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers/:serverId/invites</span>
+<span class='api-endpoint'><span class='sun-flower-text'>POST</span> /servers/<span class='emerald-text'>:serverId</span>/invites</span>
 <span class='api-auth'>Requires authentication and <span class='sun-flower-text'>SERVER_OWNER</span> permission</span>
 
  - Response
@@ -254,7 +254,7 @@ Move along, nothing to see citizen
 
 ### Accept an invite
 
-<span class='api-endpoint'><span class='sun-flower-text'>POST</span> /invites/:invite</span>
+<span class='api-endpoint'><span class='sun-flower-text'>POST</span> /invites/<span class='emerald-text'>:invite</span></span>
 <span class='api-auth'>Requires authentication</span>
 
  - Response

@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import express from 'express';
 import bodyParser from 'body-parser';
 
@@ -15,9 +16,13 @@ import RateLimit from 'express-rate-limit';
 const api = express.Router();
 const notImplemented = (req, res) => res.status(501).json({ error: 'This feature is not implemented yet. Contribute to help us bring this feature faster! https://github.com/Union-Chat/Union-Server' });
 const getB1nzy = () => new RateLimit({
-  keyGenerator: req => req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+  keyGenerator: req => {
+    const shasum = crypto.createHash('sha1');
+    shasum.update(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+    return `${req.originalUrl}:${shasum.digest('hex')}`;
+  },
   windowMs: 1000,
-  max: 10
+  max: 5
 });
 
 // Middlewares
@@ -35,6 +40,11 @@ api.get('/users/self', getB1nzy(), authorize, userGetSelf);
 api.put('/users/self', getB1nzy(), authorize, userPatch);
 api.patch('/users/self', getB1nzy(), authorize, userPatch);
 api.delete('/users/self', getB1nzy(), authorize, userDelete);
+// @todo: Auth flow with 2FA
+// @todo: Account linking (Discord, GitHub, Spotify, ...)
+// @todo: Friends and blocks https://open.spotify.com/track/08bNPGLD8AhKpnnERrAc6G
+
+// DMs @todo
 
 // Server
 api.post('/servers', getB1nzy(), authorize, serverCreate);
@@ -47,12 +57,15 @@ api.post('/servers/:serverId/messages', getB1nzy(), authorize, serverExists, mes
 api.put('/servers/:serverId/messages/:messageId', getB1nzy(), authorize, serverExists, messagePatch);
 api.patch('/servers/:serverId/messages/:messageId', getB1nzy(), authorize, serverExists, messagePatch);
 api.delete('/servers/:serverId/messages/:messageId', getB1nzy(), authorize, serverExists, messageRemove);
+// @todo: Channels
+// @todo: Roles and permissions
 
 // Invites
 api.post('/servers/:serverId([0-9]+)/invites', getB1nzy(), authorize, serverExists, inviteCreate);
 api.post('/invites/:inviteId([a-zA-Z0-9-_]+)', getB1nzy(), authorize, inviteAccept);
+// @todo: Invite management (List, update, delete)
 
-// Themes
+// Themes @todo
 api.get('/themes/all', getB1nzy(), notImplemented);
 api.get('/themes/search', getB1nzy(), notImplemented);
 api.post('/themes/:themeId/vote', getB1nzy(), notImplemented);
@@ -63,7 +76,7 @@ api.put('/themes/:themeId', getB1nzy(), notImplemented);
 api.patch('/themes/:themeId', getB1nzy(), notImplemented);
 api.delete('/themes/:themeId', getB1nzy(), notImplemented);
 
-// Developers
+// Developers @todo
 api.get('/developers/applications', getB1nzy(), notImplemented);
 api.post('/developers/applications', getB1nzy(), notImplemented);
 
@@ -75,5 +88,7 @@ api.delete('/developers/applications/:applicationId', getB1nzy(), notImplemented
 api.get('/oauth2/authorize', getB1nzy(), notImplemented);
 api.post('/oauth2/token', getB1nzy(), notImplemented);
 api.post('/oauth2/revoke', getB1nzy(), notImplemented);
+
+// Admin zone @todo
 
 export default api;

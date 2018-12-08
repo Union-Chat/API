@@ -4,6 +4,7 @@ import fs from 'fs';
 import http from 'http';
 import https from 'https';
 import WebSocket from 'ws';
+import crypto from 'crypto';
 import logger from '../logger';
 import { handlePresenceUpdate } from '../events';
 import receiver from './receiver';
@@ -23,11 +24,14 @@ const server = process.argv.includes('--use-insecure-ws') || 'test' === process.
 const socket = new WebSocket.Server({ server });
 global.server = socket;
 
-socket.on('connection', async (client) => {
-  // @todo: Fix this (headers are not here)
-  // if (global.bannedIps.includes(client.headers['cf-connecting-ip'] || client.headers['x-forwarded-for'] || client.connection.remoteAddress)) {
-    // return client.close(4007, 'Banned due to API abuse');
-  // }
+socket.on('connection', async (client, req) => {
+  const shasum = crypto.createHash('sha1');
+  shasum.update(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+  const ip = shasum.digest('hex');
+
+  if (global.bannedIps.includes(ip)) {
+    return client.close(4007, 'Banned due to API abuse');
+  }
 
   dispatchWelcome(client);
   timeout = setTimeout(() => {

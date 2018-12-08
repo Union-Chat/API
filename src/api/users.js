@@ -20,7 +20,7 @@ export async function create (req, res) {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: encodeURI('secret=' + _Configuration.default.recaptcha.secret + '&response=' + gRecaptchaResponse + '&remoteip=' + req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress)
+      body: encodeURI(`secret=${config.recaptcha.secret}&response=${gRecaptchaResponse}&remoteip=${req.headers['cf-connecting-ip']}` || req.headers['x-forwarded-for'] || req.connection.remoteAddress)
     })).json();
 
     if (!response.success) {
@@ -75,7 +75,7 @@ export async function patch (req, res) {
     }
   }
 
-  if (newPassword !== undefined && 5 > newPassword.length) {
+  if (undefined !== newPassword && 5 > newPassword.length) {
     return res.status(400).json({ error: 'Password cannot be empty and must be 5 characters long or more' });
   }
 
