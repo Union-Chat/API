@@ -3,7 +3,7 @@ import shortId from 'shortid';
 import FlakeId from 'flakeid';
 
 const r = require('rethinkdbdash')({
-  db: `union${  'production' !== process.env.NODE_ENV ? `_${  process.env.NODE_ENV}` : ''}`,
+  db: `union${'production' !== process.env.NODE_ENV ? `_${process.env.NODE_ENV}` : ''}`,
   silent: 'test' === process.env.NODE_ENV
 });
 
@@ -15,11 +15,11 @@ const idGenerator = new FlakeId({
  * Creates a user object with the provided username and password, and stores it in the DB
  * @param {String} username The username of the account to create
  * @param {String} password The password of the account to create
- * @returns {String} Whether the account was created or not
+ * @returns {Promise<string>} Generated Uniontag (username#discrim)
  */
 export async function createUser (username, password) {
   const id = idGenerator.gen();
-  const discriminator = await rollDiscriminator(username, id);
+  const discriminator = await rollDiscriminator(username);
 
   if (!discriminator) {
     throw new Error('Cannot generate unique discrim. Try a different username.');
@@ -37,19 +37,36 @@ export async function createUser (username, password) {
   return `${username}#${discriminator}`;
 }
 
-export async function updateUser (id, username, password, avatarUrl) {
+/**
+ * Updates an user with given data
+ * @param {String} id User ID to update
+ * @param {String} username Username
+ * @param {String?} password New password (not updated if undefined or null)
+ * @param {String?} avatarUrl New avatar (not updated if undefined, removed if null)
+ * @param {Boolean?} admin If the user is an administrator or no (not updated if undefined or null)
+ * @returns {Promise<string>} New Uniontag (username#discrim)
+ */
+export async function updateUser (id, username, password, avatarUrl, admin) {
   const discriminator = await rollDiscriminator(username);
   const update = { username, discriminator };
   if (password) {
     Object.assign(update, { password: await hash(password, 10) });
   }
-  if (avatarUrl) {
-    Object.assign(update, avatarUrl);
+  if (undefined !== avatarUrl) {
+    Object.assign(update, { avatarUrl });
+  }
+  if (true === admin || false === admin) {
+    Object.assign(update, { admin });
   }
   await r.table('users').get(id).update(update);
   return `${username}#${discriminator}`;
 }
 
+/**
+ * Generates a random discriminator to allow re-use of username
+ * @param {String} username Username associated with the discriminator
+ * @returns {Promise<string>} Generated discriminator
+ */
 async function rollDiscriminator (username) {
   let discriminator;
   while (true) {
@@ -58,14 +75,16 @@ async function rollDiscriminator (username) {
       break;
     }
   }
+
   return discriminator;
 }
 
 /**
  * Creates a server with the provided name and iconUrl
  * @param {String} name The name of the server
- * @param {String} iconUrl A URL leading to an image to be used as the server's icon
- * @returns {Object} The created server
+ * @param {String|null} iconUrl A URL leading to an image to be used as the server's icon (optional)
+ * @param {String} owner Owner ID (snowflake)
+ * @returns {Promise<Object|Null>} Server object
  */
 export async function createServer (name, iconUrl, owner) {
   let largestId = 0;
@@ -86,13 +105,20 @@ export async function createServer (name, iconUrl, owner) {
   return getServer(id);
 }
 
+/**
+ * Updates a server with given data
+ * @param {String} id Server ID
+ * @param {String} name New server name (not updated if undefined or null)
+ * @param {String} iconUrl New server icon (not updated if undefined, removed if null)
+ * @returns {Promise<void>}
+ */
 export async function updateServer (id, name, iconUrl) {
   const update = {};
   if (name) {
-    Object.assign(update, name);
+    Object.assign(update, { name });
   }
-  if (iconUrl) {
-    Object.assign(update, iconUrl);
+  if (undefined !== iconUrl) {
+    Object.assign(update, { iconUrl });
   }
   await r.table('servers').get(id).update(update);
 }
@@ -302,7 +328,7 @@ export function serverExists (serverId) {
     return false;
   }
 
-  return r.table('servers').filter({ id: serverId }).count().eq(1);
+  return r.table('servers').get(serverId).coerceTo('bool').default(false);
 }
 
 /**
