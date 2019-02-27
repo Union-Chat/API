@@ -12,7 +12,6 @@ logs
 build
 dist
 /index.html
-migrations/_migration
 
 # Jekyll stuff
 docs/_site
@@ -20,7 +19,7 @@ docs/.sass-cache
 docs/.jekyll-metadata
 
 # Config & certs
-Configuration.json
+config.json
 *.pem
 
 # My stuff

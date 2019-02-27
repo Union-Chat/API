@@ -4,16 +4,19 @@ A light chat service
 ## Installation
 
  - `git clone https://github.com/Union-Chat/Union-Server` - Download Union-Server
- - `yarn run setup` - Build the server & the UI, setup the database<br>
-During this step, the installer will ask you the credentials for administrator
-account. By default, it'll be `root` and `root` but you can change is as you
-want. Discriminator will always be `0001` 
- - Create a Configuration.json with your custom settings
+ - `yarn run getui` - Downloads and builds `union-react`
+ - Create a config.json with your custom settings (See `config.example.json`)
  - `yarn run start` - Start the app!
+ 
+During the 1st startup you'll be prompted to set credentials for the root user. This user will always have #0001 as
+discriminator and will have administrator permissions on the Union instance. Don't loose credentials you'll set there!
 
 ## Updating
 
+ - Stop Union
  - `git pull` - Download the latest Union-Server
- - `yarn run setup` - Re-build everything (**Will keep your database safe** and update it)
- - Check if there is no new fields in Configuration.json
- - `yarn run start` - Start the app!
+ - `yarn run getui` - Updates the UI
+ - Check if there is no new fields/moved fields in config.json
+ - `yarn run start` - Start the app
+
+*Note*: You can just run `yarn run getui` if you just want to update union-react. No restart should be required.

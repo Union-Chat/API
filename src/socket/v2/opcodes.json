@@ -1,0 +1,10 @@
+{
+    "DispatchEvent": 0,
+    "Welcome": 1,
+    "Authenticate": 2,
+    "Hello": 3,
+    "Subscribe": 4,
+    "Unsubscribe": 5,
+    "OK": 10,
+    "Heartbeat": 11
+}

@@ -1,0 +1,72 @@
+{
+  "ports": {
+    "web": 80,
+    "ws": 2096,
+    "voice": 2087
+  },
+  "certs": {
+    "_note": "Use --use-insecure and remove this part (the whole 'certs' key) if you don't want to use any cert",
+    "web": {
+      "_note": "Use --use-insecure-web and remove this part if you don't want to use a cert for the web server",
+      "cert": "/path/to/certificate.pem",
+      "key": "/path/to/key.pem"
+    },
+    "ws": {
+      "_note": "Use --use-insecure-ws and remove this part if you don't want to use a cert for the websocket",
+      "cert": "/path/to/certificate.pem",
+      "key": "/path/to/key.pem"
+    },
+    "voice": {
+      "_note": "Use --use-insecure-voice and remove this part if you don't want to use a cert for the voice server",
+      "cert": "/path/to/certificate.pem",
+      "key": "/path/to/key.pem"
+    }
+  },
+  "services": {
+    "recaptcha": {
+      "_note": "Remove this entirely if you don't want to setup it",
+      "client": "...",
+      "secret": "..."
+    },
+    "sentry": {
+      "_note": "Remove this entirely if you don't want to setup it",
+      "client": "...",
+      "secret": "..."
+    }
+  },
+  "apps": {
+    "discord": {
+      "_note": "Remove this entirely if you don't want to setup it",
+      "client": "...",
+      "secret": "..."
+    },
+    "github": {
+      "_note": "Remove this entirely if you don't want to setup it",
+      "client": "...",
+      "secret": "..."
+    },
+    "spotify": {
+      "_note": "Remove this entirely if you don't want to setup it",
+      "client": "...",
+      "secret": "..."
+    },
+    "reddit": {
+      "_note": "Remove this entirely if you don't want to setup it",
+      "client": "...",
+      "secret": "..."
+    },
+    "twitter": {
+      "_note": "Remove this entirely if you don't want to setup it",
+      "client": "...",
+      "secret": "..."
+    }
+  },
+  "settings": {
+    "_note": "Those settings will be editable through Admin dashboard",
+    "messageCharacterLimit": 1000,
+    "usernameCharacterLimit": 15,
+    "serverCharacterLimit": 15,
+    "maxServersPerUser": 5,
+    "maxAppsPerUser": 5
+  }
+}

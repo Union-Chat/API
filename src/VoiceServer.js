@@ -1,4 +1,9 @@
-const config = require('../Configuration.json');
+/*
+this shit will be a thing
+soon
+@todo
+
+const config = require('../config.json');
 const logger = require('./Logger.js');
 const fs = require('fs');
 
@@ -53,3 +58,4 @@ module.exports = {
   start,
   shutdown
 };
+*/

@@ -1,85 +1,126 @@
-import config from '../../Configuration';
+const fs = require('fs');
+const url = require('url');
+const http = require('http');
+const https = require('https');
+const shortid = require('shortid');
+const WebSocket = require('ws');
 
-import fs from 'fs';
-import http from 'http';
-import https from 'https';
-import WebSocket from 'ws';
-import crypto from 'crypto';
-import logger from '../logger';
-import { handlePresenceUpdate } from '../events';
-import receiver from './receiver';
-import { dispatchWelcome } from './dispatcher';
+const App = require('../app');
+const Middlewares = require('../web/middlewares');
+const Dispatcher = require('./dispatcher');
+const Receiver = require('./receiver');
 
-// @see socketDestroy
-let timeout, interval;
-global.__socketSubTimeouts = [];
+/**
+ * @typedef UnionClient
+ * @property {string} id Unique ID associated with the socket
+ * @property {WebSocket} ws WebSocket instance
+ * @property {int} version Version of the socket the client understands
+ * @property {User|Null} user Current user, if logged in
+ * @property {Boolean} isAuthenticated Whether or not the user is authenticated
+ * @property {Boolean} isAlive Whether or not the socket is alive
+ * @property {Array<String>} subscriptions List of events the user is subscribed to
+ */
 
-// Create HTTP server
-const server = process.argv.includes('--use-insecure-ws') || 'test' === process.env.NODE_ENV
-  ? http.createServer()
-  : https.createServer({
-    cert: fs.readFileSync(config.ws.certPath),
-    key: fs.readFileSync(config.ws.keyPath)
-  });
-const socket = new WebSocket.Server({ server });
-global.server = socket;
+/**
+ * Union WebSocket manager
+ * @property {Server} HTTP server running the ws
+ * @property {WebSocket.Server} WebSocket instance
+ * @property {Array<UnionClient>} Clients connected to the ws
+ */
+class Socket {
+  constructor () {
+    this.server = process.argv.includes('--use-insecure-ws') || process.argv.includes('--use-insecure')
+      ? http.createServer()
+      : https.createServer({
+        cert: fs.readFileSync(App.getInstance().config.certs.ws.cert),
+        key: fs.readFileSync(App.getInstance().config.certs.ws.key)
+      });
 
-socket.on('connection', async (client, req) => {
-  const shasum = crypto.createHash('sha1');
-  shasum.update(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress);
-  const ip = shasum.digest('hex');
-
-  if (global.bannedIps.includes(ip)) {
-    return client.close(4007, 'Banned due to API abuse');
+    this.socket = new WebSocket.Server({ server: this.server });
+    this.clients = [];
   }
 
-  dispatchWelcome(client);
-  timeout = setTimeout(() => {
-    if (!client.user && client.readyState !== WebSocket.CLOSED) {
-      client.close(4001, 'Authentication timed out');
-    }
-  }, 30e3);
-  // Listeners
-  client.on('message', (data) => receiver(client, data));
-  client.on('error', (error) => logger.warn('Client encountered an error\n\tisAuthenticated: {0}\n\tUser: {1}\n\tError: {2}', client.isAuthenticated, client.user, error));
-  client.on('close', () => client.user && handlePresenceUpdate(client.user.id, socket.clients));
-  client.on('pong', () => {
-    client.isAlive = true;
-  });
-});
+  /**
+   * Initializes and launches the socket server
+   */
+  startSocket () {
+    this.socket.on('connection', this._connection.bind(this));
 
-export default server;
+    this.server.listen(App.getInstance().config.ports.ws, () => {
+      setInterval(() => {
+        this.clients.forEach(async client => {
+          if (client.ws.readyState === WebSocket.CLOSING || client.ws.readyState === WebSocket.CLOSED) {
+            return;
+          }
 
-export function socketInit () {
-  logger.info('[WS] Server started on port {0}', config.ws.port);
-  interval = setInterval(() => {
-    socket.clients.forEach(async ws => {
-      if (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) {
-        return;
-      }
-      if (!ws.isAlive && ws.isAuthenticated) {
-        logger.info('Client disconnected\n\t{0}\n\t{1} clients connected', ws._un, socket.clients.size - 1);
-        await handlePresenceUpdate(ws.user.id, socket.clients);
-        return ws.terminate();
-      }
+          if (!client.isAlive) {
+            // await handlePresenceUpdate(ws.user.id, socket.clients);
+            this.clients = this.clients.filter(c => c.id !== client.id);
+            return client.ws.terminate();
+          }
 
-      ws.isAlive = false;
-      ws.ping();
+          client.isAlive = false;
+          Dispatcher.heartbeat(client);
+        });
+      }, 30e3);
     });
-  }, 10e3);
+  }
+
+  /**
+   * Gets all sockets authenticated as a specific user
+   * @param {ObjectId} id User ID
+   * @returns {Array<UnionClient>}
+   */
+  getClientsByUserID (id) {
+    return this.clients.filter(c => c.user && c.user._id === id);
+  }
+
+  /**
+   * Handles an incoming connection
+   * @param {WebSocket} ws The client attempting to connect
+   * @param {Request} req The associated HTTP request
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _connection (ws, req) {
+    // hahayes
+    const fakeRes = { sendStatus: () => ws.close(4007, 'You\'ve been banned') };
+    Middlewares.blockBanned(req, fakeRes, () => {
+      const query = url.parse(req.url, true).query;
+      const version = parseInt(query.version || 2);
+      if (![ 2 ].includes(version)) {
+        ws.close(4000, 'Invalid socket version provided');
+      }
+
+      const id = shortid();
+      const client = {
+        id,
+        ws,
+        version,
+        user: null,
+        isAlive: true,
+        isAuthenticated: false,
+        subscriptions: Dispatcher.V2_EVENTS
+      };
+
+      ws.on('message', (data) => Receiver(client, data));
+      ws.on('close', () => {
+        this.clients = this.clients.filter(c => c.id !== client.id);
+        if (client.isAuthenticated && 0 === this.getClientsByUserID(client.user._id).length) {
+          App.getInstance().db.presences.setPresence(client.user._id, false);
+        }
+      });
+
+      this.clients.push(client);
+      Dispatcher.welcome(client);
+
+      setTimeout(() => {
+        if (!client.user && client.readyState !== WebSocket.CLOSED) {
+          client.close(4001, 'Authentication timed out');
+        }
+      }, 30e3);
+    });
+  }
 }
 
-export function socketDestroy () {
-  logger.info('[WS] Shutting down server');
-  socket.clients.forEach(ws => ws.close(1000));
-
-  // Clear intervals; Ensure unit tests process stop when all test are passed. Active intervals/timeouts force
-  // the event loop to stay alive
-  global.__socketSubTimeouts.forEach(t => clearTimeout(t));
-  if (interval) {
-    clearInterval(interval);
-  }
-  if (timeout) {
-    clearTimeout(timeout);
-  }
-}
+module.exports = Socket;
