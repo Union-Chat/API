@@ -1,7 +1,7 @@
 const App = require('../../app');
 const Middlewares = require('../../web/middlewares');
 const opcodes = require('./opcodes');
-const Dispatcher = require('./dispatcher');
+const Dispatcher = require('../dispatcher');
 
 /**
  * WebSocket v2 event receiver
@@ -49,11 +49,10 @@ class Receiver {
     client.user = user;
     if (!App.getInstance().db.presences.getPresence(user._id)) {
       App.getInstance().db.presences.setPresence(user._id, true);
-      App.getInstance().socket.getClientsByServersID(user.servers).filter(c => c.user._id !== user._id).forEach(c => {
-        Dispatcher.presenceUpdate(c, {
-          user: c.user._id,
-          online: false
-        });
+      const clients = App.getInstance().socket.getClientsByServersID(user.servers).filter(c => c.user._id !== user._id);
+      Dispatcher.presenceUpdate(clients, {
+        user: user._id,
+        online: false
       });
     }
     await Dispatcher.hello(client);

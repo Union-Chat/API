@@ -2,11 +2,22 @@ const { Dispatcher: DispatcherV2 } = require('./v2');
 
 /**
  * Global WebSocket event dispatcher
+ * @property [Array<String>} V2_EVENTS List of v2 events
  */
 class Dispatcher {
   //**************//
   //* Core stuff *//
   //**************//
+  /**
+   * Says hello to a client
+   * @param {UnionClient} client The client
+   */
+  static hello (client) {
+    switch (client.version) {
+      case 2:
+        DispatcherV2.hello(client);
+    }
+  }
   /**
    * Sends welcome payload to a client
    * @param {UnionClient} client The client
