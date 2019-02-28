@@ -54,7 +54,7 @@ class Invites {
     Dispatcher.serverCreate(selfClients, server);
 
     const clients = App.getInstance().socket.getClientsByServerID(req.serverId).filter(c => c.user._id !== req.user._id);
-    Dispatcher.serverMemberJoin(clients, req.serverId, req.user._id);
+    Dispatcher.serverMemberJoin(clients, req.serverId, req.user);
   }
 }
 

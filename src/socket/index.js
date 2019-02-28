@@ -96,6 +96,20 @@ class Socket {
   }
 
   /**
+   * Updates saved user state
+   * @param {ObjectId} id The user to update
+   */
+  refreshUser (id) {
+    const user = App.getInstance().db.users.find(id);
+    this.clients = this.clients.map(client => {
+      if (client.user._id === id) {
+        return { ...client, user };
+      }
+      return client;
+    });
+  }
+
+  /**
    * Handles an incoming connection
    * @param {WebSocket} ws The client attempting to connect
    * @param {Request} req The associated HTTP request

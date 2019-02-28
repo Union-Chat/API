@@ -18,6 +18,7 @@ class Dispatcher {
         DispatcherV2.hello(client);
     }
   }
+
   /**
    * Sends welcome payload to a client
    * @param {UnionClient} client The client
@@ -78,6 +79,7 @@ class Dispatcher {
     if (Array.isArray(client)) {
       return client.forEach(c => Dispatcher.userUpdate(c, user));
     }
+    App.getInstance().socket.refreshUser(user._id);
     switch (client.version) {
       case 2:
         DispatcherV2.userUpdate(client, user);
@@ -121,12 +123,13 @@ class Dispatcher {
    * Dispatches a server member join event
    * @param {UnionClient|Array<UnionClient>} client Client(s)
    * @param {ObjectId} server Server ID the user is joining
-   * @param {ObjectId} user User ID
+   * @param {User} user User
    */
   static serverMemberJoin (client, server, user) {
     if (Array.isArray(client)) {
       return client.forEach(c => Dispatcher.serverMemberJoin(c, server, user));
     }
+    App.getInstance().socket.refreshUser(user._id);
     switch (client.version) {
       case 2:
         DispatcherV2.serverMemberJoin(client, server, user);
@@ -143,6 +146,7 @@ class Dispatcher {
     if (Array.isArray(client)) {
       return client.forEach(c => Dispatcher.serverMemberLeave(c, server, user));
     }
+    App.getInstance().socket.refreshUser(user);
     switch (client.version) {
       case 2:
         DispatcherV2.serverMemberLeave(client, server, user);
