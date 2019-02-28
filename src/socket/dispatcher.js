@@ -2,7 +2,7 @@ const { Dispatcher: DispatcherV2 } = require('./v2');
 
 /**
  * Global WebSocket event dispatcher
- * @property [Array<String>} V2_EVENTS List of v2 events
+ * @property {Array<String>} V2_EVENTS List of v2 events
  */
 class Dispatcher {
   //**************//
