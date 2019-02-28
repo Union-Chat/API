@@ -47,7 +47,15 @@ class Receiver {
 
     client.isAuthenticated = true;
     client.user = user;
-    App.getInstance().db.presences.setPresence(user._id, true);
+    if (!App.getInstance().db.presences.getPresence(user._id)) {
+      App.getInstance().db.presences.setPresence(user._id, true);
+      App.getInstance().socket.getClientsByServersID(user.servers).filter(c => c.user._id !== user._id).forEach(c => {
+        Dispatcher.presenceUpdate(c, {
+          user: c.user._id,
+          online: false
+        });
+      });
+    }
     await Dispatcher.hello(client);
   }
 
@@ -55,7 +63,6 @@ class Receiver {
    * Handles a subscribe payload
    * @param {UnionClient} client The client
    * @param {Array<string>} data Events the user is subscribing to
-   * @returns {Promise<void>}
    */
   static subscribe (client, data) {
     if (0 === data.length) {
@@ -71,8 +78,7 @@ class Receiver {
   /**
    * Handles a unsubscribe payload
    * @param {UnionClient} client The client
-   * @param {Array<string>} data Events the user is unsubscribing to
-   * @returns {Promise<void>}
+   * @param {Array<string>} data Events the user is un-subscribing to
    */
   static unsubscribe (client, data) {
     if (0 === data.length) {

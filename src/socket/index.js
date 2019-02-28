@@ -67,12 +67,32 @@ class Socket {
   }
 
   /**
-   * Gets all sockets authenticated as a specific user
+   * Gets all clients authenticated as a specific user
    * @param {ObjectId} id User ID
    * @returns {Array<UnionClient>}
    */
   getClientsByUserID (id) {
     return this.clients.filter(c => c.user && c.user._id === id);
+  }
+
+  /**
+   * Gets all clients that can see a server
+   * @param {ObjectId} id Server ID
+   * @returns {Array<UnionClient>}
+   */
+  getClientsByServerID (id) {
+    return this.clients.filter(c => c.user && c.user.servers && c.user.servers.find(s => s === id));
+  }
+
+  /**
+   * Gets all clients that are at least one server
+   * @param {Array<ObjectId>} servers Servers ID
+   * @returns {Array<UnionClient>}
+   */
+  getClientsByServersID (servers) {
+    const clients = [];
+    servers.forEach(server => clients.push(this.getClientsByServerID(server)));
+    return [ ...new Set(clients.reduce((a, b) => [ ...a, ...b ], [])) ];
   }
 
   /**
@@ -104,12 +124,7 @@ class Socket {
       };
 
       ws.on('message', (data) => Receiver(client, data));
-      ws.on('close', () => {
-        this.clients = this.clients.filter(c => c.id !== client.id);
-        if (client.isAuthenticated && 0 === this.getClientsByUserID(client.user._id).length) {
-          App.getInstance().db.presences.setPresence(client.user._id, false);
-        }
-      });
+      ws.on('close', () => this._close(client));
 
       this.clients.push(client);
       Dispatcher.welcome(client);
@@ -120,6 +135,23 @@ class Socket {
         }
       }, 30e3);
     });
+  }
+
+  /**
+   * Handles a client disconnecting from the socket
+   * @param {UnionClient} client The client disconnecting
+   * @private
+   */
+  _close (client) {
+    this.clients = this.clients.filter(c => c.id !== client.id);
+    if (client.isAuthenticated && 0 === this.getClientsByUserID(client.user._id).length) {
+      App.getInstance().db.presences.setPresence(client.user._id, false);
+      const clients = this.getClientsByServersID(client.user.servers).filter(c => c.user._id !== client.user._id);
+      Dispatcher.presenceUpdate(clients, {
+        user: client.user._id,
+        online: false
+      });
+    }
   }
 }
 

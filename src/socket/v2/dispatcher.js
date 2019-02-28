@@ -58,6 +58,18 @@ class Dispatcher {
   /**
    * Dispatches a user update event
    * @param {UnionClient} client The client
+   * @param {Presence} presence The presence to dispatch
+   */
+  static presenceUpdate (client, presence) {
+    Dispatcher._dispatchEvent(client, JSON.stringify({
+      op: opcodes.DispatchEvent,
+      e: 'PRESENCE_UPDATE',
+      d: presence
+    }));
+  }
+  /**
+   * Dispatches a user update event
+   * @param {UnionClient} client The client
    * @param {User} user The up to date user
    */
   static userUpdate (client, user) {

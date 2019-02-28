@@ -13,11 +13,6 @@ build
 dist
 /index.html
 
-# Jekyll stuff
-docs/_site
-docs/.sass-cache
-docs/.jekyll-metadata
-
 # Config & certs
 config.json
 *.pem

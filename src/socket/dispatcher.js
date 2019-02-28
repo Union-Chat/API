@@ -44,6 +44,21 @@ class Dispatcher {
   //* User Events *//
   //***************//
   /**
+   * Dispatches a presence update event
+   * @param {UnionClient|Array<UnionClient>} client Client(s)
+   * @param {Presence} presence The presence to dispatch
+   */
+  static presenceUpdate (client, presence) {
+    if (Array.isArray(client)) {
+      return client.forEach(c => Dispatcher.presenceUpdate(c, presence));
+    }
+    switch (client.version) {
+      case 2:
+        DispatcherV2.presenceUpdate(client, presence);
+    }
+  }
+
+  /**
    * Dispatches a user update event
    * @param {UnionClient|Array<UnionClient>} client Client(s)
    * @param {User} user The up to date user
