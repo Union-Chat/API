@@ -76,8 +76,7 @@ class Servers {
     const server = await App.getInstance().db.servers.update(req.serverId, updates);
     res.json(server);
 
-    const members = await App.getInstance().db.servers.findUsers(req.serverId);
-    const clients = members.map(m => App.getInstance().socket.getClientsByUserID(m._id)).reduce((a, b) => [ ...a, ...b ], []);
+    const clients = App.getInstance().socket.getClientsByServerID(req.serverId);
     Dispatcher.serverUpdate(clients, server);
   }
 
@@ -95,8 +94,7 @@ class Servers {
     await App.getInstance().db.servers.delete(req.serverId);
     res.sendStatus(204);
 
-    const members = await App.getInstance().db.servers.findUsers(req.serverId);
-    const clients = members.map(m => App.getInstance().socket.getClientsByUserID(m._id)).reduce((a, b) => [ ...a, ...b ], []);
+    const clients = App.getInstance().socket.getClientsByServerID(req.serverId);
     Dispatcher.serverDelete(clients, req.serverId);
   }
 
@@ -126,8 +124,7 @@ class Servers {
     const selfClients = App.getInstance().socket.getClientsByUserID(req.user._id);
     Dispatcher.serverDelete(selfClients, req.serverId);
 
-    const members = await App.getInstance().db.servers.findUsers(req.serverId);
-    const clients = members.map(m => App.getInstance().socket.getClientsByUserID(m._id)).reduce((a, b) => [ ...a, ...b ], []);
+    const clients = App.getInstance().socket.getClientsByServerID(req.serverId);
     Dispatcher.serverMemberLeave(clients, req.serverId, req.user._id);
   }
 }

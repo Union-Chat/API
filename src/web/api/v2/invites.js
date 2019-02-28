@@ -53,9 +53,8 @@ class Invites {
     const selfClients = await App.getInstance().socket.getClientsByUserID(req.user._id);
     Dispatcher.serverCreate(selfClients, server);
 
-    const members = await App.getInstance().db.servers.findUsers(req.serverId);
-    const clients = members.map(m => App.getInstance().socket.getClientsByUserID(m._id)).reduce((a, b) => [ ...a, ...b ], []).filter(c => c.user._id !== req.user._id);
-    Dispatcher.serverMemberLeave(clients, req.serverId, req.user._id);
+    const clients = App.getInstance().socket.getClientsByServerID(req.serverId).filter(c => c.user._id !== req.user._id);
+    Dispatcher.serverMemberJoin(clients, req.serverId, req.user._id);
   }
 }
 

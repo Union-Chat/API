@@ -38,8 +38,7 @@ class Messages {
     const message = await App.getInstance().db.messages.create(req.user._id, serverId, content);
     res.json(message);
 
-    const members = await App.getInstance().db.servers.findUsers(req.serverId);
-    const clients = members.map(m => App.getInstance().socket.getClientsByUserID(m._id)).reduce((a, b) => [ ...a, ...b ], []);
+    const clients = App.getInstance().socket.getClientsByServerID(req.serverId);
     Dispatcher.messageCreate(clients, message);
   }
 
@@ -74,8 +73,7 @@ class Messages {
       return res.status(400).json({ error: `Content cannot exceed ${App.getInstance().config.settings.messageCharacterLimit} characters` });
     }
 
-    const members = await App.getInstance().db.servers.findUsers(req.serverId);
-    const clients = members.map(m => App.getInstance().socket.getClientsByUserID(m._id)).reduce((a, b) => [ ...a, ...b ], []);
+    const clients = App.getInstance().socket.getClientsByServerID(req.serverId);
     Dispatcher.messageUpdate(clients, message);
   }
 
@@ -104,8 +102,7 @@ class Messages {
     await App.getInstance().db.messages.delete(req.params.messageId);
     res.sendStatus(204);
 
-    const members = await App.getInstance().db.servers.findUsers(req.serverId);
-    const clients = members.map(m => App.getInstance().socket.getClientsByUserID(m._id)).reduce((a, b) => [ ...a, ...b ], []);
+    const clients = App.getInstance().socket.getClientsByServerID(req.serverId);
     Dispatcher.messageDelete(clients, req.params.messageId);
   }
 }
