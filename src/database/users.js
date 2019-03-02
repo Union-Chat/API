@@ -120,6 +120,7 @@ class Users {
 
     return aggregation.map(data => data.servers);
   }
+
   /**
    * Gets all servers the user owns
    * @param {ObjectId} _id User ID

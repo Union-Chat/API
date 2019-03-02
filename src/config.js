@@ -13,6 +13,11 @@ const { writeFile } = require('fs').promises;
  * @property {string} secret Secret key
  */
 
+/**
+ * @typedef UnionConfigRateLimits
+ * @property {string} max Max requests
+ * @property {string} window Window length, in seconds
+ */
 
 /**
  * Union config manager
@@ -33,6 +38,9 @@ const { writeFile } = require('fs').promises;
  * @property {UnionConfigServiceKeys} apps.spotify Client and secret keys for Spotify integration in Union
  * @property {UnionConfigServiceKeys} apps.reddit Client and secret keys for Reddit integration in Union
  * @property {UnionConfigServiceKeys} apps.twitter Client and secret keys for Twitter integration in Union
+ * @property {object} ratelimits RateLimits for Union
+ * @property {UnionConfigRateLimits} ratelimits.perEndpoint Pre-endpoint RateLimits
+ * @property {UnionConfigRateLimits} ratelimits.global Pre-endpoint RateLimits
  * @property {object} settings Settings for Union
  * @property {int} settings.messageCharacterLimit Max message length
  * @property {int} settings.usernameCharacterLimit Max username length

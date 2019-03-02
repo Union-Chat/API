@@ -61,6 +61,16 @@
       "secret": "..."
     }
   },
+  "ratelimits": {
+    "perEndpoint": {
+      "max": 5,
+      "window": 5
+    },
+    "global": {
+      "max": 69,
+      "window": 60
+    }
+  },
   "settings": {
     "_note": "Those settings will be editable through Admin dashboard",
     "messageCharacterLimit": 1000,

@@ -14,8 +14,8 @@ class Middlewares {
    */
   static globalRateLimit () {
     return new RateLimit({
-      max: 500,
-      windowMs: 50000,
+      max: App.getInstance().config.ratelimits.global.max,
+      windowMs: App.getInstance().config.ratelimits.global.window * 1000,
       store: new RedisStore({
         prefix: 'RateLimit:',
         client: App.getInstance().redis.redis
@@ -31,8 +31,8 @@ class Middlewares {
    */
   static rateLimit () {
     return new RateLimit({
-      max: 5,
-      windowMs: 1000,
+      max: App.getInstance().config.ratelimits.perEndpoint.max,
+      windowMs: App.getInstance().config.ratelimits.perEndpoint.window * 1000,
       store: new RedisStore({
         prefix: 'RateLimit:',
         client: App.getInstance().redis.redis
@@ -141,8 +141,8 @@ class Middlewares {
    */
   static _handleGlobalRL (req, res) {
     const ip = Middlewares._computeIp(req);
-    App.getInstance().redis.set(`RateLimit:Banned:${ip}`, 'yes');
-    res.status(429).send('You\'ve been banned from the API for 5 minutes due to abuse');
+    App.getInstance().redis.set(`RateLimit:Banned:${ip}`, 'yes', 600);
+    res.status(429).send('You\'ve been banned from the API for 10 minutes due to abuse');
   }
 
   /**
