@@ -8,6 +8,8 @@
  */
 class App {
   constructor () {
+    App.instance = this;
+
     // @see https://nodejs.org/api/modules.html
     // Even if it's ugly, we require files only here to prevent cyclic dependencies and weird bugs like empty objects.
     const Database = require('./database');
@@ -27,7 +29,7 @@ class App {
     console.log('Connecting to Mongo...');
     await this.db.connectToDB();
 
-    console.log('Starting HTTP server...');
+    console.log('Starting Express server...');
     this.web.startServer();
 
     console.log('Starting WebSocket...');
@@ -42,7 +44,7 @@ class App {
    */
   static getInstance () {
     if (!App.instance) {
-      App.instance = new App();
+      new App();
     }
     return App.instance;
   }
