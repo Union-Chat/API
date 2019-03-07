@@ -4,8 +4,8 @@
   "description": "Lightweight chat service built with NodeJS",
   "main": "build/index.js",
   "scripts": {
+    "getui": "git clone https://github.com/Union-Chat/union-react && cd union-react && npm i --prod false && npm run prod && cd .. && rm -rf dist && mv union-react/index.html index.html && mv union-react/dist dist && rm -rf union-react",
     "lint": "eslint **/*.js --ignore-pattern build/* --ignore-pattern dist/* --ignore-pattern docs/*",
-    "getui": "cross-env NODE_ENV=production node installer.js",
     "start": "cross-env NODE_ENV=production node src/index.js",
     "dev": "nodemon src/index.js --use-insecure"
   },
