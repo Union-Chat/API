@@ -4,7 +4,6 @@
   "description": "Lightweight chat service built with NodeJS",
   "main": "build/index.js",
   "scripts": {
-    "getui": "git clone https://github.com/Union-Chat/union-react && cd union-react && npm i --prod false && npm run prod && cd .. && rm -rf dist && mv union-react/index.html index.html && mv union-react/dist dist && rm -rf union-react",
     "lint": "eslint **/*.js --ignore-pattern build/* --ignore-pattern dist/* --ignore-pattern docs/*",
     "start": "cross-env NODE_ENV=production node src/index.js",
     "dev": "nodemon src/index.js --use-insecure"
@@ -13,21 +12,21 @@
   "author": "Kromatic",
   "license": "MIT",
   "dependencies": {
-    "bcrypt": "^3.0.4",
-    "body-parser": "^1.18.3",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
     "express": "^4.16.3",
-    "express-rate-limit": "^3.4.0",
-    "ioredis": "^4.6.2",
-    "mongodb": "^3.1.13",
-    "node-fetch": "^2.2.0",
+    "express-rate-limit": "^3.5.1",
+    "ioredis": "^4.9.3",
+    "mongodb": "^3.2.4",
+    "node-fetch": "^2.5.0",
     "prompt": "^1.0.0",
     "rate-limit-redis": "^1.6.0",
     "shortid": "^2.2.12",
-    "ws": "^6.1.4"
+    "ws": "^7.0.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "eslint": "^5.14.1",
-    "nodemon": "^1.18.10"
+    "eslint": "^5.16.0",
+    "nodemon": "^1.19.0"
   }
 }

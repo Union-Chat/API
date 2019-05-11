@@ -1,4 +1,4 @@
-const App = require('../../../app');
+const App = require('../../app');
 
 /**
  * Core controller

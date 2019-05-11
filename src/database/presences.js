@@ -29,7 +29,7 @@ class Presences {
    * @returns {Promise<Boolean>} If the user is online or not
    */
   async getPresence (user) {
-    return 'true' === await App.redis.getOrFetch(`Presences:${user}`, () => 'false', -1);
+    return await App.redis.getOrFetch(`Presences:${user}`, () => 'false', -1) === 'true';
   }
 
   /**

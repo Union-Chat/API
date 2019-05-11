@@ -23,8 +23,6 @@ const { writeFile } = require('fs').promises;
  * Union config manager
  * @property {object} ports Ports the app is listening to
  * @property {int} ports.web Port the express server is listening to
- * @property {int} ports.ws Port the websocket is listening to
- * @property {int} ports.voice Port the voice server is listening to
  * @property {object} certs Certificates for the app
  * @property {UnionConfigCert} certs.web Certificate for the express server
  * @property {UnionConfigCert} certs.ws Certificate for the websocket

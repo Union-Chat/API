@@ -1,8 +1,8 @@
 const { compare } = require('bcrypt');
 const querystring = require('querystring');
 
-const App = require('../../../app');
-const Dispatcher = require('../../../socket/dispatcher');
+const App = require('../../app');
+const Dispatcher = require('../../socket/dispatcher');
 
 /**
  * Users controller
@@ -47,7 +47,7 @@ class Users {
       }
     }
 
-    if (!username || 0 === username.trim().length) {
+    if (!username || username.trim().length === 0) {
       return res.status(400).json({ error: 'Username cannot be empty' });
     }
 
@@ -59,7 +59,7 @@ class Users {
       return res.status(400).json({ error: 'Your username contains prohibited characters' });
     }
 
-    if (!password || 5 > password.length) {
+    if (!password || password.length < 5) {
       return res.status(400).json({ error: 'Password cannot be empty and must be 5 characters long or more' });
     }
 
@@ -92,8 +92,8 @@ class Users {
       return res.sendStatus(403);
     }
 
-    if (undefined !== username) {
-      if (0 === username.trim().length) {
+    if (username !== undefined) {
+      if (username.trim().length === 0) {
         return res.status(400).json({ error: 'Username cannot be empty' });
       }
 
@@ -108,15 +108,15 @@ class Users {
       updates.username = username;
     }
 
-    if (undefined !== newPassword) {
-      if (5 > newPassword.length) {
+    if (newPassword !== undefined) {
+      if (newPassword.length < 5) {
         return res.status(400).json({ error: 'Password cannot be empty and must be 5 characters long or more' });
       }
 
       updates.password = username;
     }
 
-    if (undefined !== avatarUrl) {
+    if (avatarUrl !== undefined) {
       // @todo: Checking, and maybe allow file uploading instead of just linking, to protect end users IPs.
       updates.avatarUrl = avatarUrl;
     }

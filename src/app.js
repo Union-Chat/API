@@ -10,19 +10,22 @@ class App {
   constructor () {
     App.instance = this;
 
-    // @see https://nodejs.org/api/modules.html
     // Even if it's ugly, we require files only here to prevent cyclic dependencies and weird bugs like empty objects.
-    const Database = require('./database');
-    const Redis = require('./redis');
+    // @see https://nodejs.org/api/modules.html
     const Config = require('./config');
-    const Web = require('./web');
-    const Socket = require('./socket');
-
     this.config = new Config();
+
+    const Database = require('./database');
     this.db = new Database();
-    this.web = new Web();
-    this.socket = new Socket();
+
+    const Redis = require('./redis');
     this.redis = new Redis();
+
+    const Web = require('./web');
+    this.web = new Web();
+
+    const Socket = require('./socket');
+    this.socket = new Socket();
   }
 
   async start () {
@@ -32,10 +35,11 @@ class App {
     console.log('Starting Express server...');
     this.web.startServer();
 
+    // @todo: Move that to Union-Socket
     console.log('Starting WebSocket...');
     this.socket.startSocket();
 
-    console.log('Union successfully launched!');
+    console.log('Union API successfully launched!');
   }
 
   /**

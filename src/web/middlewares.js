@@ -47,9 +47,9 @@ class Middlewares {
    * @param {Response} res Client response
    * @param {Function} next Function to pass request to next middleware
    */
-  static blockBanned (req, res, next) {
+  static async blockBanned (req, res, next) {
     const ip = Middlewares._computeIp(req);
-    if (!!App.getInstance().redis.get(`RateLimit:Banned:${ip}`)) {
+    if (!!await App.getInstance().redis.get(`RateLimit:Banned:${ip}`)) {
       return res.sendStatus(403);
     }
     next();

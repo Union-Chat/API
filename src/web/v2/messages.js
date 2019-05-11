@@ -1,5 +1,5 @@
-const App = require('../../../app');
-const Dispatcher = require('../../../socket/dispatcher');
+const App = require('../../app');
+const Dispatcher = require('../../socket/dispatcher');
 
 /**
  * Messages controller

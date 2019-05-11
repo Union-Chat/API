@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const Middlewares = require('../../middlewares');
+const Middlewares = require('../middlewares');
 const Core = require('./core');
 const Users = require('./users');
 const Servers = require('./servers');
