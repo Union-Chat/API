@@ -1,7 +1,5 @@
-const fs = require('fs');
 const url = require('url');
 const http = require('http');
-const https = require('https');
 const shortid = require('shortid');
 const WebSocket = require('ws');
 
@@ -29,13 +27,7 @@ const Receiver = require('./receiver');
  */
 class Socket {
   constructor () {
-    this.server = process.argv.includes('--use-insecure-ws') || process.argv.includes('--use-insecure')
-      ? http.createServer()
-      : https.createServer({
-        cert: fs.readFileSync(App.getInstance().config.certs.ws.cert),
-        key: fs.readFileSync(App.getInstance().config.certs.ws.key)
-      });
-
+    this.server = http.createServer();
     this.socket = new WebSocket.Server({ server: this.server });
     this.clients = [];
   }

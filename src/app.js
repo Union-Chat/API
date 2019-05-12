@@ -33,7 +33,7 @@ class App {
     await this.db.connectToDB();
 
     console.log('Starting Express server...');
-    this.web.startServer();
+    await this.web.startServer();
 
     // @todo: Move that to Union-Socket
     console.log('Starting WebSocket...');

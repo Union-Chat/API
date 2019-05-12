@@ -5,22 +5,9 @@
     "voice": 2087
   },
   "certs": {
-    "_note": "Use --use-insecure and remove this part (the whole 'certs' key) if you don't want to use any cert",
-    "web": {
-      "_note": "Use --use-insecure-web and remove this part if you don't want to use a cert for the web server",
-      "cert": "/path/to/certificate.pem",
-      "key": "/path/to/key.pem"
-    },
-    "ws": {
-      "_note": "Use --use-insecure-ws and remove this part if you don't want to use a cert for the websocket",
-      "cert": "/path/to/certificate.pem",
-      "key": "/path/to/key.pem"
-    },
-    "voice": {
-      "_note": "Use --use-insecure-voice and remove this part if you don't want to use a cert for the voice server",
-      "cert": "/path/to/certificate.pem",
-      "key": "/path/to/key.pem"
-    }
+    "_note": "Remove this part if you don't want to use SSL",
+    "cert": "/path/to/certificate.pem",
+    "key": "/path/to/key.pem"
   },
   "services": {
     "recaptcha": {
